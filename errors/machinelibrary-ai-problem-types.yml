@@ -1,0 +1,77 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/machinelibrary-ai-openapi.yml 4xx/5xx responses; envelope shape confirmed live on 2026-09-19 (GET https://api.machinelibrary.ai/v2/documents/abc -> 401 {"detail":"Unauthorized","status":"error"})
+format: custom
+envelope:
+  media_type: application/json
+  schema:
+    type: object
+    required: [detail, status]
+    properties:
+      detail: {type: string, description: Human-readable reason}
+      status: {type: string, enum: [error]}
+  declared_in: components.schemas.RecognitionError ("The shared Machine Library error envelope") and inline on every downloadOriginaldocument* error response
+  observed_example: '{"detail":"Unauthorized","status":"error"}'
+  rfc9457: false
+  note: Most search/document/conversation error responses declare no content schema in the spec; the live 401 shows they use the same envelope. MCP tools surface billing/auth failures as isError results; the A2A endpoint answers unauthenticated messages with a normal agent message explaining how to authenticate rather than an error.
+problem_count: 14
+problems:
+- status: 400
+  title: Bad request
+  meaning: Invalid query, filters or result window; invalid URI or text filter; invalid document ID/URI/format; malformed package or Payment credential; invalid replacement query.
+  operations: [searchDocuments, getDocumentByUri, findSimilarDocuments, createConversationTurn, streamConversationTurn, editConversationStep, streamEditedConversationStep, downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI, createMppBalanceTopUp]
+  remediation: Check offset + limit <= 500, limit within 1-500 (1-100 for similar), percent-encode the URI, and use a package from the enum.
+- status: 401
+  title: Unauthorized
+  meaning: Missing or invalid API credential (X-Api-Key or Bearer).
+  operations: all authenticated operations
+  remediation: Create a key at https://machinelibrary.ai/keys or complete OAuth per auth.md; on the MCP host the 401 carries WWW-Authenticate with resource_metadata.
+- status: 402
+  title: Insufficient account balance
+  meaning: Prepaid USD balance is exhausted for a billed call; on createMppBalanceTopUp a 402 is the Stripe MPP payment challenge (or a verification failure) rather than a fault.
+  operations: [searchDocuments, getDocumentByUri, getDocument, findSimilarDocuments, createConversationTurn, streamConversationTurn, editConversationStep, streamEditedConversationStep, create_recognition, downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI, createMppBalanceTopUp]
+  remediation: Top up at https://machinelibrary.ai/payments, or as an agent retry POST /v2/payments/mpp/top-up with the Payment credential.
+- status: 403
+  title: Feature not enabled
+  meaning: The raw-document-downloads feature is missing from the account (feature-gated; see https://machinelibrary.ai/pricing).
+  operations: [downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+- status: 404
+  title: Not found
+  meaning: Document, source document, conversation, request step or recognition job not found (or no report/result yet for a job).
+  operations: [getDocumentByUri, getDocument, findSimilarDocuments, getConversation, deleteConversation, editConversationStep, streamEditedConversationStep, get_recognition, get_recognition_report, get_recognition_result, downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+  remediation: For fetch-by-URI the MCP source notes newly cited DOIs are crawled in the background — retry in a few minutes.
+- status: 409
+  title: Payment already being processed
+  operations: [createMppBalanceTopUp]
+  remediation: Do not re-fire; wait for the in-flight payment.
+- status: 413
+  title: File exceeds the upload limit
+  meaning: Recognition uploads are capped at 100 MB.
+  operations: [create_recognition]
+- status: 416
+  title: Range not satisfiable
+  meaning: Invalid, unsatisfiable or multipart Range header.
+  operations: [downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+- status: 422
+  title: Unprocessable
+  meaning: Invalid, expired or mismatched result receipt or ratings (feedback); unsupported or invalid document (recognition).
+  operations: [submitSearchFeedback, create_recognition]
+- status: 429
+  title: Active-job limit reached
+  meaning: Too many recognition jobs in flight for the account; wait for a job to finish. (General request rate limiting is signalled by x-ratelimit-* headers; a 429 for those was not observed.)
+  operations: [create_recognition]
+- status: 500
+  title: Search service failure
+  operations: [searchDocuments]
+- status: 502
+  title: Document storage is unavailable
+  operations: [downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+- status: 503
+  title: Service unavailable
+  meaning: Feedback signing is not configured; agent payments are temporarily disabled.
+  operations: [submitSearchFeedback, createMppBalanceTopUp]
+- status: 405
+  title: Method not allowed
+  meaning: Observed live on GET https://mcp.machinelibrary.ai/ and GET https://api.machinelibrary.ai/v2/acp/checkout_sessions — endpoints that exist and expect POST.
+  operations: []
+  method: probed

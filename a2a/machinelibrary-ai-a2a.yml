@@ -1,0 +1,97 @@
+generated: '2026-09-19'
+method: probed
+source: https://machinelibrary.ai/.well-known/agent-card.json
+card:
+  file: a2a/machinelibrary-ai-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: machinelibrary.ai
+  also_served_on:
+  - host: spacefrontiers.org
+    url: https://spacefrontiers.org/.well-known/agent-card.json
+    http_status: 200
+    note: Byte-identical body. spacefrontiers.org is the company's former product domain; its homepage 301s to machinelibrary.ai but the well-known path is answered directly. Both www. hosts redirect to the apex card.
+  - host: www.machinelibrary.ai
+    url: https://www.machinelibrary.ai/.well-known/agent-card.json
+    http_status: 200
+    note: Redirects to the apex card.
+  note: >-
+    Ownership is not in question: provider.organization is "Space Frontiers" with provider.url https://machinelibrary.ai,
+    the card's url https://machinelibrary.ai/a2a is on the same apex that serves the OpenAPI and the RFC 9728
+    protected-resource metadata ("Machine Library by Space Frontiers"), and the press kit dated 2026-09-12 states
+    that Space Frontiers' search product moved from spacefrontiers.org to machinelibrary.ai. The legacy
+    /.well-known/agent.json 404s (Nuxt JSON 404 body) on every host, and the API and MCP hosts 404 both paths.
+conformance:
+  spec: A2A 1.0.0 (card declares protocolVersion 0.3.0)
+  grade: conformant
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: []
+  observations:
+  - Carries BOTH a spec `additionalInterfaces` array and a non-spec `supportedInterfaces` array with identical content (url https://machinelibrary.ai/a2a, protocolBinding + transport JSONRPC). The duplicate is tolerated by parsers and is not a hard failure.
+  - Declares two AP2 (Agentic Payments Protocol) extensions under capabilities.extensions with params.roles [merchant], uris https://github.com/google-agentic-commerce/AP2/tree/v0.1.0 and https://github.com/google-agentic-commerce/ap2/v1; required false.
+  - securitySchemes uses OpenAPI-style objects (http bearer + apiKey header X-Api-Key); security lists both as alternatives.
+agent_card:
+  name: Machine Library
+  description: Research and commerce agent for the Machine Library knowledge platform by Space Frontiers Company.
+  version: 0.1.0
+  url: https://machinelibrary.ai/a2a
+  documentation_url: https://api.machinelibrary.ai/auth.md
+  provider:
+    organization: Space Frontiers
+    url: https://machinelibrary.ai
+  capabilities:
+    streaming: true
+    push_notifications: false
+    state_transition_history: false
+    extensions: 2
+  skills: 3
+  skill_ids: [research, search-access, credit-top-up]
+  default_input_modes: [text/plain]
+  default_output_modes: [text/plain, application/json]
+  security: [bearer (http bearer - API key or OAuth 2.1 access token), apiKey (header X-Api-Key)]
+live_endpoint:
+  url: https://machinelibrary.ai/a2a
+  probed: '2026-09-19'
+  method: POST JSON-RPC message/send, unauthenticated
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  result: >-
+    A well-formed JSON-RPC result of kind "message", role "agent", with a messageId and contextId, whose text
+    explains that grounded research requires an authenticated credential (Authorization: Bearer or X-Api-Key),
+    points at https://machinelibrary.ai/keys and https://api.machinelibrary.ai/auth.md, and names the ACP checkout
+    (https://api.machinelibrary.ai/v2/acp/checkout_sessions) and MPP top-up (https://api.machinelibrary.ai/v2/payments/mpp/top-up) endpoints.
+  response_headers_of_note:
+    x-ratelimit-limit: '120'
+    x-ratelimit-remaining: '119'
+    content-signal: ai-train=no, search=yes, ai-input=yes
+  note: The endpoint is a callable agent surface, not a documentation page; the research skill itself is auth-gated and billed per turn, which this pipeline did not exercise.
+registry_listing:
+  a2aregistry_org: listed (harvest source 2026-09-19; author "Space Frontiers", agent "Machine Library")
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://machinelibrary.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 3245
+  body_parses_as: JSON object with AgentCard shape (name, url, version, protocolVersion, capabilities, skills all present)
+  corroborating_probes:
+  - url: https://spacefrontiers.org/.well-known/agent-card.json
+    http_status: 200
+  - url: https://machinelibrary.ai/.well-known/agent.json
+    http_status: 404
+  - url: https://api.machinelibrary.ai/.well-known/agent-card.json
+    http_status: 404
+  - url: https://mcp.machinelibrary.ai/.well-known/agent-card.json
+    http_status: 404
+  - url: https://machinelibrary.ai/a2a
+    http_status: 200
+    note: POST JSON-RPC message/send answered with a JSON-RPC result (see live_endpoint).

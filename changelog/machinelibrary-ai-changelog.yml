@@ -1,0 +1,42 @@
+generated: '2026-09-19'
+method: searched
+source: https://machinelibrary.ai/press
+sources:
+- https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers (dated, provider-published server versions)
+- https://raw.githubusercontent.com/SpaceFrontiers/mcp/main/server.json
+- https://pypi.org/pypi/spacefrontiers-clients/json (release dates)
+summary: >-
+  Machine Library publishes no changelog page (/changelog answers a Cloudflare 403 edge page; nothing in the sitemap).
+  The dated record below is reconstructed from the provider's own press notice and the version history it published to
+  the official MCP registry and PyPI; it is a partial history, not a provider changelog.
+changelog_published: false
+scheme: semver for the MCP server (0.2.1 -> 0.3.2) and the Python client (0.0.x); REST contract carries info.version 0.1.0 with URI-path v1/v2
+current:
+  mcp_server: 0.3.1 (registry, 2026-09-12); 0.3.2 in repo server.json
+  rest_openapi: 0.1.0
+  recognition_openapi: 1.0.0
+  python_client: spacefrontiers-clients 0.0.115 (2026-03-12)
+entries:
+- date: '2026-09-12'
+  version: 0.3.1
+  breaking: false
+  highlights:
+  - Space Frontiers search renamed Machine Library; product moved to machinelibrary.ai with redirects from spacefrontiers.org.
+  - New hosts api.machinelibrary.ai and mcp.machinelibrary.ai; api.spacefrontiers.org and mcp.spacefrontiers.org kept as compatible endpoints; accounts, subscriptions and API keys carry over.
+  - MCP registry entry retargeted to remotes https://mcp.machinelibrary.ai/ with title "Machine Library by Space Frontiers".
+  source: https://machinelibrary.ai/press; registry.modelcontextprotocol.io
+- date: '2026-07-29'
+  version: 0.3.0
+  breaking: false
+  highlights: ["MCP server 0.3.0: 'Citable retrieval across papers, books, patents, Wikipedia, and live social sources.'"]
+  source: registry.modelcontextprotocol.io
+- date: '2026-05-07'
+  version: 0.2.1
+  breaking: false
+  highlights: ["MCP server 0.2.1: 'Full-text retrieval: papers, books, patents, Wikipedia, Reddit, Telegram, YouTube. With citations.'"]
+  source: registry.modelcontextprotocol.io
+- date: '2026-03-12'
+  version: 0.0.115
+  breaking: false
+  highlights: [Latest release of the spacefrontiers-clients Python package (110 releases on PyPI).]
+  source: https://pypi.org/pypi/spacefrontiers-clients/json

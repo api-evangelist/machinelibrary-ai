@@ -1,0 +1,44 @@
+# Machine Library
+
+> Machine Library is the search and AI product by Space Frontiers Company. It is a full-text retrieval API and MCP server over millions of academic papers, books, patents, Wikipedia articles, YouTube transcripts, and live social posts from Reddit, Telegram, and Discord. Built for AI agents doing literature review, fact-checking, citation walking, and grounded research synthesis. It provides compact search snippets plus bounded full-text retrieval where source content is available.
+
+Two corpora, one API:
+
+- **documents** — peer-reviewed papers (CrossRef, PubMed, arXiv), books, patents (USPTO), Wikipedia, technical standards, manuals, and YouTube video transcripts.
+- **social** — Reddit, Telegram, and Discord.
+
+Three integration surfaces:
+
+- **MCP server** — `https://mcp.machinelibrary.ai` (Streamable HTTP transport, OAuth 2.0 with PKCE or Bearer API key). Drop-in for Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any MCP-compatible agent.
+- **REST API** — `https://api.machinelibrary.ai` (OpenAPI 3.1). Core endpoints include `POST /v2/search/`, `POST /v2/search/similar`, token-bounded text fetches at `GET /v2/documents/{document_id}` and `GET /v2/documents/by-uri/{uri}`, original-file streams at `GET /v2/downloads/{document_id}.{format}` and `GET /v2/downloads/by-uri/{uri}`, and `POST /v2/conversations/`. Full machine-readable spec at `https://machinelibrary.ai/docs/openapi.json`.
+- **Web app** — `https://machinelibrary.ai/c/` for conversational search in the browser.
+
+MCP tools (all read-only and idempotent):
+
+- `spacefrontiers_search_documents` — search papers, books, patents, Wikipedia, and YouTube transcripts. Use for peer-reviewed claims, citations, prior art, and video sources.
+- `spacefrontiers_search_social` — search Reddit, Telegram, and Discord. Use for news, current events, community sentiment.
+- `spacefrontiers_fetch_document` — return bounded full text (40K characters by default, up to 100K) + references for one canonical URI.
+- `spacefrontiers_search_in_document` — return up to five matching passages within one large document by query.
+
+Search defaults to 10 compact, reranked hits. Every hit includes `source_uri`, `score`, one bounded `snippet`, an abstract preview, `authors`, `issued_date`, and `content_size_tokens` for typed parsing and citation. Cite results by the canonical `source_uri` (DOI URL, arXiv URL, Reddit permalink, Telegram message URL); do not invent or guess identifiers.
+
+Supported URI schemes for fetch and per-document search: `doi:10.…` (or its `doi.org/<DOI>` URL), `arxiv:2301.00001`, `pmid:12345678`, `isbn:9780262033848`, Reddit permalinks (`https://reddit.com/r/<sub>/comments/…`), Telegram (`@channel_username` resolved automatically, or `https://t.me/…`), YouTube (`https://www.youtube.com/watch?v=…`).
+
+## Docs
+
+- [Product overview](https://machinelibrary.ai/): what Machine Library is and who it serves.
+- [MCP server](https://machinelibrary.ai/mcp): hosted endpoint, OAuth + API-key install snippets, one-click links for Cursor and VS Code.
+- [API reference](https://machinelibrary.ai/docs/api/reference): interactive OpenAPI explorer (Scalar) for all public REST endpoints.
+- [OpenAPI spec (JSON)](https://machinelibrary.ai/docs/openapi.json): machine-readable schema for search, conversations, text document fetches, raw PDF/EPUB/DJVU downloads by ID or URI, running line, similarity search, and recognition.
+- [Authentication](https://machinelibrary.ai/keys): API key management, OAuth scopes (`search`).
+- [Pricing](https://machinelibrary.ai/pricing): current usage rates, billing units, account options, and raw-download access terms.
+- [Premium datasets for purchase](https://machinelibrary.ai/datasets): bulk dataset access for AI training and enterprise use.
+
+## Optional
+
+- [Conversational web UI](https://machinelibrary.ai/c/)
+- [Account & API keys](https://machinelibrary.ai/keys)
+- [Payments](https://machinelibrary.ai/payments)
+- [Privacy](https://machinelibrary.ai/privacy)
+- [Terms](https://machinelibrary.ai/terms-of-service)
+- [Contact](https://machinelibrary.ai/contacts)

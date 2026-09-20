@@ -1,0 +1,36 @@
+generated: '2026-09-19'
+method: searched
+source: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+docs: https://api.machinelibrary.ai/auth.md
+sources:
+- https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource (scopes_supported [search])
+- https://machinelibrary.ai/.well-known/oauth-protected-resource (scopes_supported [search])
+- https://api.machinelibrary.ai/auth.md ("Scope and policies")
+- https://machinelibrary.ai/llms.txt ("OAuth scopes (search)")
+note: >-
+  The OpenAPI declares no oauth2 securityScheme (derive-oauth-scopes.py correctly found nothing); OAuth 2.1 access
+  tokens are accepted by the REST API through the bearer_auth http scheme ("Send the same API key, or an OAuth 2.0
+  access token, as a Bearer token") and by the MCP server. The scope vocabulary therefore comes from the RFC 8414 /
+  RFC 9728 metadata and auth.md, all provider-published and fetched live on 2026-09-19.
+authorization_server: https://api.spacefrontiers.org
+resources:
+- https://mcp.machinelibrary.ai
+- https://mcp.spacefrontiers.org
+- https://machinelibrary.ai
+- https://spacefrontiers.org
+scope_count: 1
+scopes:
+- name: search
+  description: Search the corpus and retrieve research documents using the user's account credits.
+  source: https://api.machinelibrary.ai/auth.md ("Scope and policies")
+  grants: [authorization_code, refresh_token, 'urn:workos:agent-auth:grant-type:claim', 'urn:ietf:params:oauth:grant-type:jwt-bearer']
+  mcp_tools: [spacefrontiers_search_documents, spacefrontiers_search_social, spacefrontiers_fetch_document, spacefrontiers_search_in_document]
+  note: The only scope offered; auth.md instructs clients to "request only search". Payment tools/endpoints are not covered by a distinct scope in the published metadata.
+grant_types_supported:
+- authorization_code
+- refresh_token
+- urn:ietf:params:oauth:grant-type:jwt-bearer
+- urn:workos:agent-auth:grant-type:claim
+pkce: S256
+dynamic_client_registration: https://api.spacefrontiers.org/v2/oauth/register
+token_endpoint_auth_methods_supported: [none]

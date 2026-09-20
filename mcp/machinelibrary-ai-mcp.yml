@@ -1,0 +1,160 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: https://machinelibrary.ai/mcp
+sources:
+- https://machinelibrary.ai/.well-known/mcp/server-card.json (saved verbatim: mcp/machinelibrary-ai-server-card.json)
+- https://machinelibrary.ai/install.md (saved verbatim: skills/machinelibrary-ai-install.md)
+- https://machinelibrary.ai/llms.txt (tool list)
+- https://github.com/SpaceFrontiers/mcp (MIT source: tools.py, prompts.py, resources.py, server.json, registry.json, smithery.yaml, AGENTS.md)
+- https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers (io.github.SpaceFrontiers/mcp, versions 0.2.1 -> 0.3.1)
+- https://api.machinelibrary.ai/auth.md
+deployment:
+  mode: both
+  endpoint: https://mcp.machinelibrary.ai
+  legacy_endpoint: https://mcp.spacefrontiers.org
+  install: "git clone https://github.com/SpaceFrontiers/mcp.git && cd mcp && uv sync && SEARCH_API_ENDPOINT=https://api.machinelibrary.ai SPACE_FRONTIERS_API_KEY=<key> uv run fastmcp run mcp_server.py"
+  package: https://github.com/SpaceFrontiers/mcp
+  package_note: pyproject name spacefrontiers-mcp 0.3.1, but it is NOT published to PyPI (pypi.org/pypi/spacefrontiers-mcp 404 on 2026-09-19); the stdio path is a source checkout run with uv, exactly as the README's "Self-hosted (stdio)" section states.
+  auth: oauth
+  auth_detail: OAuth 2.1 authorization code + PKCE S256 with RFC 7591 dynamic client registration against https://api.spacefrontiers.org (scope search), OR a long-lived Bearer API key from https://machinelibrary.ai/keys; the WorkOS-style service_auth claim flow is offered for clients that cannot receive a browser callback (auth.md).
+  verified: probed
+  verification: >-
+    POST https://mcp.machinelibrary.ai/ with tools/list and with initialize (Accept: application/json, text/event-stream)
+    both returned HTTP 401 "Authentication required" with WWW-Authenticate: Bearer
+    resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource" and x-ratelimit-limit: 60.
+    GET / returns 405. The legacy mcp.spacefrontiers.org answers identically with its own resource_metadata URL.
+    tools/list is therefore auth-gated; the tool inventory below is taken from the provider's published sources,
+    and the input schemas from the provider's MIT-licensed server source (tools.py), not from a live introspection.
+server:
+  name: org.spacefrontiers/search
+  registry_name: io.github.SpaceFrontiers/mcp
+  title: Machine Library by Space Frontiers
+  server_info_name: Machine Library MCP Server
+  version: 0.3.1
+  transport: streamable-http
+  url: https://mcp.machinelibrary.ai
+  stateless: true
+  supported_protocol_versions: ['2025-03-26', '2025-06-18', '2025-11-25']
+  capabilities:
+    tools: true
+    prompts: true
+    resources: false
+  capabilities_note: server-card says resources false, but the source registers one resource template (spacefrontiers://document/{uri_b64}); recorded as declared by the provider, discrepancy noted.
+  listings:
+  - Official MCP Registry (registry.modelcontextprotocol.io) as io.github.SpaceFrontiers/mcp — 0.2.1 (2026-05-07), 0.3.0 (2026-07-29), 0.3.1 (2026-09-12); repo server.json already says 0.3.2
+  - Smithery (smithery.ai/servers/@SpaceFrontiers/mcp)
+  - Glama (glama.ai/mcp/servers/SpaceFrontiers/mcp)
+  - one-click install links for Cursor, VS Code, VS Code Insiders on https://machinelibrary.ai/mcp
+  license: MIT
+auth:
+  methods: [oauth2, apikey]
+  oauth2:
+    authorization_server: https://api.spacefrontiers.org
+    protected_resource_metadata: https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource
+    authorization_server_metadata: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+    scopes_supported: [search]
+    grant_types: [authorization_code, refresh_token, 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'urn:workos:agent-auth:grant-type:claim']
+    pkce: S256
+    dynamic_client_registration: https://api.spacefrontiers.org/v2/oauth/register
+    token_endpoint_auth_methods: [none]
+    discovery: well-known/machinelibrary-ai-mcp-oauth-protected-resource.json
+  apikey:
+    header: Authorization
+    scheme: Bearer
+    key_prefix: sf_live_
+    keys_page: https://machinelibrary.ai/keys
+tool_count: 5
+tools:
+- name: spacefrontiers_search_documents
+  category: search
+  read_only: true
+  idempotent: true
+  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
+  description: Search papers, books, patents, standards, Wikipedia, and YouTube transcripts (the `documents` index). Defaults to 10 compact, reranked hits.
+  inputSchema:
+    source: tools.py (provider source, commit on main 2026-09-12); schema shape as FastMCP generates it from these annotated parameters
+    type: object
+    properties:
+      query: {type: string, maxLength: 16384, default: '', description: Free-text search query; may be empty when at least one filter is supplied}
+      limit: {type: integer, minimum: 1, maximum: 30, default: 10}
+      offset: {type: integer, minimum: 0, exclusiveMaximum: 500, default: 0, description: offset + limit must not exceed 500}
+      filter_issns: {type: [array, 'null'], items: {type: string}, description: Journal ISSN, hyphenated or plain}
+      filter_types: {type: [array, 'null'], items: {type: string}, description: CrossRef-style document type (journal-article, book, book-chapter, proceedings-article, posted-content, patent)}
+      filter_issued_after: {type: [integer, 'null'], description: Unix seconds UTC}
+      filter_issued_before: {type: [integer, 'null'], description: Unix seconds UTC}
+  outputSchema: SearchResults {query, index, hits[DocumentResult], count, total, has_more, next_offset}
+  source_operation: openapi/machinelibrary-ai-openapi.yml#searchDocuments (index_names [documents])
+- name: spacefrontiers_search_social
+  category: search
+  read_only: true
+  idempotent: true
+  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
+  description: Search Reddit, Telegram channels, and Discord (the `social` index). Defaults to 10 compact, reranked hits.
+  inputSchema:
+    source: tools.py
+    type: object
+    properties:
+      query: {type: string, maxLength: 16384, default: ''}
+      limit: {type: integer, minimum: 1, maximum: 30, default: 10}
+      offset: {type: integer, minimum: 0, exclusiveMaximum: 500, default: 0}
+      filter_uri_prefixes: {type: [array, 'null'], items: {type: string}, description: e.g. https://reddit.com/r/MachineLearning/ or @channel_username}
+      filter_issued_after: {type: [integer, 'null']}
+      filter_issued_before: {type: [integer, 'null']}
+  outputSchema: SearchResults
+  source_operation: openapi/machinelibrary-ai-openapi.yml#searchDocuments (index_names [social])
+- name: spacefrontiers_fetch_document
+  category: documents
+  read_only: true
+  idempotent: true
+  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
+  description: Retrieve bounded full text (40K chars default, up to 100K) plus up to 50 references for one canonical URI (doi:, https://doi.org/, arxiv:, pmid:, isbn:, Reddit/Telegram/YouTube URLs). Citation backlinks are opt-in because they add a separately billed search.
+  inputSchema:
+    source: tools.py
+    type: object
+    required: [uri]
+    properties:
+      uri: {type: string, maxLength: 16384, description: Copy verbatim from a source_uri; do not guess}
+      max_chars: {type: integer, minimum: 1000, maximum: 100000, default: 40000}
+      referenced_by_limit: {type: integer, minimum: 0, maximum: 20, default: 0}
+  outputSchema: FullDocument {id, title, source_uri, uris, abstract, content, content_truncated, full_content_length, authors, issued_date, document_type, publisher, languages, tags, references[], referenced_by[]}
+  source_operation: openapi/machinelibrary-ai-openapi.yml#getDocumentByUri (+ searchDocuments when referenced_by_limit > 0)
+- name: spacefrontiers_search_in_document
+  category: documents
+  read_only: true
+  idempotent: true
+  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
+  description: Return up to five scored passages (2K chars each) matching a query inside one document, without the full body.
+  inputSchema:
+    source: tools.py
+    type: object
+    required: [uri, query]
+    properties:
+      uri: {type: string, maxLength: 16384}
+      query: {type: string, minLength: 1, maxLength: 16384}
+  outputSchema: DocumentPassages {source_uri, title, passages[{text, score, field, chunk_id, truncated}], passage_count, message}
+  source_operation: openapi/machinelibrary-ai-openapi.yml#getDocumentByUri (text_filter)
+- name: spacefrontiers_top_up_balance
+  category: payments
+  read_only: false
+  idempotent: false
+  description: Fund the account balance through a Stripe MPP payment challenge (fixed USD packages). Hosted-only capability named in install.md and the README; not in the open-source tools.py.
+  inputSchema:
+    source: not published (hosted-only tool; live tools/list is auth-gated)
+    note: "The REST equivalent takes {package: usd-5|usd-10|usd-25|usd-50|usd-100|usd-250|usd-500|usd-1000}."
+  source_operation: openapi/machinelibrary-ai-openapi.yml#createMppBalanceTopUp
+prompts:
+- name: deep_research_agent
+  description: A meticulous deep-research agent that finds high-quality, citable evidence and synthesizes accurate answers grounded in sources.
+  tags: [research, academic, citations]
+  source: prompts.py
+resources:
+- uri_template: spacefrontiers://document/{uri_b64}
+  name: Space Frontiers document
+  description: Canonical document URI, base64url-encoded; mirrors spacefrontiers_fetch_document for clients that browse resources.
+  source: resources.py
+runtime_notes:
+  rate_limit_header_observed: x-ratelimit-limit 60 / x-ratelimit-remaining / x-ratelimit-reset on the MCP host (unauthenticated 401)
+  billing: search $0.01 + $0.001 per returned result (10-hit default = $0.02); fetch $0.05; in-document search $0.015; referenced_by_limit > 0 adds a billed search (README pricing section, corroborated by /v1/pricing)
+  errors: insufficient funds and auth failures surface as MCP isError results (tools.py _handle_billing_errors)
+  origin_and_protocol_checks: auth.py enforces an Origin allowlist and an MCP-Protocol-Version allowlist

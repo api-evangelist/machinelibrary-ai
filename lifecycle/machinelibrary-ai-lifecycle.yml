@@ -1,0 +1,57 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://machinelibrary.ai/press (rename notice, 2026-09-12), https://machinelibrary.ai/terms-of-service
+  (change-notice clauses), auth.md / README / install.md (legacy-endpoint commitments),
+  registry.modelcontextprotocol.io (dated MCP server versions), and the OpenAPI (URI-path versioning, no deprecated operations).
+versioning:
+  scheme: URI path segment
+  current: v2 for search, documents, downloads, conversations and payments; v1 for recognitions and pricing
+  spec_versions: {machinelibrary-ai-openapi: 0.1.0, machinelibrary-ai-recognition-openapi: 1.0.0}
+  mcp_server_version: 0.3.1 in the MCP registry (2026-09-12); server.json on main already says 0.3.2
+  header_versioning: none documented for REST; the MCP host enforces an MCP-Protocol-Version allowlist (2025-03-26, 2025-06-18, 2025-11-25)
+  note: No OAuth issuer versioning; OAuth endpoints are under /v2/oauth/ on api.spacefrontiers.org.
+deprecation_policy:
+  published: false
+  detail: >-
+    No deprecation policy, Deprecation/Sunset headers or deprecated operations were found. Terms of Service 2.2 says
+    "The Provider reserves the right to add, modify, or remove Service functionality without prior notice"; 3.5 and 4.7
+    commit to 30 days' notice for rate and subscription price changes only. Recorded as absent — no Deprecation pointer emitted.
+  deprecated_operations: []
+compatibility_commitments:
+- statement: "The original https://mcp.spacefrontiers.org endpoint remains supported; use the resource URL advertised by the endpoint you connect to."
+  source: https://api.machinelibrary.ai/auth.md
+  verified: mcp.spacefrontiers.org still serves its RFC 9728 document and a 401 challenge on 2026-09-19.
+- statement: "New integrations use api.machinelibrary.ai and mcp.machinelibrary.ai. The original API and MCP endpoints continue to work. Existing accounts, subscriptions, and API keys carry over."
+  source: https://machinelibrary.ai/press (September 12, 2026)
+  verified: api.spacefrontiers.org serves /v1/pricing, /auth.md and the OAuth issuer metadata; the OpenAPI lists it as "Space Frontiers (compatible endpoint)".
+- statement: "Existing accounts, API keys, and spacefrontiers_* tool names remain compatible."
+  source: https://github.com/SpaceFrontiers/mcp README
+milestones:
+- date: '2026-09-12'
+  event: Space Frontiers search became Machine Library; product moved from spacefrontiers.org to machinelibrary.ai with redirects; MCP registry version 0.3.1 published the same day.
+  source: https://machinelibrary.ai/press
+- date: '2026-07-29'
+  event: MCP server 0.3.0 published to the official MCP registry (remote https://mcp.spacefrontiers.org/).
+  source: https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers
+- date: '2026-05-07'
+  event: MCP server 0.2.1 published to the official MCP registry.
+  source: https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers
+- date: '2024-06-19'
+  event: GitHub organization SpaceFrontiers created.
+  source: https://api.github.com/users/spacefrontiers
+status_page:
+  published: false
+  probes:
+  - {url: 'https://status.machinelibrary.ai/', result: no DNS / connection failed (curl exit, status 000)}
+  - {url: 'https://machinelibrary.ai/status', status: 403, note: Cloudflare edge page, not a status page}
+  note: No StatusPage pointer emitted.
+sla:
+  published: false
+  detail: Terms 6.1 "Ensure stable operation of the service" and 7.2 disclaim liability for technical interruptions; no uptime percentage or credits are published.
+token_lifetimes:
+  access_token: 1 hour (auth.md section 4; privacy policy section 4)
+  refresh_token: 30 days, rotates on every use, reuse revokes the chain (privacy policy section 4)
+  api_keys: do not expire automatically; revocable from account settings (privacy policy section 4)
+  authorization_code: deleted on exchange or after 60 seconds unused (privacy policy section 4)
+  claim: user_code expires_in 900 seconds (auth.md example)

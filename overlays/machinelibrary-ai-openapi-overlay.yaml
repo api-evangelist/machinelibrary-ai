@@ -1,0 +1,78 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Machine Library API
+  version: 2026-09-19
+  x-generated: '2026-09-19'
+  x-method: generated
+  x-source: >-
+    Generated from artifacts harvested in this repo (rate-limit headers observed live, the error envelope
+    observed on a live 401, the x-service-info and llms.txt links the provider publishes, and the terms /
+    pricing pages). Applied to openapi/machinelibrary-ai-openapi.yml; the original spec is never mutated.
+extends: ./openapi/machinelibrary-ai-openapi.yml
+actions:
+- target: $.info
+  description: Add contact, terms and external docs the provider publishes elsewhere on its site.
+  update:
+    contact:
+      name: Space Frontiers / Machine Library
+      url: https://machinelibrary.ai/contacts
+      email: contact@machinelibrary.ai
+    termsOfService: https://machinelibrary.ai/terms-of-service
+    x-pricing: https://api.machinelibrary.ai/v1/pricing
+    x-llms-txt: https://machinelibrary.ai/llms.txt
+- target: $
+  description: Point at the interactive reference (Scalar) and record the well-known discovery surface.
+  update:
+    externalDocs:
+      description: Machine Library API reference (Scalar)
+      url: https://machinelibrary.ai/docs/api/reference
+    x-well-known:
+      api-catalog: https://machinelibrary.ai/.well-known/api-catalog
+      oauth-protected-resource: https://machinelibrary.ai/.well-known/oauth-protected-resource
+      oauth-authorization-server: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+      agent-card: https://machinelibrary.ai/.well-known/agent-card.json
+      mcp-server-card: https://machinelibrary.ai/.well-known/mcp/server-card.json
+- target: $.tags
+  description: Declare the Payments tag used by createMppBalanceTopUp but missing from the tag list.
+  update:
+  - name: Payments
+    description: Prepaid-credit funding of the account balance through Stripe MPP payment challenges.
+- target: $.components
+  description: Name the shared error envelope observed live ({"detail":"Unauthorized","status":"error"}) and the rate-limit headers observed on every host.
+  update:
+    schemas:
+      ErrorEnvelope:
+        type: object
+        required: [detail, status]
+        properties:
+          detail: {type: string}
+          status: {type: string, enum: [error]}
+    headers:
+      X-RateLimit-Limit:
+        description: Requests permitted in the current window (observed 12 on api.machinelibrary.ai unauthenticated, 60 on mcp.machinelibrary.ai, 120 on machinelibrary.ai/a2a).
+        schema: {type: integer}
+      X-RateLimit-Remaining:
+        description: Requests remaining in the current window.
+        schema: {type: integer}
+      X-RateLimit-Reset:
+        description: Seconds until the window resets (observed 0).
+        schema: {type: integer}
+      X-Request-Id:
+        description: Per-request identifier returned by api.machinelibrary.ai and mcp.machinelibrary.ai.
+        schema: {type: string, format: uuid}
+- target: $.paths.*.*.responses.401
+  description: Attach the observed JSON error envelope to every 401 that declares no content.
+  update:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorEnvelope'
+        example: {detail: Unauthorized, status: error}
+- target: $.paths.*.*.responses.402
+  description: Note that 402 on non-payment operations means insufficient prepaid balance (top up at /payments or via createMppBalanceTopUp); on createMppBalanceTopUp it is the Stripe MPP challenge.
+  update:
+    x-remediation: Top up the prepaid USD balance at https://machinelibrary.ai/payments, or as an agent call POST /v2/payments/mpp/top-up (ACP checkout sessions also exist at /v2/acp/checkout_sessions).
+- target: $.paths['/v1/recognitions'].post
+  description: Surface the provider's own idempotency statement from the standalone Recognition spec.
+  update:
+    x-idempotent: Resubmitting identical content is idempotent and free (Machine Library Recognition API info.description).

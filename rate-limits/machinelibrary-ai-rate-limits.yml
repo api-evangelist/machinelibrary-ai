@@ -1,0 +1,54 @@
+generated: '2026-09-19'
+method: probed
+source: live unauthenticated responses on 2026-09-19 from https://api.machinelibrary.ai/v1/pricing, POST https://mcp.machinelibrary.ai/ (tools/list), POST https://machinelibrary.ai/a2a (message/send)
+docs: none — neither https://machinelibrary.ai/docs/api nor the API reference publishes a numeric rate limit; /docs/api/rate-limits 404
+summary: >-
+  No documented limits, but every host emits the legacy X-RateLimit-* header family on every response, so the
+  runtime signal an agent needs is present. The numbers below are what unauthenticated requests observed; the
+  authenticated per-key allowance may differ and has not been observed. The only 429 the contract declares is the
+  recognition active-job limit.
+confidence: medium
+limit_count: 3
+scopes:
+- scope: per-client (unauthenticated) on the REST host
+  surface: https://api.machinelibrary.ai (GET /v1/pricing)
+  window: unknown (x-ratelimit-reset read 0)
+  limit: 12
+  unit: requests
+  burst: null
+  status_on_exhaustion: 429 (not observed)
+  headers:
+  - {name: x-ratelimit-limit, observed_value: 12}
+  - {name: x-ratelimit-remaining, observed_value: 11}
+  - {name: x-ratelimit-reset, observed_value: 0}
+  note: The 401 on POST /v2/search/ and GET /v2/documents/{id} did NOT carry the headers; the 200 on /v1/pricing did.
+- scope: per-client on the MCP host
+  surface: https://mcp.machinelibrary.ai and https://mcp.spacefrontiers.org (POST tools/list, initialize)
+  window: unknown
+  limit: 60
+  unit: requests
+  status_on_exhaustion: 429 (not observed)
+  headers:
+  - {name: x-ratelimit-limit, observed_value: 60}
+  - {name: x-ratelimit-remaining, observed_value: 59}
+  - {name: x-ratelimit-reset, observed_value: 0}
+  note: Observed on the 401 challenge responses, so the counter applies before authentication.
+- scope: per-client on the A2A endpoint
+  surface: https://machinelibrary.ai/a2a (POST JSON-RPC message/send)
+  window: unknown
+  limit: 120
+  unit: requests
+  status_on_exhaustion: 429 (not observed)
+  headers:
+  - {name: x-ratelimit-limit, observed_value: 120}
+  - {name: x-ratelimit-remaining, observed_value: 119}
+  - {name: x-ratelimit-reset, observed_value: 0}
+contract_limits:
+- operation: create_recognition
+  status: 429
+  description: Active-job limit reached; wait for a job to finish. (count not published)
+- operation: searchDocuments
+  constraint: offset + limit <= 500; limit 1-500; query <= 16 KiB
+- operation: MCP spacefrontiers_search_*
+  constraint: limit 1-30 (default 10), offset < 500
+retry_after: not observed; no Retry-After documented

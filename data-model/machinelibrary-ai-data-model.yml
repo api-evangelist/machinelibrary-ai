@@ -1,0 +1,211 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/machinelibrary-ai-openapi.yml components.schemas $ref graph and id-reference fields
+description: Entity-relationship sketch of the Machine Library API. The Document itself is untyped in the contract (V2Hit.document
+  and V2DocumentResponse.document are empty schemas); its shape is documented in the MCP source DocumentResult/FullDocument
+  models (mcp/machinelibrary-ai-mcp.yml).
+identifiers:
+  document_id: opaque Machine Library ID (e.g. 31tlqhmn2jmoh3gzlea74trb3 in the docs)
+  canonical_uri: doi:, https://doi.org/, arxiv:, pmid:, isbn:, Reddit permalink, https://t.me/..., YouTube watch URL
+  conversation: slug or numeric conversation_id_or_slug
+  recognition_job: uuid
+entities:
+- name: V2SearchResponse
+  fields:
+  - ranking_mode
+  - retrieval_traces
+  - trajectory
+  - candidate_ranking
+  - hits
+  - total_hits
+  - has_next
+  - timings
+  - embed_ms
+  - corrected_query
+  refs:
+  - CandidateRankingInfo
+  - RankingMode
+  - SearchTrajectory
+  - V2Hit
+  - V2Timings
+- name: V2Hit
+  fields:
+  - rrf
+  - candidate_scores
+  - id
+  - score
+  - snippets
+  - document
+  refs:
+  - CandidateScores
+  - RrfAttribution
+  - Snippet
+- name: Snippet
+  fields:
+  - field
+  - text
+  - score
+  - chunk_id
+  - evidence
+  refs:
+  - SnippetEvidence
+- name: V2DocumentResponse
+  fields:
+  - id
+  - uris
+  - document
+  refs: []
+- name: ByUriResponse
+  fields: []
+  refs:
+  - V2DocumentResponse
+  - V2SearchResponse
+- name: ConversationMetadata
+  fields:
+  - id
+  - title
+  - created_at
+  - slug
+  - query
+  - user_id
+  - preview
+  refs: []
+- name: FullConversation
+  fields:
+  - conversation_metadata
+  - conversation_steps
+  refs:
+  - ConversationMetadata
+  - ConversationStep
+- name: ConversationStep
+  fields: []
+  refs:
+  - ConversationRequest
+  - ConversationResponse
+- name: ConversationRequest
+  fields:
+  - id
+  - conversation_id
+  - document_ids
+  - query
+  - llm_config
+  - sources_filters
+  - sources_literal_filters
+  - resolved_sources_literal_filters
+  - limit
+  - max_model_documents
+  - kind
+  refs:
+  - LlmConfig
+- name: ConversationResponse
+  fields:
+  - query_details
+  - trajectory
+  - id
+  - conversation_id
+  - answer
+  - search_documents
+  - citations
+  - query
+  - model_name
+  - kind
+  refs:
+  - CitationOccurrence
+  - Query
+  - QueryDetails
+  - SearchDocument
+  - SearchTrajectory
+- name: RecognitionSubmission
+  fields:
+  - deduplicated
+  - id
+  - status
+  refs: []
+- name: RecognitionJobStatus
+  fields:
+  - completed_at
+  - created_at
+  - error_class
+  - has_result
+  - id
+  - input_format
+  - languages
+  - report_url
+  - result_url
+  - started_at
+  - status
+  refs: []
+- name: SearchFeedback
+  fields:
+  - trajectory_id
+  - feedback_token
+  - feedback_id
+  - ratings
+  - useful
+  - comment
+  refs:
+  - RelevanceRating
+- name: FeedbackAccepted
+  fields:
+  - event_id
+  - trajectory_id
+  refs: []
+- name: SearchTrajectory
+  fields:
+  - id
+  - feedback_token
+  refs: []
+relationships:
+- from: V2SearchResponse
+  to: V2Hit
+  type: has_many
+  via: hits[]
+- from: V2Hit
+  to: Snippet
+  type: has_many
+  via: snippets[]
+- from: V2Hit
+  to: Document
+  type: has_one
+  via: document (untyped object) + id
+- from: V2SearchResponse
+  to: SearchTrajectory
+  type: has_one
+  via: trajectory (nullable)
+- from: V2DocumentResponse
+  to: Document
+  type: has_one
+  via: id, uris[], document
+- from: FullConversation
+  to: ConversationStep
+  type: has_many
+  via: conversation_steps[] (+ conversation_metadata)
+- from: ConversationRequest
+  to: Conversation
+  type: belongs_to
+  via: conversation_id (nullable; absent creates a new conversation)
+- from: ConversationRequest
+  to: Document
+  type: has_many
+  via: document_ids[] (pinned into retrieval)
+- from: ConversationRequest
+  to: LlmConfig
+  type: has_one
+  via: llm_config (required)
+- from: SimilarRequestV2
+  to: Document
+  type: belongs_to
+  via: document_id (seed)
+- from: RecognitionSubmission
+  to: RecognitionJobStatus
+  type: has_one
+  via: id (uuid) polled at /v1/recognitions/{id}
+- from: RecognitionJobStatus
+  to: RecognitionResult
+  type: has_one
+  via: result_url / report_url
+- from: SearchFeedback
+  to: V2SearchResponse
+  type: belongs_to
+  via: result receipt (422 on invalid/expired/mismatched receipt)
+schema_count: 45

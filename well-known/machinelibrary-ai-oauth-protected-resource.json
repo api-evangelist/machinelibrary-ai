@@ -1,0 +1,1 @@
+{"resource":"https://machinelibrary.ai","resource_name":"Machine Library by Space Frontiers","authorization_servers":["https://api.spacefrontiers.org"],"bearer_methods_supported":["header"],"scopes_supported":["search"],"resource_documentation":"https://machinelibrary.ai/auth.md"}

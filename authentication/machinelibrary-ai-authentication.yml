@@ -1,0 +1,78 @@
+generated: '2026-09-19'
+method: searched
+source: openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml (securitySchemes) upgraded with https://api.machinelibrary.ai/auth.md, the RFC 8414 / RFC 9728 metadata under well-known/, https://machinelibrary.ai/privacy (token lifetimes) and the MCP repo README/smithery.yaml (key prefix)
+docs: https://api.machinelibrary.ai/auth.md
+keys_page: https://machinelibrary.ai/keys
+summary:
+  types: [apiKey, http, oauth2]
+  api_key_in: [header]
+  one_credential_three_surfaces: The same API key authenticates the REST API (X-Api-Key or Bearer), the MCP server (Authorization Bearer) and the A2A agent (bearer or X-Api-Key security schemes in the card).
+  sign_in_methods: Google, GitHub, or email (press page); the /keys page 302s to /auth/signin for anonymous visitors.
+schemes:
+- name: api_key
+  type: apiKey
+  in: header
+  parameter: X-Api-Key
+  description: Machine Library API key from https://machinelibrary.ai/keys.
+  key_prefix: sf_live_ (example shape in the MCP README and smithery.yaml exampleConfig)
+  expiry: Long-lived; does not expire automatically, revocable from account settings (privacy policy section 4).
+  sources: [openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml]
+- name: bearer_auth
+  type: http
+  scheme: bearer
+  bearerFormat: API key or OAuth 2.0 access token
+  description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+  sources: [openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml]
+- name: oauth2
+  type: oauth2
+  issuer: https://api.spacefrontiers.org
+  metadata: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+  protected_resource_metadata:
+  - https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource
+  - https://machinelibrary.ai/.well-known/oauth-protected-resource
+  flows:
+    authorizationCode:
+      authorizationUrl: https://api.spacefrontiers.org/v2/oauth/authorize
+      tokenUrl: https://api.spacefrontiers.org/v2/oauth/token
+      refreshUrl: https://api.spacefrontiers.org/v2/oauth/token
+      revocationUrl: https://api.spacefrontiers.org/v2/oauth/revoke
+      registrationUrl: https://api.spacefrontiers.org/v2/oauth/register
+      scopes:
+        search: Search the corpus and retrieve research documents using the user's account credits.
+      pkce: S256 required
+      client_auth: none (public clients; token_endpoint_auth_methods_supported [none])
+      resource_indicator: Set the OAuth resource to https://mcp.machinelibrary.ai (auth.md section 7)
+    service_auth (agent claim flow):
+      description: >-
+        For agents that cannot receive a browser callback. POST https://api.spacefrontiers.org/v2/agent/identity
+        {"type":"service_auth","login_hint":"<user email>"} returns a registration_id, a secret claim_token and a
+        claim {user_code (6 digits), verification_uri, expires_in 900, interval 5}. The user opens the verification
+        URI, signs in with the matching verified email, confirms the code and approves; the agent polls the token
+        endpoint with grant_type=urn:workos:agent-auth:grant-type:claim&claim_token=... honouring
+        authorization_pending / slow_down / access_denied / expired_token. Approval yields a one-hour access_token
+        plus a service-signed identity_assertion; renew with grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=...
+      endpoints:
+        identity: https://api.spacefrontiers.org/v2/agent/identity (also served on api.machinelibrary.ai)
+        claim: https://api.spacefrontiers.org/v2/agent/identity/claim
+        claim_complete: https://api.spacefrontiers.org/v2/agent/identity/claim/complete (browser-only; agents must not call it)
+      constraints: Anonymous registration and external identity assertions are not accepted; the email is a login hint, not proof of identity.
+  token_lifetimes:
+    access_token: 3600 seconds
+    refresh_token: 30 days, rotating; reuse of a rotated token revokes the chain
+    authorization_code: deleted on exchange or after 60 seconds
+  audience_binding: Tokens are audience-bound to the requested MCP host (privacy policy section 4).
+  a2a_card_schemes:
+    bearer: http bearer — "Machine Library API key or OAuth 2.1 access token"
+    apiKey: header X-Api-Key
+operation_security:
+  default: Every REST operation lists api_key OR bearer_auth (the Recognition operations inherit the same two schemes in the standalone spec); no operation is anonymous except GET /v1/pricing, which answered 200 unauthenticated on 2026-09-19.
+  unauthenticated_observations:
+  - {url: 'POST https://api.machinelibrary.ai/v2/search/', status: 401, body: '{"detail":"Unauthorized","status":"error"}'}
+  - {url: 'POST https://mcp.machinelibrary.ai/ tools/list', status: 401, www_authenticate: 'Bearer resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource"'}
+  - {url: 'POST https://machinelibrary.ai/a2a message/send', status: 200, note: answered with an agent message describing how to authenticate}
+  - {url: 'GET https://api.machinelibrary.ai/v1/pricing', status: 200}
+safety_rules_from_provider:
+- Never ask a user to share a password, session cookie, API key, authorization code, access token, refresh token, claim token, or identity assertion in chat. (auth.md)
+- Store claim_token as a secret; show the user only the verification_uri and user_code together; do not email the code. (auth.md)
+- Send the access token only to the configured MCP resource. (auth.md)
+- On a 401, discard the credential, re-fetch both discovery documents, and restart registration if necessary. (auth.md)

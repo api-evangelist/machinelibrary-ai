@@ -1,0 +1,106 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/machinelibrary-ai-openapi.yml (parameters, envelopes, pagination fields), live response headers observed on
+  2026-09-19 on api.machinelibrary.ai / mcp.machinelibrary.ai / machinelibrary.ai, https://machinelibrary.ai/docs/api,
+  https://machinelibrary.ai/terms-of-service (refund and change-notice clauses), auth.md, and the MCP repo README.
+description: How the Machine Library REST API behaves across operations — auth style, idempotency, pagination, tracing, versioning, error envelope, rate-limit signalling, streaming — plus the reversibility profile of its write surface.
+base_url: https://api.machinelibrary.ai
+legacy_base_url: https://api.spacefrontiers.org (compatible endpoint, still served)
+api_style: REST over HTTPS, JSON request bodies (multipart for recognition uploads), JSON responses; SSE for streaming turns; binary streams for original downloads
+authentication:
+  scheme: X-Api-Key header, or the same key / an OAuth 2.1 access token as Authorization Bearer
+  detail: authentication/machinelibrary-ai-authentication.yml
+  scopes: scopes/machinelibrary-ai-scopes.yml
+idempotency:
+  coverage: partial
+  scope: [create_recognition]
+  mechanism: Content-hash idempotency on recognition submissions — "Resubmitting identical content is idempotent and free" (Recognition API info.description). No Idempotency-Key header exists.
+  writes_without_replay_protection: [createConversationTurn, streamConversationTurn, editConversationStep, streamEditedConversationStep, submitSearchFeedback, createMppBalanceTopUp]
+  concurrency_guards: createMppBalanceTopUp returns 409 "Payment is already being processed" — a double-submission guard for the in-flight payment, not key-based idempotency.
+  read_side: All search/document/download operations are GETs or read-only POST searches; the four MCP retrieval tools carry idempotentHint true and readOnlyHint true.
+  docs: https://api.machinelibrary.ai/v1/recognitions/docs/openapi.json
+dry_run_mode:
+  supported: false
+  note: No test mode, sandbox or dry-run flag is published; the pricing page says "Free credit already included for testing" without stating the amount.
+reversibility:
+  grade: documented
+  summary: >-
+    One write pair is reversible by construction (a created conversation can be deleted); nothing else on the write
+    surface has a published reversal, and prepaid funds are explicitly non-refundable. No reversal window is stated
+    anywhere, so the grade cannot be verified.
+  surfaces:
+  - write: createConversationTurn / streamConversationTurn (creates or extends a conversation)
+    reversal: deleteConversation
+    window: not stated
+    status: documented
+    docs: https://machinelibrary.ai/docs/api/reference
+  - write: editConversationStep / streamEditedConversationStep (replaces a request step and recomputes downstream steps)
+    reversal: none published (no undo or step history restore)
+    status: none
+  - write: deleteConversation
+    reversal: none published (no restore)
+    status: none
+  - write: create_recognition (asynchronous job)
+    reversal: none published (no cancel operation); identical resubmission is free
+    status: none
+  - write: submitSearchFeedback
+    reversal: none published
+    status: none
+  - write: createMppBalanceTopUp (prepaid credit purchase)
+    reversal: none — "The Provider does not refund unused funds on the User's balance, except in cases provided for by applicable law" (Terms 4.8); subscription cancellation keeps Pro active to period end with no partial refund (Terms 4.6)
+    status: none
+    docs: https://machinelibrary.ai/terms-of-service
+  read_only_surface: [searchDocuments, findSimilarDocuments, getDocument, getDocumentByUri, listConversations, getConversation, get_recognition, get_recognition_report, get_recognition_result, downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+pagination:
+  style: offset
+  request_params:
+    limit: 1-500, default 10 (search); 1-100 (similar); MCP tools cap limit at 30
+    offset: 0-499, default 0; offset + limit cannot exceed 500
+  response_fields:
+    hits: array of V2Hit
+    total_hits: integer
+    has_next: boolean
+    corrected_query: nullable string
+  mcp_projection: SearchResults {count, total, has_more, next_offset}
+  docs: https://machinelibrary.ai/docs/api/reference
+field_selection:
+  supported: partial
+  mechanism: max_tokens query parameter bounds returned document text ("return exactly the first N tokens"); text_filter turns a document fetch into an in-document passage search; index_names selects corpora; include_candidate_scores / include_rrf_scores / tracing opt into ranking diagnostics on search.
+filtering:
+  search_filters: [filter_types, filter_languages, filter_issns, filter_uri_prefixes, filter_issued_after, filter_issued_before]
+  ranking_controls: [mode (sparse|short_document|binary|hybrid|fulltext, default hybrid), ranking_mode (auto|documents|passages), l1 formula ranking, candidate_ranking, l2_rerank]
+  quoted_phrases: Wrap a span in double quotes to require ordered indexed tokens (SearchRequestV2.query description)
+request_tracing:
+  request_id_header: x-request-id
+  observed: UUID values on api.machinelibrary.ai and mcp.machinelibrary.ai responses; the apex sets an SF_STICKY cookie (Max-Age 600) on /a2a.
+  search_trajectory: V2SearchResponse.trajectory can be passed back to attribute a subsequent read (README example; "Do not publish trajectory tokens").
+versioning:
+  scheme: URI path (v1 recognitions/pricing, v2 everything else)
+  detail: lifecycle/machinelibrary-ai-lifecycle.yml
+  changelog: changelog/machinelibrary-ai-changelog.yml
+error_envelope:
+  media_type: application/json
+  shape: '{"detail": "<reason>", "status": "error"}'
+  rfc9457: false
+  detail: errors/machinelibrary-ai-problem-types.yml
+  billing_signal: HTTP 402 on any billed call when the prepaid balance is exhausted
+rate_limiting:
+  headers: [x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset]
+  observed_limits: {api.machinelibrary.ai unauthenticated: 12, mcp.machinelibrary.ai: 60, machinelibrary.ai/a2a: 120}
+  exhaustion_status: 429 declared only on create_recognition (active-job limit); general 429 not observed
+  detail: rate-limits/machinelibrary-ai-rate-limits.yml
+streaming:
+  sse: POST /v2/conversations/stream and PUT .../edit-step/{step_id}/stream return text/event-stream newline-delimited progress and result events
+  ranges: downloads accept Range and answer 206 / 416
+  a2a: capabilities.streaming true on the agent card
+webhooks:
+  supported: false
+  note: No webhook or AsyncAPI surface is published; recognition is poll-based (202 + Location).
+billing_conventions:
+  model: prepaid USD balance, per-request charge = base_price + multiplier x variable (Terms 3.2; /v1/pricing)
+  machine_readable_pricing: https://api.machinelibrary.ai/v1/pricing (also https://machinelibrary.ai/api/pricing)
+  detail: plans/machinelibrary-ai-plans-pricing.yml
+content_signals:
+  robots_txt: Content-Signal ai-train=no, search=yes, ai-input=yes; /api/ disallowed; sitemap https://machinelibrary.ai/sitemap.xml
+  response_header: 'content-signal: ai-train=no, search=yes, ai-input=yes (observed on machinelibrary.ai/a2a)'
