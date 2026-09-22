@@ -189,11 +189,12 @@ apis:
   tags:
   - Search
   - gRPC
-  - Open Source
+  - Open-Source
   tags_raw:
   - search
   - grpc
   - open-source
+  - Open Source
   properties:
   - type: Protobuf
     url: grpc/machinelibrary-ai-hermes.proto
