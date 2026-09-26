@@ -6,14 +6,19 @@ info:
     structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at
     https://machinelibrary.ai/docs/api/reference presents both specs merged.'
   license:
-    name: MIT
+    name: MIT (API description only; retrieved content retains its own rights)
     identifier: MIT
   version: 0.1.0
+  contact:
+    email: contact@machinelibrary.ai
+    name: Machine Library
+    url: https://machinelibrary.ai/contacts
+  termsOfService: https://machinelibrary.ai/terms-of-service
 servers:
-- url: https://api.machinelibrary.ai
-  description: Machine Library
-- url: https://api.spacefrontiers.org
-  description: Space Frontiers (compatible endpoint)
+- description: Machine Library
+  url: https://api.machinelibrary.ai
+- description: Space Frontiers (compatible endpoint)
+  url: https://api.spacefrontiers.org
 paths:
   /v2/search/:
     post:
@@ -37,15 +42,102 @@ paths:
                 $ref: '#/components/schemas/V2SearchResponse'
         '400':
           description: Invalid query, filters, or result window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '500':
           description: Search service failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Query or parameters could not be processed.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Search documents and public discussions. Results are bounded by offset + limit <= 500. Each completed billed
+        request can consume credits, including retries.
   /v2/search/feedback:
     post:
       tags:
@@ -66,11 +158,80 @@ paths:
                 $ref: '#/components/schemas/FeedbackAccepted'
         '422':
           description: Invalid, expired or mismatched result receipt or ratings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '503':
           description: Feedback signing is not configured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Missing or invalid credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Submit ratings bound to a valid search result receipt. Invalid or expired receipts return 422. Do not blindly
+        replay feedback after an uncertain outcome.
   /v2/documents/by-uri/{uri}:
     get:
       tags:
@@ -78,26 +239,26 @@ paths:
       summary: Fetch a document by canonical URI, or search inside it with `text_filter`.
       operationId: getDocumentByUri
       parameters:
-      - name: uri
+      - description: Percent-encoded canonical URI, such as doi://10.1000/example.
         in: path
-        description: Percent-encoded canonical URI, such as doi://10.1000/example.
+        name: uri
         required: true
         schema:
           type: string
-      - name: text_filter
-        in: query
-        description: When present, return up to five matching passages instead of the full document. Double-quoted spans must
+      - description: When present, return up to five matching passages instead of the full document. Double-quoted spans must
           occur verbatim in the passage.
+        in: query
+        name: text_filter
         required: false
         schema:
           type: string
-      - name: max_tokens
+      - description: Return exactly the first N content tokens. Omit to return all content tokens.
         in: query
-        description: Return exactly the first N content tokens. Omit to return all content tokens.
+        name: max_tokens
         required: false
         schema:
-          type: integer
           minimum: 0
+          type: integer
       responses:
         '200':
           description: Document or in-document search results.
@@ -107,15 +268,113 @@ paths:
                 $ref: '#/components/schemas/ByUriResponse'
         '400':
           description: Invalid URI or text filter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Query or parameters could not be processed.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Retrieve document text with optional token bounds and passage filtering. A repeated successful fetch can
+        incur another usage charge.
   /v2/documents/{document_id}:
     get:
       tags:
@@ -123,19 +382,19 @@ paths:
       summary: Fetch a document and its public metadata by Machine Library document ID.
       operationId: getDocument
       parameters:
-      - name: document_id
+      - description: Machine Library document ID.
         in: path
-        description: Machine Library document ID.
+        name: document_id
         required: true
         schema:
           type: string
-      - name: max_tokens
+      - description: Return exactly the first N content tokens. Omit to return all content tokens.
         in: query
-        description: Return exactly the first N content tokens. Omit to return all content tokens.
+        name: max_tokens
         required: false
         schema:
-          type: integer
           minimum: 0
+          type: integer
       responses:
         '200':
           description: Document content and public metadata.
@@ -145,13 +404,102 @@ paths:
                 $ref: '#/components/schemas/V2DocumentResponse'
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Query or parameters could not be processed.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Retrieve document text with optional token bounds and passage filtering. A repeated successful fetch can
+        incur another usage charge.
   /v2/search/similar:
     post:
       tags:
@@ -174,15 +522,113 @@ paths:
                 $ref: '#/components/schemas/V2SearchResponse'
         '400':
           description: Invalid request or limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Source document not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Query or parameters could not be processed.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Find documents similar to a supplied document. Search-capacity rejection returns 429; retry with bounded
+        backoff respecting Retry-After.
   /v2/conversations/:
     get:
       tags:
@@ -198,9 +644,57 @@ paths:
                 $ref: '#/components/schemas/ListConversationsResponse'
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: List conversations owned by the authenticated account.
     post:
       tags:
       - Conversations
@@ -222,13 +716,81 @@ paths:
                 $ref: '#/components/schemas/ConversationResponse'
         '400':
           description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and
+        has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn.
+        Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
   /v2/conversations/stream:
     post:
       tags:
@@ -251,13 +813,81 @@ paths:
                 type: string
         '400':
           description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and
+        has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn.
+        Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
   /v2/conversations/{slug}:
     get:
       tags:
@@ -265,9 +895,9 @@ paths:
       summary: Fetch a conversation and all recorded request/response steps.
       operationId: getConversation
       parameters:
-      - name: slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: slug
         required: true
         schema:
           type: string
@@ -280,20 +910,77 @@ paths:
                 $ref: '#/components/schemas/FullConversation'
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Conversation not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Read one conversation owned by the authenticated account; an unavailable conversation returns 404.
     delete:
       tags:
       - Conversations
       summary: Delete a conversation owned by the authenticated user.
       operationId: deleteConversation
       parameters:
-      - name: slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: slug
         required: true
         schema:
           type: string
@@ -302,11 +989,68 @@ paths:
           description: Conversation deleted.
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Conversation not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Delete a conversation owned by the authenticated account. No restore operation is provided.
   /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}:
     put:
       tags:
@@ -314,19 +1058,19 @@ paths:
       summary: Replace a request step and recompute the conversation from that point.
       operationId: editConversationStep
       parameters:
-      - name: conversation_id_or_slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: conversation_id_or_slug
         required: true
         schema:
           type: string
-      - name: step_id
+      - description: Recorded request step position.
         in: path
-        description: Recorded request step position.
+        name: step_id
         required: true
         schema:
-          type: integer
           format: int64
+          type: integer
       requestBody:
         content:
           application/json:
@@ -342,15 +1086,92 @@ paths:
                 $ref: '#/components/schemas/FullConversation'
         '400':
           description: Invalid replacement query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Conversation or request step not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and
+        has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn.
+        Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
   /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream:
     put:
       tags:
@@ -358,19 +1179,19 @@ paths:
       summary: Replace a request step and stream the recomputation as newline-delimited events.
       operationId: streamEditedConversationStep
       parameters:
-      - name: conversation_id_or_slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: conversation_id_or_slug
         required: true
         schema:
           type: string
-      - name: step_id
+      - description: Recorded request step ID.
         in: path
-        description: Recorded request step ID.
+        name: step_id
         required: true
         schema:
-          type: integer
           format: int64
+          type: integer
       requestBody:
         content:
           application/json:
@@ -386,15 +1207,92 @@ paths:
                 type: string
         '400':
           description: Invalid replacement query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
           description: Missing or invalid API credential.
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
           description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
           description: Conversation or request step not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and
+        has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn.
+        Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
   /v1/recognitions:
     post:
       operationId: create_recognition
@@ -424,6 +1322,10 @@ paths:
           description: Job accepted; poll the Location header.
         '401':
           description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '402':
           content:
             application/json:
@@ -447,6 +1349,13 @@ paths:
       summary: Submit a document for recognition
       tags:
       - Recognition
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      description: Submit a PDF, EPUB, or DJVU file. Poll the returned job until completion; identical content for the same
+        account is deduplicated without a new charge. A 429 active-job response means wait for an existing job to finish.
   /v1/recognitions/{id}:
     get:
       operationId: get_recognition
@@ -466,9 +1375,26 @@ paths:
           description: Current job state.
         '404':
           description: No such job for this account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Missing or invalid account credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       summary: Job status
       tags:
       - Recognition
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      description: Poll recognition progress for a job owned by your account. Timestamps and result links can be null while
+        work is pending. Poll with bounded backoff.
   /v1/recognitions/{id}/report:
     get:
       description: Quality verdict, score, rejection reasons, structured extraction (sections, references), and the processing
@@ -490,9 +1416,24 @@ paths:
           description: The recognition report.
         '404':
           description: No such job, or no report yet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Missing or invalid account credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       summary: Structured recognition report
       tags:
       - Recognition
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
   /v1/recognitions/{id}/result:
     get:
       operationId: get_recognition_result
@@ -512,9 +1453,26 @@ paths:
           description: The recognized document.
         '404':
           description: No such job, or no result yet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Missing or invalid account credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       summary: Recognized Markdown
       tags:
       - Recognition
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      description: Fetch recognized Markdown for your job. A 404 can mean the job has not produced a result yet; check its
+        status before retrying.
   /v2/downloads/{filename}:
     get:
       tags:
@@ -526,6 +1484,8 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
       parameters:
       - name: filename
         in: path
@@ -719,6 +1679,8 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
       parameters:
       - name: uri
         in: path
@@ -922,6 +1884,8 @@ paths:
       security:
       - bearer_auth: []
       - api_key: []
+      - oauth2:
+        - search
       requestBody:
         required: true
         content:
@@ -994,8 +1958,16 @@ paths:
           description: Payment settled and balance credited.
         '400':
           description: Malformed package or Payment credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '401':
           description: Missing or invalid account credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '402':
           description: MPP payment challenge or verification failure.
           headers:
@@ -1004,8 +1976,16 @@ paths:
                 type: string
         '409':
           description: Payment is already being processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '503':
           description: Agent payments are temporarily disabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   schemas:
     BatchInfo:
@@ -1337,7 +2317,7 @@ components:
       properties:
         formula:
           type: string
-          description: Hermes symbolic expression over named raw branch scores and organic `rrf`.
+          description: Summa symbolic expression over named raw branch scores and organic `rrf`.
         backfill:
           type: boolean
           description: Preserve organic scores and probe only missing cells when enabled.
@@ -1442,10 +2422,10 @@ components:
           - 'null'
           items: false
           prefixItems:
-          - type: string
-            format: date-time
-          - type: string
-            format: date-time
+          - format: date-time
+            type: string
+          - format: date-time
+            type: string
           description: (start, end) as RFC3339 datetimes in JSON.
         date_expression:
           type:
@@ -1801,7 +2781,7 @@ components:
           - number
           - 'null'
           format: float
-          description: Hermes candidate heap multiplier.
+          description: Summa candidate heap multiplier.
           default: 0.8500000238418579
         pruning:
           type:
@@ -1878,7 +2858,7 @@ components:
 
             to skip it. No-op unless the reranker is configured
 
-            (`reranker.enabled`). Runs after Hermes candidate selection.'
+            (`reranker.enabled`). Runs after Summa candidate selection.'
           default: true
         cross_rerank_candidates:
           type: integer
@@ -2159,14 +3139,16 @@ components:
       properties:
         completed_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+          - string
+          - 'null'
         created_at:
           format: date-time
           type: string
         error_class:
-          nullable: true
-          type: string
+          type:
+          - string
+          - 'null'
         has_result:
           type: boolean
         id:
@@ -2183,15 +3165,18 @@ components:
             type: string
           type: array
         report_url:
-          nullable: true
-          type: string
+          type:
+          - string
+          - 'null'
         result_url:
-          nullable: true
-          type: string
+          type:
+          - string
+          - 'null'
         started_at:
           format: date-time
-          nullable: true
-          type: string
+          type:
+          - string
+          - 'null'
         status:
           type: string
       type: object
@@ -2213,6 +3198,24 @@ components:
           - cancelled
           type: string
       type: object
+    ApiError:
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - additionalProperties: true
+            properties:
+              code:
+                type: string
+            type: object
+        status:
+          enum:
+          - error
+          type: string
+      required:
+      - status
+      - detail
+      type: object
   securitySchemes:
     api_key:
       type: apiKey
@@ -2224,6 +3227,17 @@ components:
       scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+    oauth2:
+      description: Authorization code with mandatory S256 PKCE. Public clients use dynamic registration; see https://machinelibrary.ai/auth.md.
+        Access spends the consenting account's credits.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+          refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+          scopes:
+            search: Search and retrieve research documents using your account credits.
+          tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      type: oauth2
 tags:
 - name: Search
   description: Ranked retrieval and document similarity.
@@ -2231,8 +3245,8 @@ tags:
   description: Fetch documents by ID or canonical URI.
 - name: Conversations
   description: Retrieval-augmented conversation workflows.
-- description: 'Document recognition: PDF, EPUB, and DJVU to structured Markdown with quality reports.'
-  name: Recognition
+- name: Recognition
+  description: 'Document recognition: PDF, EPUB, and DJVU to structured Markdown with quality reports.'
 - name: Raw document downloads
   description: Authenticated, feature-gated streaming of PDF, EPUB, and DJVU library originals.
 x-service-info:
@@ -2243,10 +3257,6 @@ x-service-info:
     apiReference: https://machinelibrary.ai/docs/api/reference
     homepage: https://machinelibrary.ai
     llms: https://machinelibrary.ai/llms.txt
-x-api-evangelist:
-  method: searched
-  source: https://machinelibrary.ai/openapi.json
-  fetched: '2026-09-19'
-  note: Saved verbatim from the provider host; converted JSON->YAML only. Also served at https://machinelibrary.ai/docs/openapi.json
-    (byte-identical) and, via redirect, spacefrontiers.org/openapi.json. The .well-known/api-catalog linkset names /docs/openapi.json
-    as the service-desc for https://api.machinelibrary.ai.
+externalDocs:
+  description: Authentication, limits, errors, retries, and API lifecycle
+  url: https://machinelibrary.ai/docs/api/operations

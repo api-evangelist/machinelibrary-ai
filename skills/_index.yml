@@ -1,11 +1,10 @@
 generated: '2026-09-19'
 method: searched
-source: >-
-  Two provider-published agent instruction documents saved verbatim (auth.md — which the OAuth
-  authorization-server metadata itself names as agent_auth.skill — and install.md, the MCP installation guide
-  written in the second person to an installing agent), plus four skills generated from
-  openapi/machinelibrary-ai-openapi.yml. Every generated step is grounded in an operationId present in that
-  spec; cross-cutting rules cite ../conventions/, ../errors/, ../authentication/ and ../rate-limits/.
+source: Two provider-published agent instruction documents saved verbatim (auth.md — which the OAuth authorization-server
+  metadata itself names as agent_auth.skill — and install.md, the MCP installation guide written in the second person
+  to an installing agent), plus four skills generated from openapi/machinelibrary-ai-openapi.yml. Every generated
+  step is grounded in an operationId present in that spec; cross-cutting rules cite ../conventions/, ../errors/,
+  ../authentication/ and ../rate-limits/.
 skills:
 - file: machinelibrary-ai-auth.md
   name: Agent authentication (service_auth and OAuth 2.1 PKCE)
@@ -14,30 +13,48 @@ skills:
   api: mcp/machinelibrary-ai-mcp.yml
   operations: []
   note: Verbatim. Also served at https://machinelibrary.ai/auth.md and https://api.spacefrontiers.org/auth.md.
+  verified: '2026-09-26'
 - file: machinelibrary-ai-install.md
   name: Install the Machine Library MCP server
   method: searched
   source: https://machinelibrary.ai/install.md
   api: mcp/machinelibrary-ai-mcp.yml
   operations: []
-  note: Verbatim. The /mcp page tells users to say "Install the Machine Library MCP from https://machinelibrary.ai/install.md" to an AI coding agent.
+  note: Verbatim. The /mcp page tells users to say "Install the Machine Library MCP from https://machinelibrary.ai/install.md"
+    to an AI coding agent.
+  verified: '2026-09-26'
 - file: machinelibrary-ai-grounded-research.md
   name: Grounded research with citations over REST
   method: generated
   api: openapi/machinelibrary-ai-openapi.yml
-  operations: [searchDocuments, getDocumentByUri, getDocument, findSimilarDocuments]
+  operations:
+  - searchDocuments
+  - getDocumentByUri
+  - getDocument
+  - findSimilarDocuments
 - file: machinelibrary-ai-recognize-document.md
   name: Recognize a PDF/EPUB/DJVU into Markdown
   method: generated
   api: openapi/machinelibrary-ai-openapi.yml
-  operations: [create_recognition, get_recognition, get_recognition_result, get_recognition_report]
+  operations:
+  - create_recognition
+  - get_recognition
+  - get_recognition_result
+  - get_recognition_report
 - file: machinelibrary-ai-conversation-turn.md
   name: Run and revise a retrieval-augmented conversation
   method: generated
   api: openapi/machinelibrary-ai-openapi.yml
-  operations: [createConversationTurn, streamConversationTurn, getConversation, editConversationStep, deleteConversation]
+  operations:
+  - createConversationTurn
+  - streamConversationTurn
+  - getConversation
+  - editConversationStep
+  - deleteConversation
 - file: machinelibrary-ai-agent-top-up.md
   name: Fund the prepaid balance as an agent (Stripe MPP)
   method: generated
   api: openapi/machinelibrary-ai-openapi.yml
-  operations: [createMppBalanceTopUp]
+  operations:
+  - createMppBalanceTopUp
+updated: '2026-09-26'

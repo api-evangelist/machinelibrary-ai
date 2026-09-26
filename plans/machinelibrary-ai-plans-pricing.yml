@@ -2,19 +2,20 @@ generated: '2026-09-19'
 method: probed
 source: https://api.machinelibrary.ai/v1/pricing
 sources:
-- https://api.machinelibrary.ai/v1/pricing (machine-readable; identical at https://machinelibrary.ai/api/pricing and https://api.spacefrontiers.org/v1/pricing)
+- https://api.machinelibrary.ai/v1/pricing (machine-readable; identical at https://machinelibrary.ai/api/pricing
+  and https://api.spacefrontiers.org/v1/pricing)
 - https://machinelibrary.ai/pricing (pricing model text; per-endpoint table is rendered from the endpoint above)
-- https://machinelibrary.ai/terms-of-service (3.2 formula, 4.2 arbitrary prepayment, 4.5-4.8 Pro subscription and refunds)
+- https://machinelibrary.ai/terms-of-service (3.2 formula, 4.2 arbitrary prepayment, 4.5-4.8 Pro subscription and
+  refunds)
 - openapi/machinelibrary-ai-openapi.yml createMppBalanceTopUp package enum + x-payment-info offers
-- https://github.com/SpaceFrontiers/mcp README "Pricing"
 checked: '2026-09-19'
-summary: >-
-  Pay-as-you-go from a prepaid USD balance with a published, machine-readable per-endpoint price list
-  (base_price + multiplier x variable), plus a monthly "Pro" subscription whose price is not published and a
-  feature-gated raw-download entitlement. No free tier is advertised beyond "Free credit already included for
-  testing" (amount unstated); the MCP registry.json says free_tier false.
+summary: Pay-as-you-go from a prepaid USD balance with a published, machine-readable per-endpoint price list (base_price
+  + multiplier x variable), plus a monthly "Pro" subscription whose price is not published and a feature-gated raw-download
+  entitlement. No free tier is advertised beyond "Free credit already included for testing" (amount unstated); the
+  MCP registry.json says free_tier false.
 currency: USD
-billing_model: prepaid balance, per-request deduction (Terms 3.3); Stripe cards (Visa, MasterCard, Amex) for humans, Stripe MPP / ACP for agents
+billing_model: prepaid balance, per-request deduction (Terms 3.3); Stripe cards (Visa, MasterCard, Amex) for humans,
+  Stripe MPP / ACP for agents
 prices_published: true
 plan_count: 2
 plans:
@@ -25,7 +26,7 @@ plans:
   cta: Get API keys
   onboarding: self-serve (sign up with Google, GitHub or email; create a key at /keys; top up any amount at /payments)
   included_quota: unstated "free credit ... for testing"
-  overage: n/a — every call is charged at the published rate
+  overage: "n/a \u2014 every call is charged at the published rate"
   rates:
   - endpoint: /v2/search
     endpoint_type: search
@@ -43,7 +44,8 @@ plans:
     base_price: 0.0
     multiplier: 7.32421875e-07
     variable: 4,096 returned tokens
-    derived_note: multiplier x 4096 = $0.003 per 4,096 returned tokens (arithmetic on the published fields; the MCP README rounds a default fetch to $0.05)
+    derived_note: The published multiplier times 4096 is USD 0.003 per 4096 returned tokens; consult the pricing
+      page for current billing units.
   - endpoint: /v2/downloads/{id}.{format}
     endpoint_type: download
     base_price: 0.02
@@ -56,27 +58,42 @@ plans:
     multiplier: 0.0
     variable: submitted document
     note: identical resubmissions are free
-  mcp_rates_from_readme:
-    search: $0.01 base + $0.001 per returned result
-    fetch_document: $0.05
-    search_in_document: $0.015
-    referenced_by: adds a separately billed search
   limits: x-ratelimit-* headers (see rate-limits/); offset + limit <= 500 per search
+  mcp_billing_note: Hosted tools use current account usage rates; the standalone Python README is not a fixed hosted
+    price guarantee. Citation backlinks add a separately billed search.
 - name: Pro
   price: null
   currency: USD
   billing_period: monthly, auto-renewing via Stripe
   cta: Manage subscription
-  positioning: '"Pro subscription unlocks extra capabilities" (pricing page); "unlock additional features" (Terms 4.5)'
+  positioning: '"Pro subscription unlocks extra capabilities" (pricing page); "unlock additional features" (Terms
+    4.5)'
   included_quota: null
   overage: null
   cancellation: any time from Account Settings; remains active to period end; no partial refunds (Terms 4.6)
   price_change_notice: 30 days by email (Terms 4.7)
-  note: Price and feature list are not published on any public page; the /profile page that manages it is behind sign-in.
+  note: Price and feature list are not published on any public page; the /profile page that manages it is behind
+    sign-in.
 prepaid_credit_packages:
   source: openapi createMppBalanceTopUp package enum; x-payment-info amounts are in cents
-  packages: [usd-5, usd-10, usd-25, usd-50, usd-100, usd-250, usd-500, usd-1000]
-  channels: [Stripe MPP top-up (POST /v2/payments/mpp/top-up), ACP checkout sessions (POST /v2/acp/checkout_sessions), A2A credit-top-up skill, MCP tool spacefrontiers_top_up_balance, human top-up at https://machinelibrary.ai/payments in an arbitrary amount (Terms 4.2)]
-refunds: Unused balance is not refunded except where required by law (Terms 4.8); remaining balance is not refunded on termination (Terms 8.3).
+  packages:
+  - usd-5
+  - usd-10
+  - usd-25
+  - usd-50
+  - usd-100
+  - usd-250
+  - usd-500
+  - usd-1000
+  channels:
+  - Stripe MPP top-up (POST /v2/payments/mpp/top-up)
+  - ACP checkout sessions (POST /v2/acp/checkout_sessions)
+  - A2A credit-top-up skill
+  - MCP tool machinelibrary_top_up_balance
+  - human top-up at https://machinelibrary.ai/payments in an arbitrary amount (Terms 4.2)
+refunds: Unused balance is not refunded except where required by law (Terms 4.8); remaining balance is not refunded
+  on termination (Terms 8.3).
 rate_change_notice: 30 days (Terms 3.5)
-bulk_data: Separate licensed product ("Premium datasets for purchase", https://machinelibrary.ai/datasets) scoped by source segment, use and volume; no published price; "There is no anonymous whole-corpus download."
+bulk_data: Separate licensed product ("Premium datasets for purchase", https://machinelibrary.ai/datasets) scoped
+  by source segment, use and volume; no published price; "There is no anonymous whole-corpus download."
+updated: '2026-09-26'

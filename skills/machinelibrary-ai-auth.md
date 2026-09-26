@@ -3,7 +3,7 @@
 Machine Library, the search and AI product by Space Frontiers Company, supports agentic registration for its read-only research search
 and document-retrieval service. The MCP resource is
 https://mcp.machinelibrary.ai and the authorization server is
-https://api.spacefrontiers.org. The available scope is `search`.
+https://api.machinelibrary.ai. The available scope is `search`.
 
 Machine Library uses the existing Space Frontiers account database and OAuth issuer.
 The original `https://mcp.spacefrontiers.org` resource remains supported; use
@@ -20,7 +20,7 @@ source of truth:
 
 ```text
 GET https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource
-GET https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+GET https://api.machinelibrary.ai/.well-known/oauth-authorization-server
 ```
 
 The Protected Resource Metadata identifies the resource, authorization server,
@@ -52,7 +52,7 @@ Ask the user which Machine Library account email to use. The email is only a
 login hint; it is not proof of identity.
 
 ```http
-POST https://api.spacefrontiers.org/v2/agent/identity
+POST https://api.machinelibrary.ai/v2/agent/identity
 Content-Type: application/json
 
 {"type":"service_auth","login_hint":"user@example.com"}
@@ -65,7 +65,7 @@ placeholders:
 {
   "registration_id": "<registration ID>",
   "registration_type": "service_auth",
-  "claim_url": "https://api.spacefrontiers.org/v2/agent/identity/claim",
+  "claim_url": "https://api.machinelibrary.ai/v2/agent/identity/claim",
   "claim_token": "<secret claim token>",
   "claim_token_expires": "<RFC 3339 timestamp>",
   "post_claim_scopes": ["search"],
@@ -93,7 +93,7 @@ While the user decides, poll the OAuth token endpoint no faster than the
 returned `claim.interval`:
 
 ```http
-POST https://api.spacefrontiers.org/v2/oauth/token
+POST https://api.machinelibrary.ai/v2/oauth/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=urn%3Aworkos%3Aagent-auth%3Agrant-type%3Aclaim&claim_token=<claim token>
@@ -128,7 +128,7 @@ When the access token expires, exchange the still-active service-signed
 identity assertion at the discovered token endpoint:
 
 ```http
-POST https://api.spacefrontiers.org/v2/oauth/token
+POST https://api.machinelibrary.ai/v2/oauth/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=<identity assertion>
@@ -139,7 +139,7 @@ grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=<iden
 Revoke an access token when it is no longer needed:
 
 ```http
-POST https://api.spacefrontiers.org/v2/oauth/revoke
+POST https://api.machinelibrary.ai/v2/oauth/revoke
 Content-Type: application/x-www-form-urlencoded
 
 token=<access token>&token_type_hint=access_token
@@ -156,7 +156,7 @@ Clients that can receive a callback should prefer OAuth authorization code with
 PKCE. Register a public client using RFC 7591:
 
 ```http
-POST https://api.spacefrontiers.org/v2/oauth/register
+POST https://api.machinelibrary.ai/v2/oauth/register
 Content-Type: application/json
 
 {

@@ -1,43 +1,52 @@
 generated: '2026-09-19'
 method: searched
-source: >-
-  Live probes of the well-known surface (RFC 8414 / 9728 / 9727 / 8615 documents saved under well-known/),
+source: Live probes of the well-known surface (RFC 8414 / 9728 / 9727 / 8615 documents saved under well-known/),
   the A2A card, the MCP endpoint's 401 challenge, auth.md, plus the OpenAPI at openapi/machinelibrary-ai-openapi.yml.
   Each entry names the evidence it rests on; nothing below is asserted from a marketing page.
-summary: >-
-  Strong OAuth/agent-discovery conformance (RFC 8414, RFC 9728 with a live WWW-Authenticate resource_metadata
-  challenge, RFC 7591 dynamic client registration, PKCE S256, RFC 9727 api-catalog, MCP server card, A2A 0.3.0
-  card graded conformant). The REST error envelope is a custom {detail, status} object, NOT RFC 9457, and there
-  is no OpenID Connect discovery. No published SOC 2 / ISO 27001 style certification anywhere on the site, so
-  NO Compliance pointer is emitted.
+summary: Strong OAuth/agent-discovery conformance (RFC 8414, RFC 9728 with a live WWW-Authenticate resource_metadata
+  challenge, RFC 7591 dynamic client registration, PKCE S256, RFC 9727 api-catalog, MCP server card, A2A 0.3.0 card
+  graded conformant). The REST error envelope is a custom {detail, status} object, NOT RFC 9457, and there is no
+  OpenID Connect discovery. No published SOC 2 / ISO 27001 style certification anywhere on the site, so NO Compliance
+  pointer is emitted.
 conformance:
 - id: openapi-3.1
   conforms: true
-  evidence: openapi/machinelibrary-ai-openapi.yml declares openapi 3.1.0 (fetched from https://machinelibrary.ai/openapi.json, 17 paths / 19 operations); the Recognition spec is 3.0.3.
+  evidence: openapi/machinelibrary-ai-openapi.yml declares openapi 3.1.0 (fetched from https://machinelibrary.ai/openapi.json,
+    17 paths / 19 operations); the Recognition spec is 3.0.3.
 - id: oauth2
   conforms: true
-  evidence: https://api.spacefrontiers.org/.well-known/oauth-authorization-server — authorization_code + refresh_token grants, authorization_endpoint /v2/oauth/authorize, token_endpoint /v2/oauth/token (well-known/machinelibrary-ai-api-spacefrontiers-oauth-authorization-server.json).
+  evidence: https://api.machinelibrary.ai/.well-known/oauth-authorization-server — authorization_code + refresh_token
+    grants, authorization_endpoint /v2/oauth/authorize, token_endpoint /v2/oauth/token (well-known/machinelibrary-ai-api-oauth-authorization-server.json).
 - id: oauth2-pkce (RFC 7636)
   conforms: true
-  evidence: code_challenge_methods_supported [S256] in the authorization-server metadata; auth.md section 7 requires PKCE S256 for public clients.
+  evidence: code_challenge_methods_supported [S256] in the authorization-server metadata; auth.md section 7 requires
+    PKCE S256 for public clients.
 - id: oauth-authorization-server-metadata (RFC 8414)
   conforms: true
-  evidence: 200 application/json at /.well-known/oauth-authorization-server on api.spacefrontiers.org (issuer), api.machinelibrary.ai, machinelibrary.ai and spacefrontiers.org.
+  evidence: 200 application/json at /.well-known/oauth-authorization-server on api.machinelibrary.ai (issuer), api.machinelibrary.ai,
+    machinelibrary.ai and spacefrontiers.org.
 - id: oauth-protected-resource-metadata (RFC 9728)
   conforms: true
-  evidence: 200 at https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource naming authorization_servers [https://api.spacefrontiers.org]; POST tools/list on the MCP endpoint answers 401 with WWW-Authenticate Bearer resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource" — the RFC 9728 section 5 challenge, observed live.
+  evidence: 200 at https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource naming authorization_servers
+    [https://api.machinelibrary.ai]; POST tools/list on the MCP endpoint answers 401 with WWW-Authenticate Bearer
+    resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource" — the RFC 9728 section
+    5 challenge, observed live.
 - id: oauth-dynamic-client-registration (RFC 7591)
   conforms: true
-  evidence: registration_endpoint https://api.spacefrontiers.org/v2/oauth/register in the metadata; auth.md section 7 shows the RFC 7591 request body; README "Spec compliance" states RFC 7591 DCR.
+  evidence: registration_endpoint https://api.machinelibrary.ai/v2/oauth/register in the metadata; auth.md section
+    7 shows the RFC 7591 request body; README "Spec compliance" states RFC 7591 DCR.
 - id: oauth-token-revocation (RFC 7009)
   conforms: true
-  evidence: revocation_endpoint https://api.spacefrontiers.org/v2/oauth/revoke; auth.md section 6 shows token=...&token_type_hint=access_token.
+  evidence: revocation_endpoint https://api.machinelibrary.ai/v2/oauth/revoke; auth.md section 6 shows token=...&token_type_hint=access_token.
 - id: oauth-jwt-bearer (RFC 7523)
   conforms: true
-  evidence: grant_types_supported includes urn:ietf:params:oauth:grant-type:jwt-bearer; auth.md section 5 exchanges a service-signed identity_assertion for a new access token.
+  evidence: grant_types_supported includes urn:ietf:params:oauth:grant-type:jwt-bearer; auth.md section 5 exchanges
+    a service-signed identity_assertion for a new access token.
 - id: workos-agent-auth-claim-grant
   conforms: true
-  evidence: grant_types_supported includes urn:workos:agent-auth:grant-type:claim and the metadata carries an agent_auth object (identity_endpoint, claim_endpoint, claim_complete_uri, identity_types_supported [service_auth]); auth.md sections 3-4 document the user-claimed flow with a six-digit user_code and verification_uri (device-flow-shaped).
+  evidence: grant_types_supported includes urn:workos:agent-auth:grant-type:claim and the metadata carries an agent_auth
+    object (identity_endpoint, claim_endpoint, claim_complete_uri, identity_types_supported [service_auth]); auth.md
+    sections 3-4 document the user-claimed flow with a six-digit user_code and verification_uri (device-flow-shaped).
 - id: oidc
   conforms: false
   evidence: /.well-known/openid-configuration 404 on every host; no id_token, no openid scope.
@@ -46,52 +55,71 @@ conformance:
   evidence: nine real documents under /.well-known/ across the hosts (well-known/machinelibrary-ai-well-known.yml).
 - id: api-catalog (RFC 9727)
   conforms: true
-  evidence: https://machinelibrary.ai/.well-known/api-catalog returns application/linkset+json with service-desc and service-doc relations for the REST host and the MCP host.
+  evidence: https://machinelibrary.ai/.well-known/api-catalog returns application/linkset+json with service-desc
+    and service-doc relations for the REST host and the MCP host.
 - id: security-txt (RFC 9116)
-  conforms: false
-  evidence: /.well-known/security.txt 404 on machinelibrary.ai, api.machinelibrary.ai, mcp.machinelibrary.ai, spacefrontiers.org, api.spacefrontiers.org.
+  conforms: true
+  evidence: https://machinelibrary.ai/.well-known/security.txt returns 200 with Contact, Expires, Canonical and
+    Preferred-Languages fields; saved under well-known/.
 - id: mcp-streamable-http
   conforms: true
-  evidence: server card remotes[0].type streamable-http; README states Streamable HTTP, stateless, protocol versions 2025-03-26 / 2025-06-18 / 2025-11-25; endpoint enforces MCP-Protocol-Version allowlist (auth.py).
+  evidence: server card remotes[0].type streamable-http; README states Streamable HTTP, stateless, protocol versions
+    2025-03-26 / 2025-06-18 / 2025-11-25; endpoint enforces MCP-Protocol-Version allowlist (auth.py).
 - id: mcp-server-card
   conforms: true
-  evidence: https://machinelibrary.ai/.well-known/mcp/server-card.json, application/mcp-server-card+json, $schema static.modelcontextprotocol.io/schemas/v1/server-card.schema.json.
+  evidence: https://machinelibrary.ai/.well-known/mcp/server-card.json, application/mcp-server-card+json, $schema
+    static.modelcontextprotocol.io/schemas/v1/server-card.schema.json.
 - id: mcp-registry-server-json
   conforms: true
-  evidence: registry.modelcontextprotocol.io lists io.github.SpaceFrontiers/mcp (0.2.1, 0.3.0, 0.3.1, status active); server.json in the repo uses schema 2025-12-11.
+  evidence: registry.modelcontextprotocol.io lists io.github.SpaceFrontiers/mcp (0.2.1, 0.3.0, 0.3.1, status active);
+    server.json in the repo uses schema 2025-12-11.
 - id: mcp-tool-annotations
   conforms: true
-  evidence: tools.py applies readOnlyHint, idempotentHint, openWorldHint and destructiveHint:false to all four retrieval tools; AGENTS.md says this is required for the Anthropic Connectors Directory.
+  evidence: Historical observation of the standalone Python package. Hosted capabilities and tool names are documented
+    separately in mcp/machinelibrary-ai-mcp.yml; this refresh did not use authenticated tools/list.
 - id: a2a-0.3.0
   conforms: true
-  evidence: /.well-known/agent-card.json on machinelibrary.ai and spacefrontiers.org, protocolVersion 0.3.0, capabilities object, skills array, preferredTransport JSONRPC; graded conformant in a2a/machinelibrary-ai-a2a.yml; the /a2a endpoint answers JSON-RPC message/send.
+  evidence: /.well-known/agent-card.json on machinelibrary.ai and spacefrontiers.org, protocolVersion 0.3.0, capabilities
+    object, skills array, preferredTransport JSONRPC; graded conformant in a2a/machinelibrary-ai-a2a.yml; the /a2a
+    endpoint answers JSON-RPC message/send.
 - id: ap2-agent-payments-extension
   conforms: true
-  evidence: The agent card declares capabilities.extensions with uri https://github.com/google-agentic-commerce/AP2/tree/v0.1.0 and .../ap2/v1, params.roles [merchant]; settlement is described as Stripe ACP checkout sessions and MPP top-ups. Declared by the provider; not exercised by this pipeline.
+  evidence: The agent card declares capabilities.extensions with uri https://github.com/google-agentic-commerce/AP2/tree/v0.1.0
+    and .../ap2/v1, params.roles [merchant]; settlement is described as Stripe ACP checkout sessions and MPP top-ups.
+    Declared by the provider; not exercised by this pipeline.
 - id: stripe-mpp
   conforms: true
-  evidence: POST /v2/payments/mpp/top-up (x-payment-info method stripe) whose first call returns a 402 MPP payment challenge; install.md names the hosted MCP tool spacefrontiers_top_up_balance as returning "a standard MPP payment challenge".
+  evidence: POST /v2/payments/mpp/top-up (x-payment-info method stripe) whose first call returns a 402 MPP payment
+    challenge; install.md names the hosted MCP tool machinelibrary_top_up_balance as returning "a standard MPP payment
+    challenge".
 - id: rfc9457
   conforms: false
-  evidence: 'Error bodies are {"detail": "...", "status": "error"} (RecognitionError schema; observed live on a 401 from api.machinelibrary.ai), served as application/json, not application/problem+json.'
+  evidence: 'Error bodies are {"detail": "...", "status": "error"} (RecognitionError schema; observed live on a
+    401 from api.machinelibrary.ai), served as application/json, not application/problem+json.'
 - id: pagination
   conforms: true
-  evidence: SearchRequestV2 offset (0-499) + limit (1-500) with offset+limit <= 500; responses carry total_hits and has_next. Offset pagination, not cursor.
+  evidence: SearchRequestV2 offset (0-499) + limit (1-500) with offset+limit <= 500; responses carry total_hits
+    and has_next. Offset pagination, not cursor.
 - id: idempotency
   conforms: partial
-  evidence: Recognition API info.description — "Resubmitting identical content is idempotent and free"; MCP tools carry idempotentHint. No Idempotency-Key header on the REST writes (conversations, feedback, top-up); createMppBalanceTopUp guards double-submission with 409 only.
+  evidence: Recognition deduplicates identical submissions. MPP payment attempts replay completed receipts when
+    the same challenge and payment credential are reused. Feedback uses a UUID with the same payload on retries.
+    No general Idempotency-Key header; see https://machinelibrary.ai/docs/api/operations#writes
 - id: rate-limit-headers
   conforms: true
-  evidence: x-ratelimit-limit / x-ratelimit-remaining / x-ratelimit-reset observed live on api.machinelibrary.ai, mcp.machinelibrary.ai and machinelibrary.ai/a2a (legacy X-RateLimit-* family, not the IETF RateLimit header).
+  evidence: x-ratelimit-limit / x-ratelimit-remaining / x-ratelimit-reset observed live on api.machinelibrary.ai,
+    mcp.machinelibrary.ai and machinelibrary.ai/a2a (legacy X-RateLimit-* family, not the IETF RateLimit header).
 - id: llms-txt
   conforms: true
-  evidence: https://machinelibrary.ai/llms.txt (text/plain, 4,130 bytes) saved at llms/machinelibrary-ai-llms.txt; the OpenAPI's x-service-info.docs.llms names it.
+  evidence: https://machinelibrary.ai/llms.txt refreshed verbatim on September 26 under llms/.
 - id: content-signals (robots.txt Content-Signal)
   conforms: true
-  evidence: robots.txt and the Content-Signal response header carry ai-train=no, search=yes, ai-input=yes with the EU DSM Article 4 reservation text.
+  evidence: robots.txt and the Content-Signal response header carry ai-train=no, search=yes, ai-input=yes with the
+    EU DSM Article 4 reservation text.
 - id: sse-streaming
   conforms: true
-  evidence: streamConversationTurn and streamEditedConversationStep return text/event-stream (newline-delimited events); A2A card capabilities.streaming true.
+  evidence: streamConversationTurn and streamEditedConversationStep return text/event-stream (newline-delimited
+    events); A2A card capabilities.streaming true.
 - id: http-range-requests (RFC 9110 partial content)
   conforms: true
   evidence: downloadOriginaldocumentbyID / byURI accept a Range header and declare 206 and 416 responses.
@@ -100,18 +128,23 @@ domain_standard:
   entries:
   - id: doi-identifier-scheme
     conforms: true
-    evidence: >-
-      openapi/machinelibrary-ai-openapi.yml GET /v2/documents/by-uri/{uri} — the uri path parameter is described as a
-      "Percent-encoded canonical URI, such as doi://10.1000/example"; llms.txt lists the accepted schemes doi:, arxiv:,
-      pmid:, isbn: (plus doi.org URLs) for fetch and per-document search; the MCP fetch tool's uri examples are
-      https://doi.org/10.1038/s41586-023-06924-6, arxiv:2301.00001, pmid:38019072, isbn:9780262033848.
-    note: Contract-level use of the DOI / arXiv / PubMed / ISBN identifier schemes as the document address space, and CrossRef-style document types (journal-article, book-chapter, posted-content, patent) as the filter vocabulary. Recorded as an identifier-scheme signature, not a claim of Crossref/DataCite API conformance.
+    evidence: 'openapi/machinelibrary-ai-openapi.yml GET /v2/documents/by-uri/{uri} — the uri path parameter is
+      described as a "Percent-encoded canonical URI, such as doi://10.1000/example"; llms.txt lists the accepted
+      schemes doi:, arxiv:, pmid:, isbn: (plus doi.org URLs) for fetch and per-document search; the MCP fetch tool''s
+      uri examples are https://doi.org/10.1038/s41586-023-06924-6, arxiv:2301.00001, pmid:38019072, isbn:9780262033848.'
+    note: Contract-level use of the DOI / arXiv / PubMed / ISBN identifier schemes as the document address space,
+      and CrossRef-style document types (journal-article, book-chapter, posted-content, patent) as the filter vocabulary.
+      Recorded as an identifier-scheme signature, not a claim of Crossref/DataCite API conformance.
   - id: crossref-document-types
     conforms: true
-    evidence: 'MCP tool spacefrontiers_search_documents filter_types — "Filter by CrossRef-style document type. Examples: journal-article, book, book-chapter, proceedings-article, posted-content, patent" (tools.py); REST SearchRequestV2.filter_types "Restrict results to document types".'
+    evidence: 'MCP tool spacefrontiers_search_documents filter_types — "Filter by CrossRef-style document type.
+      Examples: journal-article, book, book-chapter, proceedings-article, posted-content, patent" (tools.py); REST
+      SearchRequestV2.filter_types "Restrict results to document types".'
   - id: oai-pmh
     conforms: false
     evidence: No OAI-PMH verb surface published; not probed blind.
 compliance_programs:
   published: false
-  note: No trust center, SOC 2, ISO 27001, PCI or HIPAA statement found on machinelibrary.ai (/security 403 edge page, no security.txt, ToS 6.1 only says "Ensure the security of user data"). No Compliance pointer emitted.
+  note: No certification is inferred from the newly published security disclosure contact. Other compliance observations
+    remain dated September 19.
+updated: '2026-09-26'

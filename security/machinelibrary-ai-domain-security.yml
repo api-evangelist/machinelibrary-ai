@@ -25,3 +25,9 @@ domains:
   spf: true
   dmarc: true
   dmarc_policy: none
+updated: '2026-09-26'
+security_txt:
+  url: https://machinelibrary.ai/.well-known/security.txt
+  status: 200
+  verified: '2026-09-26'
+  file: well-known/machinelibrary-ai-security.txt

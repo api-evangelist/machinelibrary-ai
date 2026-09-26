@@ -1,65 +1,98 @@
-generated: '2026-09-19'
-method: derived
-source: mcp/machinelibrary-ai-mcp.yml (tool inventory from provider-published sources) bound to openapi/machinelibrary-ai-openapi.yml operationIds
-description: >-
-  Binds each Machine Library MCP tool to the REST operation(s) that back it, so a tool's real input contract
-  can be read from the OpenAPI. The open-source server (client.py) calls the v2 search API, so the bindings are
-  read from source rather than inferred by name; confidence is high where the source shows the call and medium
-  where the hosted server adds a capability the public repo does not contain.
+generated: '2026-09-26'
+method: documented
+source: https://machinelibrary.ai/install.md and https://machinelibrary.ai/openapi.json
+description: Documented correspondence between hosted MCP capabilities and REST operations. Exact MCP schemas come
+  from authenticated tools/list; do not substitute REST schemas for MCP tool inputs.
 surfaces:
   openapi: openapi/machinelibrary-ai-openapi.yml (19 operations, 17 paths; OpenAPI 3.1.0)
-  mcp: https://mcp.machinelibrary.ai (streamable-http; tools/list auth-gated — 401 + RFC 9728 resource_metadata)
+  mcp: "https://mcp.machinelibrary.ai (streamable-http; tools/list auth-gated \u2014 401 + RFC 9728 resource_metadata)"
   graphql: none
-  a2a: https://machinelibrary.ai/a2a (skills research, search-access, credit-top-up — sit above the same REST core)
+  a2a: "https://machinelibrary.ai/a2a (skills research, search-access, credit-top-up \u2014 sit above the same REST\
+    \ core)"
 crosswalk:
-- tool: spacefrontiers_search_documents
+- tool: machinelibrary_search_documents
   category: search
-  rest: [searchDocuments]
-  binding: rest
-  confidence: high
-  note: POST /v2/search/ with index_names [documents]; MCP caps limit at 30 (REST allows 500) and passes filter_issns, filter_types, filter_issued_after/before straight through.
-- tool: spacefrontiers_search_social
-  category: search
-  rest: [searchDocuments]
-  binding: rest
-  confidence: high
-  note: Same operation with index_names [social] and filter_uri_prefixes.
-- tool: spacefrontiers_fetch_document
-  category: documents
-  rest: [getDocumentByUri, searchDocuments]
-  binding: rest
-  confidence: high
-  note: GET /v2/documents/by-uri/{uri}; when referenced_by_limit > 0 the server issues a second, separately billed search for citing documents.
-- tool: spacefrontiers_search_in_document
-  category: documents
-  rest: [getDocumentByUri]
-  binding: rest
-  confidence: high
-  note: GET /v2/documents/by-uri/{uri}?text_filter=<query> — the REST summary says "or search inside it with text_filter", which is exactly this tool.
-- tool: spacefrontiers_top_up_balance
-  category: payments
-  rest: [createMppBalanceTopUp]
+  rest:
+  - searchDocuments
   binding: rest
   confidence: medium
-  note: Hosted-only tool (install.md); its description ("fixed USD packages; returns a standard MPP payment challenge") matches POST /v2/payments/mpp/top-up, whose 402 is the MPP challenge. Not present in the public tools.py, so the binding is by documented semantics.
+  note: POST /v2/search/ with index_names [documents]; MCP caps limit at 30 (REST allows 500) and passes filter_issns,
+    filter_types, filter_issued_after/before straight through.
+- tool: machinelibrary_search_social
+  category: search
+  rest:
+  - searchDocuments
+  binding: rest
+  confidence: medium
+  note: Same operation with index_names [social] and filter_uri_prefixes.
+- tool: machinelibrary_fetch_document
+  category: documents
+  rest:
+  - getDocumentByUri
+  - searchDocuments
+  binding: rest
+  confidence: medium
+  note: GET /v2/documents/by-uri/{uri}; when referenced_by_limit > 0 the server issues a second, separately billed
+    search for citing documents.
+- tool: machinelibrary_search_in_document
+  category: documents
+  rest:
+  - getDocumentByUri
+  binding: rest
+  confidence: medium
+  note: "GET /v2/documents/by-uri/{uri}?text_filter=<query> \u2014 the REST summary says \"or search inside it with\
+    \ text_filter\", which is exactly this tool."
+- tool: machinelibrary_top_up_balance
+  category: payments
+  rest:
+  - createMppBalanceTopUp
+  binding: rest
+  confidence: medium
+  note: Hosted MPP top-up capability described in install.md; REST counterpart publishes the payment challenge contract.
+- tool: machinelibrary_research
+  category: research
+  rest:
+  - createConversationTurn
+  binding: rest
+  confidence: medium
+  note: Documented capability correspondence; not verified through authenticated execution in this refresh.
+- tool: machinelibrary_search_feedback
+  category: feedback
+  rest:
+  - submitSearchFeedback
+  binding: rest
+  confidence: medium
+  note: Documented capability correspondence; not verified through authenticated execution in this refresh.
 mcp_only: []
 rest_only:
 - capability: similarity search
-  operations: [findSimilarDocuments]
+  operations:
+  - findSimilarDocuments
 - capability: document fetch by Machine Library ID
-  operations: [getDocument]
-- capability: search-quality feedback
-  operations: [submitSearchFeedback]
-- capability: retrieval-augmented conversations
-  operations: [listConversations, createConversationTurn, streamConversationTurn, getConversation, deleteConversation, editConversationStep, streamEditedConversationStep]
+  operations:
+  - getDocument
+- capability: conversation listing, streaming, editing and deletion
+  operations:
+  - listConversations
+  - streamConversationTurn
+  - getConversation
+  - deleteConversation
+  - editConversationStep
+  - streamEditedConversationStep
 - capability: original PDF/EPUB/DJVU downloads
-  operations: [downloadOriginaldocumentbyID, downloadOriginaldocumentbyURI]
+  operations:
+  - downloadOriginaldocumentbyID
+  - downloadOriginaldocumentbyURI
 - capability: document recognition (PDF/EPUB/DJVU to Markdown)
-  operations: [create_recognition, get_recognition, get_recognition_report, get_recognition_result]
+  operations:
+  - create_recognition
+  - get_recognition
+  - get_recognition_report
+  - get_recognition_result
 coverage:
-  tools_named: 5
-  tools_bound: 5
+  tools_named: 7
+  tools_bound: 7
   mcp_only: 0
   rest_operations_total: 19
-  rest_operations_with_tool: 4
-  rest_operations_without_tool: 15
+  rest_operations_with_tool: 5
+  rest_operations_without_tool: 14

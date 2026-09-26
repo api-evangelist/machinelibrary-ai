@@ -79,6 +79,17 @@ components:
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
       scheme: bearer
       type: http
+    oauth2:
+      description: Authorization code with mandatory S256 PKCE. Public clients use dynamic registration; see https://machinelibrary.ai/auth.md.
+        Access spends the consenting account's credits.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+          refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+          scopes:
+            search: Search and retrieve research documents using your account credits.
+          tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      type: oauth2
 info:
   description: 'Upload a PDF, EPUB, or DJVU document and receive recognized Markdown plus a structured quality report. Jobs
     are asynchronous: submit, poll, fetch. Resubmitting identical content is idempotent and free. Each accepted submission
@@ -210,14 +221,10 @@ paths:
 security:
 - api_key: []
 - bearer_auth: []
+- oauth2:
+  - search
 servers:
 - url: https://api.spacefrontiers.org
 tags:
 - description: 'Document recognition: PDF, EPUB, and DJVU to structured Markdown with quality reports.'
   name: Recognition
-x-api-evangelist:
-  method: searched
-  source: https://api.machinelibrary.ai/v1/recognitions/docs/openapi.json
-  fetched: '2026-09-19'
-  note: Saved verbatim from the API host; converted JSON->YAML only. Standalone Recognition contract (OpenAPI 3.0.3) whose
-    four operations are ALSO merged into machinelibrary-ai-openapi.yml by the provider; do not double-count operations.

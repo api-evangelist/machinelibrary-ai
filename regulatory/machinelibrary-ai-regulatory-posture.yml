@@ -3,42 +3,75 @@ method: searched
 probe: true
 source: https://machinelibrary.ai/privacy
 probed:
-- {url: 'https://machinelibrary.ai/privacy', status: 200}
-- {url: 'https://machinelibrary.ai/terms-of-service', status: 200}
-- {url: 'https://machinelibrary.ai/accessibility', status: 403, note: Cloudflare edge page, no content}
-- {url: 'https://machinelibrary.ai/legal/subprocessors', status: 403}
-- {url: 'https://machinelibrary.ai/legal/dpa', status: 403}
-- {url: 'https://machinelibrary.ai/transparency', status: 403}
-- {url: 'https://machinelibrary.ai/ai/transparency', status: 403}
-- {url: 'https://machinelibrary.ai/docs/data-residency', status: 404}
-- {url: 'https://machinelibrary.ai/security', status: 403}
-- {url: 'https://machinelibrary.ai/.well-known/security.txt', status: 404}
-- {url: 'https://machinelibrary.ai/robots.txt', status: 200}
+- url: https://machinelibrary.ai/privacy
+  status: 200
+- url: https://machinelibrary.ai/terms-of-service
+  status: 200
+- url: https://machinelibrary.ai/accessibility
+  status: 403
+  note: Cloudflare edge page
+  no content: null
+- url: https://machinelibrary.ai/legal/subprocessors
+  status: 403
+- url: https://machinelibrary.ai/legal/dpa
+  status: 403
+- url: https://machinelibrary.ai/transparency
+  status: 403
+- url: https://machinelibrary.ai/ai/transparency
+  status: 403
+- url: https://machinelibrary.ai/docs/data-residency
+  status: 404
+- url: https://machinelibrary.ai/security
+  status: 403
+- url: https://machinelibrary.ai/.well-known/security.txt
+  status: 200
+  verified: '2026-09-26'
+- url: https://machinelibrary.ai/robots.txt
+  status: 200
 signals:
   data_subject_request:
     url: https://machinelibrary.ai/privacy
-    section: '7. Your Rights'
-    channel: contact details in section 11 (email address is obfuscated by Cloudflare email protection in the served HTML; the contact form is at https://machinelibrary.ai/contacts)
+    section: 7. Your Rights
+    channel: contact details in section 11 (email address is obfuscated by Cloudflare email protection in the served
+      HTML; the contact form is at https://machinelibrary.ai/contacts)
     stated_sla: null
-    rights_named: [access, update, delete, withdraw consent for marketing communications, information about how data is processed]
+    rights_named:
+    - access
+    - update
+    - delete
+    - withdraw consent for marketing communications
+    - information about how data is processed
     strength: weak
     evidence:
     - source: https://machinelibrary.ai/privacy
       http_status: 200
       fetched: '2026-09-19'
-      quote: '"7. Your Rights: Access, update, or delete your personal information; Withdraw consent for marketing communications; Request information about how your data is processed. To exercise your rights, please contact us using the information below."'
-    note: >-
-      A rights list with a contact channel, inside the privacy policy; no dedicated intake page (/privacy/requests not
-      served), no response period, no escalation body. Recorded because the substance (named rights + a channel) is
-      present, flagged weak because the SLA and a readable channel are not.
+      quote: '"7. Your Rights: Access, update, or delete your personal information; Withdraw consent for marketing
+        communications; Request information about how your data is processed. To exercise your rights, please contact
+        us using the information below."'
+    note: A rights list with a contact channel, inside the privacy policy; no dedicated intake page (/privacy/requests
+      not served), no response period, no escalation body. Recorded because the substance (named rights + a channel)
+      is present, flagged weak because the SLA and a readable channel are not.
+  vulnerability_disclosure:
+    url: https://machinelibrary.ai/.well-known/security.txt
+    fetched: '2026-09-26'
+    note: Published reporting contact and expiry; this is not a certification or promised response SLA.
 observations_not_scored:
 - topic: AI training / content-use signals
-  detail: robots.txt and a Content-Signal response header declare ai-train=no, search=yes, ai-input=yes with an EU DSM Directive 2019/790 Article 4 rights reservation; the privacy policy states "we do not train a public model on your queries". These are usage restrictions and a processing commitment, not a training-data summary or an AI-transparency disclosure, so no signal is recorded.
+  detail: robots.txt and a Content-Signal response header declare ai-train=no, search=yes, ai-input=yes with an
+    EU DSM Directive 2019/790 Article 4 rights reservation; the privacy policy states "we do not train a public
+    model on your queries". These are usage restrictions and a processing commitment, not a training-data summary
+    or an AI-transparency disclosure, so no signal is recorded.
 - topic: subprocessors
-  detail: Privacy section 6 names only categories ("payment processors or analytics providers"); Stripe is named as the payment method in the Terms. No dated subprocessor table — absent.
+  detail: Privacy section 6 names only categories ("payment processors or analytics providers"); Stripe is named
+    as the payment method in the Terms. No dated subprocessor table — absent.
 - topic: data_residency
-  detail: Privacy section 9 says data "may be processed and stored in countries outside your own" — the opposite of a residency commitment; absent.
+  detail: Privacy section 9 says data "may be processed and stored in countries outside your own" — the opposite
+    of a residency commitment; absent.
 - topic: retention
-  detail: Privacy section 3 states query text and tool arguments are retained up to 30 days then aggregated, and refresh tokens are stored hashed for 30 days — retention facts, but no retention/DSR SLA.
-- topic: incident_notification, accessibility_conformance, sbom, support_lifetime, transparency_report, age_assurance, notice_and_action, exit_assistance, global_privacy_control
+  detail: Privacy section 3 states query text and tool arguments are retained up to 30 days then aggregated, and
+    refresh tokens are stored hashed for 30 days — retention facts, but no retention/DSR SLA.
+- topic: incident_notification, accessibility_conformance, sbom, support_lifetime, transparency_report, age_assurance,
+    notice_and_action, exit_assistance, global_privacy_control
   detail: Nothing published; conventional paths 403/404 as listed above.
+updated: '2026-09-26'
