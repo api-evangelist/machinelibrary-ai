@@ -1,0 +1,41 @@
+{
+  "provider": "machinelibrary-ai",
+  "sources": [
+    "_original/machinelibrary-ai-openapi.json",
+    "machinelibrary-ai-openapi.yml",
+    "machinelibrary-ai-recognition-openapi.yml"
+  ],
+  "outputs": [
+    "machinelibrary-ai-conversations-api-openapi.yml",
+    "machinelibrary-ai-documents-api-openapi.yml",
+    "machinelibrary-ai-payments-api-openapi.yml",
+    "machinelibrary-ai-raw-document-downloads-api-openapi.yml",
+    "machinelibrary-ai-recognition-api-openapi.yml",
+    "machinelibrary-ai-search-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/machinelibrary-ai-openapi.yml",
+    "archived openapi/machinelibrary-ai-recognition-openapi.yml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "machinelibrary-ai-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "machinelibrary-ai-openapi.json: declared missing tag: Payments",
+    "machinelibrary-ai-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "machinelibrary-ai-openapi.yml: declared missing tag: Payments",
+    "machinelibrary-ai-recognition-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "tag 'Conversations' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
+    "tag 'Documents' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
+    "tag 'Payments' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
+    "tag 'Raw document downloads' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
+    "tag 'Recognition' spans 3 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml, machinelibrary-ai-recognition-openapi.yml): per-path servers applied",
+    "tag 'Search' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
+    "apis.yml register: written (+6 apis, 9 total)"
+  ],
+  "skipped": [
+    "_original/machinelibrary-ai-recognition-openapi.json: archived document superseded by a larger archived document"
+  ]
+}

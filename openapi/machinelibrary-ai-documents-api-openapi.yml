@@ -1,0 +1,583 @@
+openapi: 3.2.0
+info:
+  title: Machinelibrary Ai Documents API
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+  description: 'Operations tagged Documents across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.machinelibrary.ai
+  description: Machine Library
+- url: https://api.spacefrontiers.org
+  description: Space Frontiers (compatible endpoint)
+tags:
+- name: Documents
+  description: Fetch documents by ID or canonical URI.
+paths:
+  /v2/documents/by-uri/{uri}:
+    get:
+      tags:
+      - Documents
+      summary: Fetch a document by canonical URI, or search inside it with `text_filter`
+      operationId: getDocumentByUri
+      parameters:
+      - name: uri
+        in: path
+        description: Percent-encoded canonical URI, such as doi://10.1000/example.
+        required: true
+        schema:
+          type: string
+      - name: text_filter
+        in: query
+        description: When present, return up to five matching passages instead of the full document. Double-quoted spans must occur verbatim in the passage.
+        required: false
+        schema:
+          type: string
+      - name: max_tokens
+        in: query
+        description: Return exactly the first N content tokens. Omit to return all content tokens.
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      responses:
+        '200':
+          description: Document or in-document search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ByUriResponse'
+        '400':
+          description: Invalid URI or text filter.
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+        '404':
+          description: Document not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/documents/{document_id}:
+    get:
+      tags:
+      - Documents
+      summary: Fetch a document and its public metadata by Machine Library document ID
+      operationId: getDocument
+      parameters:
+      - name: document_id
+        in: path
+        description: Machine Library document ID.
+        required: true
+        schema:
+          type: string
+      - name: max_tokens
+        in: query
+        description: Return exactly the first N content tokens. Omit to return all content tokens.
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      responses:
+        '200':
+          description: Document content and public metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2DocumentResponse'
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+        '404':
+          description: Document not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+components:
+  schemas:
+    Scoring:
+      type: object
+      required:
+      - target
+      - correction_weight
+      properties:
+        target:
+          $ref: '#/components/schemas/PredictionTarget'
+        correction_weight:
+          type: number
+          format: double
+      additionalProperties: false
+    V2DocumentResponse:
+      type: object
+      required:
+      - id
+      - uris
+      - document
+      properties:
+        id:
+          type: string
+        uris:
+          type: array
+          items:
+            type: string
+        document: {}
+    ByUriResponse:
+      oneOf:
+      - $ref: '#/components/schemas/V2SearchResponse'
+      - $ref: '#/components/schemas/V2DocumentResponse'
+      description: 'by-uri endpoints return either a document or (with `text_filter`) a
+
+        search response, matching the Python union return type.'
+    VectorCombiner:
+      type: object
+      description: 'Exact multi-value reduction used by vector nomination and document features.
+
+        This is separate from the reduction of final L1 passage predictions.
+
+        The v4 body-binary branch uses fixed MAX, bound by the profile name.'
+      required:
+      - name
+      - temperature
+      - top_k
+      - decay
+      properties:
+        name:
+          type: string
+        temperature:
+          type: number
+          format: float
+        top_k:
+          type: integer
+          format: int32
+          minimum: 0
+        decay:
+          type: number
+          format: float
+      additionalProperties: false
+    RankingMode:
+      type: string
+      description: 'Relevance objective, independent of corpus and lexical/vector retrieval.
+
+        Results remain document groups for both objectives.'
+      enum:
+      - auto
+      - documents
+      - passages
+    CorpusRankingInfo:
+      type: object
+      required:
+      - corpus
+      - model_sha256
+      - scoring
+      - input_documents
+      - input_rows
+      properties:
+        corpus:
+          type: string
+        model_sha256:
+          type: string
+        scoring:
+          $ref: '#/components/schemas/Scoring'
+        input_documents:
+          type: integer
+          minimum: 0
+        input_rows:
+          type: integer
+          minimum: 0
+    Snippet:
+      type: object
+      description: One highlighted passage of a search hit.
+      required:
+      - field
+      - text
+      properties:
+        field:
+          type: string
+        text:
+          type: string
+        score:
+          type: number
+          format: double
+        chunk_id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        evidence:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetEvidence'
+    SparseQueryPolicy:
+      type: object
+      required:
+      - max_query_dims
+      - weight_threshold
+      - heap_factor
+      - pruning
+      properties:
+        max_query_dims:
+          type: integer
+          format: int32
+          minimum: 0
+        weight_threshold:
+          type: number
+          format: float
+        heap_factor:
+          type: number
+          format: float
+        pruning:
+          type: number
+          format: float
+      additionalProperties: false
+    BatchInfo:
+      type: object
+      required:
+      - enabled
+      - as_of
+      - computed_at
+      - observed_documents
+      - requested_documents
+      - elapsed_us
+      properties:
+        enabled:
+          type: boolean
+        as_of:
+          type: string
+          format: date-time
+        computed_at:
+          type: string
+          format: date-time
+        observed_documents:
+          type: integer
+          minimum: 0
+        requested_documents:
+          type: integer
+          minimum: 0
+        elapsed_us:
+          type: integer
+          format: int64
+          minimum: 0
+    RrfAttribution:
+      type: object
+      required:
+      - score
+      - contributions
+      properties:
+        score:
+          type: number
+          format: float
+        contributions:
+          type: array
+          items:
+            type: object
+    V2SearchResponse:
+      type: object
+      required:
+      - ranking_mode
+      - hits
+      - total_hits
+      - has_next
+      properties:
+        ranking_mode:
+          $ref: '#/components/schemas/RankingMode'
+          description: Resolved relevance objective. Auto is a request routing policy only.
+        retrieval_traces:
+          type: array
+          items: {}
+        trajectory:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SearchTrajectory'
+        candidate_ranking:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/CandidateRankingInfo'
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2Hit'
+        total_hits:
+          type: integer
+          format: int64
+          minimum: 0
+        has_next:
+          type: boolean
+        timings:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/V2Timings'
+        embed_ms:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          minimum: 0
+        corrected_query:
+          type:
+          - string
+          - 'null'
+    V2Hit:
+      type: object
+      required:
+      - id
+      - score
+      - snippets
+      - document
+      properties:
+        rrf:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/RrfAttribution'
+        candidate_scores:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/CandidateScores'
+        id:
+          type: string
+        score:
+          type: number
+          format: double
+        snippets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Snippet'
+        document: {}
+    FeatureContract:
+      type: object
+      description: Feature identity includes query construction, not only column names.
+      required:
+      - name
+      - features
+      - score_policy
+      - rrf_policy
+      - backfill
+      - candidate_depth
+      - phrase_policy
+      - tokenizer_policy
+      - document_reduction
+      - teacher_input
+      - vector_combiner
+      - sparse_query
+      properties:
+        name:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        score_policy:
+          type: string
+        rrf_policy:
+          type: string
+        backfill:
+          type: boolean
+        candidate_depth:
+          type: integer
+          format: int32
+          description: Fixed per-branch, per-shard nomination depth for this feature population.
+          minimum: 0
+        phrase_policy:
+          type: string
+          description: Whole query phrase plus mean of explicit quoted-span phrase scores.
+        tokenizer_policy:
+          type: string
+          description: Single language hint using indexed original forms when undetermined.
+        document_reduction:
+          type: string
+        teacher_input:
+          type: string
+        vector_combiner:
+          $ref: '#/components/schemas/VectorCombiner'
+        sparse_query:
+          $ref: '#/components/schemas/SparseQueryPolicy'
+      additionalProperties: false
+    RankingInfo:
+      type: object
+      required:
+      - method
+      - artifact_sha256
+      - model_sha256
+      - feature_version
+      - corpus_models
+      - input_documents
+      - input_rows
+      - output_documents
+      - elapsed_us
+      - engagement
+      properties:
+        method:
+          type: string
+        artifact_sha256:
+          type: string
+        model_sha256:
+          type: string
+        feature_version:
+          type: string
+        corpus_models:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorpusRankingInfo'
+        input_documents:
+          type: integer
+          minimum: 0
+        input_rows:
+          type: integer
+          minimum: 0
+        output_documents:
+          type: integer
+          minimum: 0
+        elapsed_us:
+          type: integer
+          format: int64
+          minimum: 0
+        engagement:
+          $ref: '#/components/schemas/BatchInfo'
+    CandidateRankingInfo:
+      type: object
+      required:
+      - method
+      - contract
+      properties:
+        l2:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/RankingInfo'
+        method:
+          type: string
+        model_sha256:
+          type:
+          - string
+          - 'null'
+        contract:
+          $ref: '#/components/schemas/FeatureContract'
+    CandidateScores:
+      type: object
+      required:
+      - document
+      - passages
+      - scored_passages
+      properties:
+        document:
+          type: object
+          description: Absent field data is omitted; valid zero and negative scores are retained.
+          additionalProperties:
+            type: number
+            format: float
+          propertyNames:
+            type: string
+        passages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PassageScores'
+        scored_passages:
+          type: integer
+          format: int32
+          minimum: 0
+    SearchTrajectory:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: string
+        feedback_token:
+          type:
+          - string
+          - 'null'
+          description: A bounded, expiring capability to rate results of this retrieval.
+    PassageScores:
+      type: object
+      required:
+      - ordinal
+      - scores
+      properties:
+        ordinal:
+          type: integer
+          format: int32
+          minimum: 0
+        scores:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          propertyNames:
+            type: string
+        l1_score:
+          type:
+          - number
+          - 'null'
+          format: float
+    V2Timings:
+      type: object
+      required:
+      - search_us
+      - load_us
+      - total_us
+      properties:
+        search_us:
+          type: integer
+          format: int64
+          minimum: 0
+        load_us:
+          type: integer
+          format: int64
+          minimum: 0
+        total_us:
+          type: integer
+          format: int64
+          minimum: 0
+    PredictionTarget:
+      type: string
+      enum:
+      - teacher_score
+    SnippetEvidence:
+      type: object
+      description: A reranker-selected, verbatim window within the original snippet.
+      required:
+      - text
+      - start_char
+      - score
+      properties:
+        text:
+          type: string
+        start_char:
+          type: integer
+          description: Unicode scalar values, relative to the full `Snippet.text`.
+          minimum: 0
+        score:
+          type: number
+          format: double
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Machine Library API key from https://machinelibrary.ai/keys.
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key or OAuth 2.0 access token
+      description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+x-refined-from:
+- machinelibrary-ai-openapi.json
+- machinelibrary-ai-openapi.yml
+x-service-info:
+  categories:
+  - data
+  - search
+  docs:
+    apiReference: https://machinelibrary.ai/docs/api/reference
+    homepage: https://machinelibrary.ai
+    llms: https://machinelibrary.ai/llms.txt

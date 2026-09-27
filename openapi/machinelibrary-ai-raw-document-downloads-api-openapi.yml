@@ -1,0 +1,441 @@
+openapi: 3.2.0
+info:
+  title: Machinelibrary Ai Raw document downloads API
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+  description: 'Operations tagged Raw document downloads across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.machinelibrary.ai
+  description: Machine Library
+- url: https://api.spacefrontiers.org
+  description: Space Frontiers (compatible endpoint)
+tags:
+- name: Raw document downloads
+  description: Authenticated, feature-gated streaming of PDF, EPUB, and DJVU library originals.
+paths:
+  /v2/downloads/{filename}:
+    get:
+      tags:
+      - Raw document downloads
+      summary: Original document by ID
+      description: Requires the durable raw-document-downloads feature and streams directly from object storage. See current pricing and access terms.
+      operationId: downloadOriginaldocumentbyID
+      security:
+      - api_key: []
+      - bearer_auth: []
+      parameters:
+      - name: filename
+        in: path
+        required: true
+        description: Canonical document ID plus `.pdf`, `.epub`, or `.djvu`, for example `31tlqhmn2jmoh3gzlea74trb3.pdf`.
+        schema:
+          type: string
+      - name: Range
+        in: header
+        required: false
+        description: One RFC 9110 byte range, for example `bytes=0-1048575`. Multipart ranges are not supported.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Complete original document.
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+            ETag:
+              schema:
+                type: string
+            X-Spent-Budget:
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/epub+zip:
+              schema:
+                type: string
+                format: binary
+            image/vnd.djvu:
+              schema:
+                type: string
+                format: binary
+        '206':
+          description: Requested byte range.
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+            ETag:
+              schema:
+                type: string
+            X-Spent-Budget:
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/epub+zip:
+              schema:
+                type: string
+                format: binary
+            image/vnd.djvu:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid document ID, URI, or format.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '401':
+          description: Missing or invalid API credential.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '402':
+          description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '403':
+          description: The raw-document-downloads feature is missing. See https://machinelibrary.ai/pricing for current access terms.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '404':
+          description: No matching original document is available.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '416':
+          description: Invalid, unsatisfiable, or multipart range.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '502':
+          description: Document storage is unavailable.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/downloads/by-uri/{uri}:
+    get:
+      tags:
+      - Raw document downloads
+      summary: Original document by URI
+      description: Requires the durable raw-document-downloads feature and streams directly from object storage. See current pricing and access terms. The URI is resolved through the canonical document_uris index.
+      operationId: downloadOriginaldocumentbyURI
+      security:
+      - api_key: []
+      - bearer_auth: []
+      parameters:
+      - name: uri
+        in: path
+        required: true
+        description: Percent-encoded canonical URI copied from a search result, for example `doi%3A%2F%2F10.1000%2Fexample`.
+        schema:
+          type: string
+          maxLength: 8192
+      - name: format
+        in: query
+        required: false
+        description: Request PDF, EPUB, or DJVU. The default is PDF.
+        schema:
+          type: string
+          enum:
+          - pdf
+          - epub
+          - djvu
+      - name: Range
+        in: header
+        required: false
+        description: One RFC 9110 byte range, for example `bytes=0-1048575`. Multipart ranges are not supported.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Complete original document.
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+            ETag:
+              schema:
+                type: string
+            X-Spent-Budget:
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/epub+zip:
+              schema:
+                type: string
+                format: binary
+            image/vnd.djvu:
+              schema:
+                type: string
+                format: binary
+        '206':
+          description: Requested byte range.
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+            ETag:
+              schema:
+                type: string
+            X-Spent-Budget:
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/epub+zip:
+              schema:
+                type: string
+                format: binary
+            image/vnd.djvu:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid document ID, URI, or format.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '401':
+          description: Missing or invalid API credential.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '402':
+          description: Insufficient account balance.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '403':
+          description: The raw-document-downloads feature is missing. See https://machinelibrary.ai/pricing for current access terms.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '404':
+          description: No matching original document is available.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '416':
+          description: Invalid, unsatisfiable, or multipart range.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+        '502':
+          description: Document storage is unavailable.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - detail
+                - status
+                properties:
+                  detail: {}
+                  status:
+                    type: string
+                    example: error
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Machine Library API key from https://machinelibrary.ai/keys.
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key or OAuth 2.0 access token
+      description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+x-refined-from:
+- machinelibrary-ai-openapi.json
+- machinelibrary-ai-openapi.yml
+x-service-info:
+  categories:
+  - data
+  - search
+  docs:
+    apiReference: https://machinelibrary.ai/docs/api/reference
+    homepage: https://machinelibrary.ai
+    llms: https://machinelibrary.ai/llms.txt

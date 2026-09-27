@@ -1,0 +1,641 @@
+openapi: 3.2.0
+info:
+  title: Machinelibrary Ai Conversations API
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+  description: 'Operations tagged Conversations across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.machinelibrary.ai
+  description: Machine Library
+- url: https://api.spacefrontiers.org
+  description: Space Frontiers (compatible endpoint)
+tags:
+- name: Conversations
+  description: Retrieval-augmented conversation workflows.
+paths:
+  /v2/conversations/:
+    get:
+      tags:
+      - Conversations
+      summary: List conversations owned by the authenticated user
+      operationId: listConversations
+      responses:
+        '200':
+          description: Conversation summaries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListConversationsResponse'
+        '401':
+          description: Missing or invalid API credential.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    post:
+      tags:
+      - Conversations
+      summary: Run a retrieval-augmented conversation turn
+      operationId: createConversationTurn
+      requestBody:
+        description: Conversation query and model configuration.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationRequest'
+        required: true
+      responses:
+        '200':
+          description: Completed assistant response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationResponse'
+        '400':
+          description: Invalid request.
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/conversations/stream:
+    post:
+      tags:
+      - Conversations
+      summary: Run a conversation turn and stream newline-delimited progress events
+      operationId: streamConversationTurn
+      requestBody:
+        description: Conversation query and model configuration.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationRequest'
+        required: true
+      responses:
+        '200':
+          description: Newline-delimited progress and result events.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '400':
+          description: Invalid request.
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/conversations/{slug}:
+    get:
+      tags:
+      - Conversations
+      summary: Fetch a conversation and all recorded request/response steps
+      operationId: getConversation
+      parameters:
+      - name: slug
+        in: path
+        description: Conversation slug or UUID.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Complete conversation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullConversation'
+        '401':
+          description: Missing or invalid API credential.
+        '404':
+          description: Conversation not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    delete:
+      tags:
+      - Conversations
+      summary: Delete a conversation owned by the authenticated user
+      operationId: deleteConversation
+      parameters:
+      - name: slug
+        in: path
+        description: Conversation slug or UUID.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Conversation deleted.
+        '401':
+          description: Missing or invalid API credential.
+        '404':
+          description: Conversation not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}:
+    put:
+      tags:
+      - Conversations
+      summary: Replace a request step and recompute the conversation from that point
+      operationId: editConversationStep
+      parameters:
+      - name: conversation_id_or_slug
+        in: path
+        description: Conversation slug or UUID.
+        required: true
+        schema:
+          type: string
+      - name: step_id
+        in: path
+        description: Recorded request step position.
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditStepRequest'
+        required: true
+      responses:
+        '200':
+          description: Recomputed complete conversation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullConversation'
+        '400':
+          description: Invalid replacement query.
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+        '404':
+          description: Conversation or request step not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream:
+    put:
+      tags:
+      - Conversations
+      summary: Replace a request step and stream the recomputation as newline-delimited events
+      operationId: streamEditedConversationStep
+      parameters:
+      - name: conversation_id_or_slug
+        in: path
+        description: Conversation slug or UUID.
+        required: true
+        schema:
+          type: string
+      - name: step_id
+        in: path
+        description: Recorded request step ID.
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditStepRequest'
+        required: true
+      responses:
+        '200':
+          description: Newline-delimited progress and result events.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '400':
+          description: Invalid replacement query.
+        '401':
+          description: Missing or invalid API credential.
+        '402':
+          description: Insufficient account balance.
+        '404':
+          description: Conversation or request step not found.
+      security:
+      - api_key: []
+      - bearer_auth: []
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+components:
+  schemas:
+    ListConversationsResponse:
+      type: object
+      required:
+      - conversations
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationMetadata'
+    ConversationStep:
+      oneOf:
+      - $ref: '#/components/schemas/ConversationRequest'
+      - $ref: '#/components/schemas/ConversationResponse'
+      description: 'Discriminated on `kind`: "request" | "response".'
+    LlmConfig:
+      type: object
+      required:
+      - model_name
+      properties:
+        model_name:
+          type: string
+        api_key:
+          type:
+          - string
+          - 'null'
+        max_context_length:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+    SearchDocument:
+      type: object
+      description: 'One search hit: the stored document plus its snippets and score.'
+      required:
+      - source
+      - document
+      properties:
+        source:
+          type: string
+        document: {}
+        snippets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Snippet'
+        score:
+          type: number
+          format: double
+    SnippetEvidence:
+      type: object
+      description: A reranker-selected, verbatim window within the original snippet.
+      required:
+      - text
+      - start_char
+      - score
+      properties:
+        text:
+          type: string
+        start_char:
+          type: integer
+          description: Unicode scalar values, relative to the full `Snippet.text`.
+          minimum: 0
+        score:
+          type: number
+          format: double
+    ConversationResponse:
+      type: object
+      required:
+      - conversation_id
+      - answer
+      properties:
+        query_details:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/QueryDetails'
+            description: Persisted search-stage snapshot, captured only for entitled planning.
+        trajectory:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SearchTrajectory'
+        id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        conversation_id:
+          type: string
+        answer:
+          type: string
+        search_documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchDocument'
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CitationOccurrence'
+          description: 'Ordered metadata for every inline citation marker, including repeated
+
+            citations to different passages of the same document.'
+        query:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/Query'
+        model_name:
+          type:
+          - string
+          - 'null'
+        kind:
+          type: string
+    FullConversation:
+      type: object
+      required:
+      - conversation_metadata
+      - conversation_steps
+      properties:
+        conversation_metadata:
+          $ref: '#/components/schemas/ConversationMetadata'
+        conversation_steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationStep'
+    CitationOccurrence:
+      type: object
+      required:
+      - citation_index
+      - document_index
+      - excerpt
+      properties:
+        citation_index:
+          type: integer
+          description: Zero-based position among citation markers in the answer.
+          minimum: 0
+        document_index:
+          type: integer
+          description: One-based index into `ConversationResponse.search_documents`.
+          minimum: 0
+        snippet_index:
+          type:
+          - integer
+          - 'null'
+          description: Zero-based index into the selected document's snippets.
+          minimum: 0
+        excerpt:
+          type: string
+          description: Claim-specific excerpt suitable for citation previews.
+    ConversationRequest:
+      type: object
+      required:
+      - query
+      - llm_config
+      properties:
+        id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        conversation_id:
+          type:
+          - string
+          - 'null'
+        document_ids:
+          type: array
+          items:
+            type: string
+          description: 'Exact Nexus documents to merge into retrieval regardless of the query
+
+            classifier. `default` keeps historical persisted steps compatible.'
+        query:
+          type: string
+        llm_config:
+          $ref: '#/components/schemas/LlmConfig'
+        sources_filters: {}
+        sources_literal_filters: {}
+        resolved_sources_literal_filters: {}
+        limit:
+          type: integer
+          format: int32
+          minimum: 0
+        max_model_documents:
+          type:
+          - integer
+          - 'null'
+          format: int32
+          description: 'Cap on documents sent to the model after reranking and budget
+
+            stripping (pinned documents keep priority). Experimentation knob for
+
+            quality/cost sweeps; absent or zero means no cap.'
+          minimum: 0
+        kind:
+          type: string
+    QueryDetails:
+      type: object
+      properties:
+        query:
+          type:
+          - string
+          - 'null'
+        queries:
+          type: array
+          items:
+            type: string
+        incomplete_queries:
+          type: array
+          items:
+            type: string
+        retrieved:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        compared:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        selected:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        planning_fallback:
+          type: boolean
+        ranking_fallback:
+          type: boolean
+    Query:
+      type: object
+      description: Classifier state object (spacefrontiers `Query`).
+      properties:
+        original_query:
+          type: string
+        reformulated_query:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        filters: {}
+        is_recent:
+          type: boolean
+        is_event:
+          type: boolean
+        date:
+          type:
+          - array
+          - 'null'
+          items: false
+          prefixItems:
+          - type: string
+            format: date-time
+          - type: string
+            format: date-time
+          description: (start, end) as RFC3339 datetimes in JSON.
+        date_expression:
+          type:
+          - string
+          - 'null'
+          description: 'Unresolved classifier expression; cached instead of absolute timestamps
+
+            so relative ranges are evaluated at request time.'
+        content_type:
+          type:
+          - string
+          - 'null'
+        related_queries:
+          type: array
+          items:
+            type: string
+        query_language:
+          type:
+          - string
+          - 'null'
+        instruction:
+          type:
+          - string
+          - 'null'
+        knowledge_source:
+          type:
+          - string
+          - 'null'
+        classified_aspects:
+          type: array
+          items:
+            type: string
+        title:
+          type:
+          - string
+          - 'null'
+    SearchTrajectory:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: string
+        feedback_token:
+          type:
+          - string
+          - 'null'
+          description: A bounded, expiring capability to rate results of this retrieval.
+    Snippet:
+      type: object
+      description: One highlighted passage of a search hit.
+      required:
+      - field
+      - text
+      properties:
+        field:
+          type: string
+        text:
+          type: string
+        score:
+          type: number
+          format: double
+        chunk_id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        evidence:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetEvidence'
+    ConversationMetadata:
+      type: object
+      required:
+      - id
+      - created_at
+      properties:
+        id:
+          type: string
+        title:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        slug:
+          type:
+          - string
+          - 'null'
+        query:
+          type:
+          - string
+          - 'null'
+        user_id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        preview:
+          type:
+          - string
+          - 'null'
+    EditStepRequest:
+      type: object
+      required:
+      - new_query
+      properties:
+        new_query:
+          type: string
+          description: Replacement query for the selected request step.
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Machine Library API key from https://machinelibrary.ai/keys.
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key or OAuth 2.0 access token
+      description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+x-refined-from:
+- machinelibrary-ai-openapi.json
+- machinelibrary-ai-openapi.yml
+x-service-info:
+  categories:
+  - data
+  - search
+  docs:
+    apiReference: https://machinelibrary.ai/docs/api/reference
+    homepage: https://machinelibrary.ai
+    llms: https://machinelibrary.ai/llms.txt

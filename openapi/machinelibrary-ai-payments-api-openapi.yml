@@ -1,0 +1,138 @@
+openapi: 3.2.0
+info:
+  title: Machinelibrary Ai Payments API
+  version: 0.1.0
+  license:
+    name: MIT
+    identifier: MIT
+  description: 'Operations tagged Payments across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.machinelibrary.ai
+  description: Machine Library
+- url: https://api.spacefrontiers.org
+  description: Space Frontiers (compatible endpoint)
+tags:
+- name: Payments
+paths:
+  /v2/payments/mpp/top-up:
+    post:
+      tags:
+      - Payments
+      operationId: createMppBalanceTopUp
+      summary: Fund the authenticated account balance using Stripe MPP
+      description: The first authenticated request returns a Stripe MPP challenge. Retry the same request with the resulting Payment credential to settle and credit the existing USD balance.
+      security:
+      - bearer_auth: []
+      - api_key: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - package
+              properties:
+                package:
+                  type: string
+                  enum:
+                  - usd-5
+                  - usd-10
+                  - usd-25
+                  - usd-50
+                  - usd-100
+                  - usd-250
+                  - usd-500
+                  - usd-1000
+      x-payment-info:
+        intent: charge
+        method: stripe
+        amount: '500'
+        currency: usd
+        description: Prepaid-credit packages from $5 to $1000; select one in the request body.
+        offers:
+        - intent: charge
+          method: stripe
+          amount: '500'
+          currency: usd
+          description: Prepaid-credit package usd-5; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '1000'
+          currency: usd
+          description: Prepaid-credit package usd-10; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '2500'
+          currency: usd
+          description: Prepaid-credit package usd-25; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '5000'
+          currency: usd
+          description: Prepaid-credit package usd-50; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '10000'
+          currency: usd
+          description: Prepaid-credit package usd-100; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '25000'
+          currency: usd
+          description: Prepaid-credit package usd-250; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '50000'
+          currency: usd
+          description: Prepaid-credit package usd-500; select it in the request body.
+        - intent: charge
+          method: stripe
+          amount: '100000'
+          currency: usd
+          description: Prepaid-credit package usd-1000; select it in the request body.
+      responses:
+        '200':
+          description: Payment settled and balance credited.
+        '400':
+          description: Malformed package or Payment credential.
+        '401':
+          description: Missing or invalid account credential.
+        '402':
+          description: MPP payment challenge or verification failure.
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+        '409':
+          description: Payment is already being processed.
+        '503':
+          description: Agent payments are temporarily disabled.
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Machine Library API key from https://machinelibrary.ai/keys.
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key or OAuth 2.0 access token
+      description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+x-refined-from:
+- machinelibrary-ai-openapi.json
+- machinelibrary-ai-openapi.yml
+x-service-info:
+  categories:
+  - data
+  - search
+  docs:
+    apiReference: https://machinelibrary.ai/docs/api/reference
+    homepage: https://machinelibrary.ai
+    llms: https://machinelibrary.ai/llms.txt

@@ -1,0 +1,290 @@
+openapi: 3.2.0
+info:
+  title: Machinelibrary Ai Recognition API
+  version: '1.0'
+  description: 'Operations tagged Recognition across 3 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml, machinelibrary-ai-recognition-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.machinelibrary.ai
+  description: Machine Library
+- url: https://api.spacefrontiers.org
+  description: Space Frontiers (compatible endpoint)
+tags:
+- description: 'Document recognition: PDF, EPUB, and DJVU to structured Markdown with quality reports.'
+  name: Recognition
+paths:
+  /v1/recognitions:
+    post:
+      operationId: create_recognition
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: PDF, EPUB, or DJVU, up to 100 MB. Format is detected from bytes.
+                  format: binary
+                  type: string
+                languages:
+                  description: Optional comma-separated OCR language hints, e.g. "eng,deu". When omitted, the language is detected from the document body, falling back to English.
+                  type: string
+              required:
+              - file
+              type: object
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionSubmission'
+          description: Job accepted; poll the Location header.
+        '401':
+          description: Missing or invalid API key.
+        '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionError'
+          description: Insufficient balance.
+        '413':
+          description: File exceeds the upload limit.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionError'
+          description: Unsupported or invalid document.
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionError'
+          description: Active-job limit reached; wait for a job to finish.
+      summary: Submit a document for recognition
+      tags:
+      - Recognition
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v1/recognitions/{id}:
+    get:
+      operationId: get_recognition
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionJobStatus'
+          description: Current job state.
+        '404':
+          description: No such job for this account.
+      summary: Job status
+      tags:
+      - Recognition
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v1/recognitions/{id}/report:
+    get:
+      description: Quality verdict, score, rejection reasons, structured extraction (sections, references), and the processing route.
+      operationId: get_recognition_report
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+          description: The recognition report.
+        '404':
+          description: No such job, or no report yet.
+      summary: Structured recognition report
+      tags:
+      - Recognition
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+  /v1/recognitions/{id}/result:
+    get:
+      operationId: get_recognition_result
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            text/markdown:
+              schema:
+                type: string
+          description: The recognized document.
+        '404':
+          description: No such job, or no result yet.
+      summary: Recognized Markdown
+      tags:
+      - Recognition
+    servers:
+    - url: https://api.machinelibrary.ai
+      description: Machine Library
+    - url: https://api.spacefrontiers.org
+      description: Space Frontiers (compatible endpoint)
+components:
+  schemas:
+    RecognitionJobStatus:
+      properties:
+        completed_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        error_class:
+          nullable: true
+          type: string
+        has_result:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        input_format:
+          enum:
+          - pdf
+          - epub
+          - djvu
+          type: string
+        languages:
+          items:
+            type: string
+          type: array
+        report_url:
+          nullable: true
+          type: string
+        result_url:
+          nullable: true
+          type: string
+        started_at:
+          format: date-time
+          nullable: true
+          type: string
+        status:
+          type: string
+      type: object
+    RecognitionSubmission:
+      properties:
+        deduplicated:
+          description: True when this exact content was already submitted by you; no new charge applies.
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        status:
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          - quarantined
+          - cancelled
+          type: string
+      type: object
+    RecognitionError:
+      description: The shared Machine Library error envelope.
+      properties:
+        detail:
+          type: string
+        status:
+          enum:
+          - error
+          type: string
+      type: object
+    RecognitionJobStatus_2:
+      properties:
+        completed_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        created_at:
+          format: date-time
+          type: string
+        error_class:
+          type:
+          - string
+          - 'null'
+        has_result:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        input_format:
+          enum:
+          - pdf
+          - epub
+          - djvu
+          type: string
+        languages:
+          items:
+            type: string
+          type: array
+        report_url:
+          type:
+          - string
+          - 'null'
+        result_url:
+          type:
+          - string
+          - 'null'
+        started_at:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+      type: object
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Machine Library API key from https://machinelibrary.ai/keys.
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key or OAuth 2.0 access token
+      description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+x-refined-from:
+- machinelibrary-ai-openapi.json
+- machinelibrary-ai-openapi.yml
+- machinelibrary-ai-recognition-openapi.yml
+x-service-info:
+  categories:
+  - data
+  - search
+  docs:
+    apiReference: https://machinelibrary.ai/docs/api/reference
+    homepage: https://machinelibrary.ai
+    llms: https://machinelibrary.ai/llms.txt
