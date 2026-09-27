@@ -449,3 +449,10 @@ x-a2a:
   grade: "conformant"
   protocol_version: "0.3.0"
   control: 404
+x-correction-request:
+  requested: '2026-09-27'
+  source: https://github.com/api-search/inbox/issues/39
+  request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1
+    -- review, do NOT merge wholesale): provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/
+    which 404s -- use the current MCP product name so a working server page is generated; fix inconsistent
+    counts and stale scope data. Re-profile from current sources.'
