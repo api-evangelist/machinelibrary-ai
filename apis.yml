@@ -450,9 +450,23 @@ x-a2a:
   protocol_version: "0.3.0"
   control: 404
 x-correction-request:
-  requested: '2026-09-27'
-  source: https://github.com/api-search/inbox/issues/39
-  request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1
-    -- review, do NOT merge wholesale): provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/
-    which 404s -- use the current MCP product name so a working server page is generated; fix inconsistent
-    counts and stale scope data. Re-profile from current sources.'
+  requested: '2026-09-28'
+  source:
+  - https://github.com/api-evangelist/machinelibrary-ai/pull/1
+  request: 'Provider PR #1 (ppodolsky, 2026-09-26), verified live 2026-09-28; not merged because it predates the
+    09-27 per-area OpenAPI split. Its rate-limits file is committed (12/60/30 requests per minute per source IP;
+    https://machinelibrary.ai/docs/api/operations#limits). Capture: OAuth authorization server issuer https://api.machinelibrary.ai,
+    scopes_supported [search], PKCE S256, dynamic client registration at /v2/oauth/register, protected-resource
+    metadata on mcp.machinelibrary.ai naming that issuer (legacy spacefrontiers hosts serve the same issuer); pages
+    Operations https://machinelibrary.ai/docs/api/operations, ChangeLog https://machinelibrary.ai/changelog, StatusPage
+    https://machinelibrary.ai/status, Datasets https://machinelibrary.ai/datasets; security.txt and api-catalog.
+    MCP tools are renamed machinelibrary_* and number 9 in the live llms.txt (comment_on_document, vote_on_comment
+    added); live OpenAPI https://machinelibrary.ai/docs/openapi.json has 21 paths. Note: their api-catalog links
+    mcp.machinelibrary.ai/.well-known/mcp/server-card.json, which returns 404.'
+  earlier:
+    requested: '2026-09-27'
+    source: https://github.com/api-search/inbox/issues/39
+    request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1 --
+      review, do NOT merge wholesale): provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/
+      which 404s -- use the current MCP product name so a working server page is generated; fix inconsistent counts
+      and stale scope data. Re-profile from current sources.'
