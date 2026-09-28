@@ -1,0 +1,393 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-conversation-response-schema.json",
+  "title": "ConversationResponse",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationResponse",
+  "properties": {
+    "answer": {
+      "type": "string"
+    },
+    "citations": {
+      "description": "Ordered metadata for every inline citation marker, including repeated\ncitations to different passages of the same document.",
+      "items": {
+        "$ref": "#/$defs/CitationOccurrence"
+      },
+      "type": "array"
+    },
+    "conversation_id": {
+      "type": "string"
+    },
+    "id": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "kind": {
+      "type": "string"
+    },
+    "model_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "query": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/Query"
+        }
+      ]
+    },
+    "query_details": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/QueryDetails",
+          "description": "Persisted search-stage snapshot, captured only for entitled planning."
+        }
+      ]
+    },
+    "search_documents": {
+      "items": {
+        "$ref": "#/$defs/SearchDocument"
+      },
+      "type": "array"
+    },
+    "trajectory": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/SearchTrajectory"
+        }
+      ]
+    }
+  },
+  "required": [
+    "conversation_id",
+    "answer"
+  ],
+  "type": "object",
+  "$defs": {
+    "CitationOccurrence": {
+      "properties": {
+        "citation_index": {
+          "description": "Zero-based position among citation markers in the answer.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "document_index": {
+          "description": "One-based index into `ConversationResponse.search_documents`.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "excerpt": {
+          "description": "Claim-specific excerpt suitable for citation previews.",
+          "type": "string"
+        },
+        "snippet_index": {
+          "description": "Zero-based index into the selected document's snippets.",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "citation_index",
+        "document_index",
+        "excerpt"
+      ],
+      "type": "object"
+    },
+    "Query": {
+      "description": "Classifier state object (spacefrontiers `Query`).",
+      "properties": {
+        "classified_aspects": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "content_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date": {
+          "description": "(start, end) as RFC3339 datetimes in JSON.",
+          "items": false,
+          "prefixItems": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "format": "date-time",
+              "type": "string"
+            }
+          ],
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "date_expression": {
+          "description": "Unresolved classifier expression; cached instead of absolute timestamps\nso relative ranges are evaluated at request time.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "filters": {},
+        "instruction": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_event": {
+          "type": "boolean"
+        },
+        "is_recent": {
+          "type": "boolean"
+        },
+        "keywords": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "knowledge_source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "original_query": {
+          "type": "string"
+        },
+        "query_language": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reformulated_query": {
+          "type": "string"
+        },
+        "related_queries": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "QueryDetails": {
+      "properties": {
+        "compared": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "incomplete_queries": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "planning_fallback": {
+          "type": "boolean"
+        },
+        "queries": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "query": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ranking_fallback": {
+          "type": "boolean"
+        },
+        "retrieved": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "selected": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SearchDocument": {
+      "description": "One search hit: the stored document plus its snippets and score.",
+      "properties": {
+        "document": {},
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "snippets": {
+          "items": {
+            "$ref": "#/$defs/Snippet"
+          },
+          "type": "array"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "document"
+      ],
+      "type": "object"
+    },
+    "SearchTrajectory": {
+      "properties": {
+        "feedback_token": {
+          "description": "A bounded, expiring capability to rate results of this retrieval.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "Snippet": {
+      "description": "One highlighted passage of a search hit.",
+      "properties": {
+        "chunk_id": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "evidence": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SnippetEvidence"
+            }
+          ]
+        },
+        "field": {
+          "type": "string"
+        },
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SnippetSource"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "text"
+      ],
+      "type": "object"
+    },
+    "SnippetEvidence": {
+      "description": "A reranker-selected, verbatim window within the original snippet.",
+      "properties": {
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "start_char": {
+          "description": "Unicode scalar values, relative to the full `Snippet.text`.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "start_char",
+        "score"
+      ],
+      "type": "object"
+    },
+    "SnippetSource": {
+      "description": "Location of a verbatim snippet in the original stored field. All positions\ncount Unicode scalar values; `end_char` is exclusive.",
+      "properties": {
+        "end_char": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "field_length": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_char": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_char",
+        "end_char",
+        "field_length"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-search-request-v2-schema.json",
+  "title": "SearchRequestV2",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchRequestV2",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_ranking": {
+      "$ref": "#/$defs/CandidateRanking",
+      "description": "Candidate selection before the cross-encoder. Formula requires an\nexplicit model or an artifact configured for the query's ranking profile."
+    },
+    "combiner": {
+      "default": "log_sum_exp",
+      "description": "Multi-query score combiner.",
+      "type": "string"
+    },
+    "combiner_decay": {
+      "default": 0.699999988079071,
+      "description": "Rank decay applied by the combiner.",
+      "format": "float",
+      "type": "number"
+    },
+    "combiner_temperature": {
+      "default": 1.5,
+      "description": "Temperature for the weighted combiner.",
+      "format": "float",
+      "type": "number"
+    },
+    "combiner_top_k": {
+      "default": 3,
+      "description": "Number of sub-query ranks considered by the combiner.",
+      "format": "int32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cross_rerank": {
+      "default": true,
+      "description": "Final-stage hosted cross-encoder reranker. On by default; pass `false`\nto skip it. No-op unless the reranker is configured\n(`reranker.enabled`). Runs after Summa candidate selection.",
+      "type": "boolean"
+    },
+    "cross_rerank_candidates": {
+      "default": 0,
+      "description": "Override the number of candidates retrieved and reranked (0 = config\ndefault). Capped at `MAX_CROSS_RERANK_POOL`.",
+      "format": "int32",
+      "maximum": 256,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "deduplicate": {
+      "default": true,
+      "description": "Collapse duplicate documents.",
+      "type": "boolean"
+    },
+    "filter_issns": {
+      "description": "Restrict results to ISSNs.",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "filter_issued_after": {
+      "description": "Earliest issue time as a Unix timestamp.",
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "filter_issued_before": {
+      "description": "Latest issue time as a Unix timestamp.",
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "filter_languages": {
+      "description": "Restrict results to ISO language codes.",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "filter_publisher": {
+      "description": "Restrict results to a publisher.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "filter_types": {
+      "description": "Restrict results to document types.",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "filter_uri_prefixes": {
+      "description": "Restrict results to canonical URI prefixes.",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "fulltext_phrase_boost": {
+      "description": "Extra weight for exact phrase matches inside the BM25 branch (default\n1.0). Zero disables the bonus while keeping quoted phrase constraints.",
+      "format": "float",
+      "maximum": 10,
+      "minimum": 0,
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "fulltext_weight": {
+      "description": "Weight of the stemmed BM25 (full-text) channel in hybrid fusion; `0`\ndisables it. Omit for the service default (1.0). Takes effect only on\nindexes whose schema carries the text fields.",
+      "format": "float",
+      "maximum": 10,
+      "minimum": 0,
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "heap_factor": {
+      "default": 0.8500000238418579,
+      "description": "Summa candidate heap multiplier.",
+      "format": "float",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "include_candidate_scores": {
+      "description": "Include raw document/passage features for formula-ranked returned hits.\nTraining collection uses the separate complete-union export path.",
+      "type": "boolean"
+    },
+    "include_rrf_scores": {
+      "description": "Include exact organic RRF votes alongside fusion results.",
+      "type": "boolean"
+    },
+    "index_names": {
+      "default": [
+        "documents"
+      ],
+      "description": "Logical indexes to search. Public values are `documents` and `social`.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "type": "array"
+    },
+    "l1": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/FormulaRanking",
+          "description": "Symbolic formula over named raw scores and organic `rrf`.\nMissing raw cells use defaults; references to absent branches fail validation."
+        }
+      ]
+    },
+    "l2_rerank": {
+      "$ref": "#/$defs/L2Rerank",
+      "description": "Search API CatBoost selection before the cross-encoder. Auto activates\na configured profile; off is the control. Catboost requires a model."
+    },
+    "limit": {
+      "default": 10,
+      "description": "Maximum number of hits to return.",
+      "format": "int32",
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "max_query_dims": {
+      "default": 0,
+      "description": "Maximum number of reformulated query dimensions; zero uses the service default.",
+      "format": "int32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mode": {
+      "default": "hybrid",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SearchMode",
+          "description": "Retrieval strategy. Hybrid combines lexical and semantic retrieval."
+        }
+      ]
+    },
+    "offset": {
+      "default": 0,
+      "description": "Result offset. `offset + limit` cannot exceed 500.",
+      "format": "int32",
+      "maximum": 499,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "possible_languages": {
+      "description": "Language hints used by query processing.",
+      "items": {
+        "type": "string"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "pruning": {
+      "description": "Optional sparse-vector pruning threshold.",
+      "format": "float",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "query": {
+      "default": "",
+      "description": "Natural-language query (at most 16 KiB UTF-8). Wrap a span in double\nquotes (`\"float-zero determinants\"`) to require ordered indexed tokens.\nStraight, curly and guillemet pairs work; all quoted spans are required\nand receive a lexical score bonus. Tokenizer normalization still applies.\nUnquoted words guide relevance; use structured parameters for filters.\nQuoted identifiers are text constraints, not direct lookup requests.\nAn empty query can be combined with filters.",
+      "type": "string"
+    },
+    "ranking_mode": {
+      "default": "auto",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/RankingMode",
+          "description": "Relevance objective: passages ranks answer-bearing passages and their\ndocument groups; documents ranks sources for researching the topic.\nAuto resolves intent to one of those two objectives. The response reports\nthe resolved mode. Corpus selection is independent."
+        }
+      ]
+    },
+    "referenced_by_uri": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/ReferencedBy",
+          "description": "Return documents that cite this work: one `doi://`/`arxiv://` URI or\na list of up to 16 identifiers of the same work."
+        }
+      ]
+    },
+    "return_documents": {
+      "default": true,
+      "description": "Include enriched document metadata and query-matched snippets. Set to\nfalse for bulk ranking jobs that only need document IDs and scores.",
+      "type": "boolean"
+    },
+    "rrf_k": {
+      "description": "RRF smoothing constant for hybrid fusion. Omit for the service\ndefault (60, the original-paper value); smaller values weight\ntop-ranked results more aggressively.",
+      "format": "float",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "tracing": {
+      "description": "Return bounded per-shard and per-vertical execution traces.",
+      "type": "boolean"
+    },
+    "weight_threshold": {
+      "default": 0,
+      "description": "Minimum generated sub-query weight.",
+      "format": "float",
+      "type": "number"
+    }
+  },
+  "type": "object",
+  "$defs": {
+    "CandidateRanking": {
+      "enum": [
+        "auto",
+        "rrf",
+        "formula"
+      ],
+      "type": "string"
+    },
+    "FormulaRanking": {
+      "additionalProperties": false,
+      "properties": {
+        "backfill": {
+          "description": "Preserve organic scores and probe only missing cells when enabled.",
+          "type": "boolean"
+        },
+        "formula": {
+          "description": "Summa symbolic expression over named raw branch scores and organic `rrf`.",
+          "type": "string"
+        },
+        "missing_values": {
+          "additionalProperties": {
+            "format": "double",
+            "type": "number"
+          },
+          "description": "Finite raw defaults for absent formula variables. Observed zero wins.",
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "formula"
+      ],
+      "type": "object"
+    },
+    "L2Rerank": {
+      "enum": [
+        "auto",
+        "off",
+        "catboost"
+      ],
+      "type": "string"
+    },
+    "RankingMode": {
+      "description": "Relevance objective, independent of corpus and lexical/vector retrieval.\nResults remain document groups for both objectives.",
+      "enum": [
+        "auto",
+        "documents",
+        "passages"
+      ],
+      "type": "string"
+    },
+    "ReferencedBy": {
+      "description": "One identifier or several identifiers of the same cited work.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "SearchMode": {
+      "enum": [
+        "sparse",
+        "short_document",
+        "binary",
+        "hybrid",
+        "fulltext"
+      ],
+      "type": "string"
+    }
+  }
+}

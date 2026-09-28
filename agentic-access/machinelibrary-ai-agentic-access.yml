@@ -1,0 +1,598 @@
+generated: '2026-09-28'
+method: generated
+source: openapi/machinelibrary-ai-conversations-api-openapi.json, openapi/machinelibrary-ai-conversations-api-openapi.yml,
+  openapi/machinelibrary-ai-documents-api-openapi.yml, openapi/machinelibrary-ai-payments-api-openapi.yml,
+  openapi/machinelibrary-ai-raw-document-downloads-api-openapi.yml, openapi/machinelibrary-ai-recognition-api-openapi.yml,
+  openapi/machinelibrary-ai-search-api-openapi.yml
+description: Recommended x-agentic-access execution contracts, classified heuristically from
+  the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
+  audience per deployment. See research/curity/agentic-governance/.
+summary:
+  operations: 42
+  by_action_class:
+    connected: 24
+    acting: 18
+  by_consequence:
+    read: 24
+    write: 16
+    physical: 2
+  human_in_the_loop_required: 0
+operations:
+- path: /v2/conversations/
+  method: get
+  operationId: listConversations
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/conversations/
+  method: post
+  operationId: createConversationTurn
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/stream
+  method: post
+  operationId: streamConversationTurn
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}
+  method: put
+  operationId: editConversationStep
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream
+  method: put
+  operationId: streamEditedConversationStep
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{slug}
+  method: delete
+  operationId: deleteConversation
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{slug}
+  method: get
+  operationId: getConversation
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/documents/by-uri/{uri}
+  method: get
+  operationId: getDocumentByUri
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/documents/trending
+  method: get
+  operationId: getTrendingDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/documents/{document_id}
+  method: get
+  operationId: getDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/documents/{document_id}/activity
+  method: get
+  operationId: getDocumentActivity
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/search/
+  method: post
+  operationId: searchDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/search/comments
+  method: post
+  operationId: submitAgentComment
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/search/comments/{comment_id}/vote
+  method: post
+  operationId: voteOnComment
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/search/feedback
+  method: post
+  operationId: submitSearchFeedback
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/search/similar
+  method: post
+  operationId: findSimilarDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions
+  method: post
+  operationId: create_recognition
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v1/recognitions/{id}
+  method: get
+  operationId: get_recognition
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions/{id}/report
+  method: get
+  operationId: get_recognition_report
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions/{id}/result
+  method: get
+  operationId: get_recognition_result
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/downloads/{filename}
+  method: get
+  operationId: downloadOriginaldocumentbyID
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/downloads/by-uri/{uri}
+  method: get
+  operationId: downloadOriginaldocumentbyURI
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - search
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/payments/mpp/top-up
+  method: post
+  operationId: createMppBalanceTopUp
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: required
+    scope:
+    - search
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: true
+      purpose-required: true
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/
+  method: get
+  operationId: listConversations
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/conversations/
+  method: post
+  operationId: createConversationTurn
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/stream
+  method: post
+  operationId: streamConversationTurn
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{slug}
+  method: get
+  operationId: getConversation
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/conversations/{slug}
+  method: delete
+  operationId: deleteConversation
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}
+  method: put
+  operationId: editConversationStep
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream
+  method: put
+  operationId: streamEditedConversationStep
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/documents/by-uri/{uri}
+  method: get
+  operationId: getDocumentByUri
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/documents/{document_id}
+  method: get
+  operationId: getDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/payments/mpp/top-up
+  method: post
+  operationId: createMppBalanceTopUp
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: true
+      purpose-required: true
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/downloads/{filename}
+  method: get
+  operationId: downloadOriginaldocumentbyID
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/downloads/by-uri/{uri}
+  method: get
+  operationId: downloadOriginaldocumentbyURI
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions
+  method: post
+  operationId: create_recognition
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v1/recognitions/{id}
+  method: get
+  operationId: get_recognition
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions/{id}/report
+  method: get
+  operationId: get_recognition_report
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/recognitions/{id}/result
+  method: get
+  operationId: get_recognition_result
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/search/
+  method: post
+  operationId: searchDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/search/feedback
+  method: post
+  operationId: submitSearchFeedback
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /v2/search/similar
+  method: post
+  operationId: findSimilarDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none

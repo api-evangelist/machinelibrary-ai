@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-v2-document-response-schema.json",
+  "title": "V2DocumentResponse",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-documents-api-openapi.yml#/components/schemas/V2DocumentResponse",
+  "type": "object",
+  "required": [
+    "id",
+    "uris",
+    "document"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "uris": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "document": {}
+  }
+}

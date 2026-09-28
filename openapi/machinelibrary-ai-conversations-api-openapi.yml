@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Machinelibrary Ai Conversations API
-  version: 0.1.0
+  title: Machine Library Conversations API
+  description: 'Search, retrieve, and synthesize scholarly and public-interest documents through Machine Library, the search and AI product by Space Frontiers Company. Document recognition endpoints (`/v1/recognitions`: PDF, EPUB, and DJVU to structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at https://machinelibrary.ai/docs/api/reference presents both specs merged.'
   license:
     name: MIT
     identifier: MIT
-  description: 'Operations tagged Conversations across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 0.1.0
 servers:
 - url: https://api.machinelibrary.ai
   description: Machine Library
@@ -61,11 +61,6 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v2/conversations/stream:
     post:
       tags:
@@ -95,11 +90,6 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v2/conversations/{slug}:
     get:
       tags:
@@ -149,11 +139,6 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}:
     put:
       tags:
@@ -198,11 +183,6 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream:
     put:
       tags:
@@ -247,134 +227,45 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
 components:
   schemas:
-    ListConversationsResponse:
-      type: object
-      required:
-      - conversations
-      properties:
-        conversations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationMetadata'
     ConversationStep:
       oneOf:
       - $ref: '#/components/schemas/ConversationRequest'
       - $ref: '#/components/schemas/ConversationResponse'
       description: 'Discriminated on `kind`: "request" | "response".'
-    LlmConfig:
+    ConversationMetadata:
       type: object
       required:
-      - model_name
+      - id
+      - created_at
       properties:
-        model_name:
+        id:
           type: string
-        api_key:
+        title:
           type:
           - string
           - 'null'
-        max_context_length:
+        created_at:
+          type: string
+          format: date-time
+        slug:
           type:
-          - integer
+          - string
           - 'null'
-          minimum: 0
-    SearchDocument:
-      type: object
-      description: 'One search hit: the stored document plus its snippets and score.'
-      required:
-      - source
-      - document
-      properties:
-        source:
-          type: string
-        document: {}
-        snippets:
-          type: array
-          items:
-            $ref: '#/components/schemas/Snippet'
-        score:
-          type: number
-          format: double
-    SnippetEvidence:
-      type: object
-      description: A reranker-selected, verbatim window within the original snippet.
-      required:
-      - text
-      - start_char
-      - score
-      properties:
-        text:
-          type: string
-        start_char:
-          type: integer
-          description: Unicode scalar values, relative to the full `Snippet.text`.
-          minimum: 0
-        score:
-          type: number
-          format: double
-    ConversationResponse:
-      type: object
-      required:
-      - conversation_id
-      - answer
-      properties:
-        query_details:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/QueryDetails'
-            description: Persisted search-stage snapshot, captured only for entitled planning.
-        trajectory:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/SearchTrajectory'
-        id:
+        query:
+          type:
+          - string
+          - 'null'
+        user_id:
           type:
           - integer
           - 'null'
           format: int64
-        conversation_id:
-          type: string
-        answer:
-          type: string
-        search_documents:
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchDocument'
-        citations:
-          type: array
-          items:
-            $ref: '#/components/schemas/CitationOccurrence'
-          description: 'Ordered metadata for every inline citation marker, including repeated
-
-            citations to different passages of the same document.'
-        query:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/Query'
-        model_name:
+        preview:
           type:
           - string
           - 'null'
-        kind:
-          type: string
-    FullConversation:
-      type: object
-      required:
-      - conversation_metadata
-      - conversation_steps
-      properties:
-        conversation_metadata:
-          $ref: '#/components/schemas/ConversationMetadata'
-        conversation_steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationStep'
     CitationOccurrence:
       type: object
       required:
@@ -399,86 +290,80 @@ components:
         excerpt:
           type: string
           description: Claim-specific excerpt suitable for citation previews.
-    ConversationRequest:
+    Snippet:
       type: object
+      description: One highlighted passage of a search hit.
       required:
-      - query
-      - llm_config
+      - field
+      - text
       properties:
-        id:
+        field:
+          type: string
+        text:
+          type: string
+        score:
+          type: number
+          format: double
+        chunk_id:
           type:
           - integer
           - 'null'
           format: int64
-        conversation_id:
-          type:
-          - string
-          - 'null'
-        document_ids:
-          type: array
-          items:
-            type: string
-          description: 'Exact Nexus documents to merge into retrieval regardless of the query
-
-            classifier. `default` keeps historical persisted steps compatible.'
-        query:
-          type: string
-        llm_config:
-          $ref: '#/components/schemas/LlmConfig'
-        sources_filters: {}
-        sources_literal_filters: {}
-        resolved_sources_literal_filters: {}
-        limit:
-          type: integer
-          format: int32
-          minimum: 0
-        max_model_documents:
-          type:
-          - integer
-          - 'null'
-          format: int32
-          description: 'Cap on documents sent to the model after reranking and budget
-
-            stripping (pinned documents keep priority). Experimentation knob for
-
-            quality/cost sweeps; absent or zero means no cap.'
-          minimum: 0
-        kind:
-          type: string
-    QueryDetails:
+        evidence:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetEvidence'
+    SnippetEvidence:
       type: object
+      description: A reranker-selected, verbatim window within the original snippet.
+      required:
+      - text
+      - start_char
+      - score
       properties:
-        query:
-          type:
-          - string
-          - 'null'
-        queries:
+        text:
+          type: string
+        start_char:
+          type: integer
+          description: Unicode scalar values, relative to the full `Snippet.text`.
+          minimum: 0
+        score:
+          type: number
+          format: double
+    EditStepRequest:
+      type: object
+      required:
+      - new_query
+      properties:
+        new_query:
+          type: string
+          description: Replacement query for the selected request step.
+    SearchDocument:
+      type: object
+      description: 'One search hit: the stored document plus its snippets and score.'
+      required:
+      - source
+      - document
+      properties:
+        source:
+          type: string
+        document: {}
+        snippets:
           type: array
           items:
-            type: string
-        incomplete_queries:
+            $ref: '#/components/schemas/Snippet'
+        score:
+          type: number
+          format: double
+    ListConversationsResponse:
+      type: object
+      required:
+      - conversations
+      properties:
+        conversations:
           type: array
           items:
-            type: string
-        retrieved:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        compared:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        selected:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        planning_fallback:
-          type: boolean
-        ranking_fallback:
-          type: boolean
+            $ref: '#/components/schemas/ConversationMetadata'
     Query:
       type: object
       description: Classifier state object (spacefrontiers `Query`).
@@ -542,6 +427,51 @@ components:
           type:
           - string
           - 'null'
+    ConversationResponse:
+      type: object
+      required:
+      - conversation_id
+      - answer
+      properties:
+        query_details:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/QueryDetails'
+            description: Persisted search-stage snapshot, captured only for entitled planning.
+        trajectory:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SearchTrajectory'
+        id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        conversation_id:
+          type: string
+        answer:
+          type: string
+        search_documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchDocument'
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CitationOccurrence'
+          description: 'Ordered metadata for every inline citation marker, including repeated
+
+            citations to different passages of the same document.'
+        query:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/Query'
+        model_name:
+          type:
+          - string
+          - 'null'
+        kind:
+          type: string
     SearchTrajectory:
       type: object
       required:
@@ -554,69 +484,114 @@ components:
           - string
           - 'null'
           description: A bounded, expiring capability to rate results of this retrieval.
-    Snippet:
+    ConversationRequest:
       type: object
-      description: One highlighted passage of a search hit.
       required:
-      - field
-      - text
+      - query
+      - llm_config
       properties:
-        field:
-          type: string
-        text:
-          type: string
-        score:
-          type: number
-          format: double
-        chunk_id:
+        id:
           type:
           - integer
           - 'null'
           format: int64
-        evidence:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/SnippetEvidence'
-    ConversationMetadata:
+        conversation_id:
+          type:
+          - string
+          - 'null'
+        document_ids:
+          type: array
+          items:
+            type: string
+          description: 'Exact Nexus documents to merge into retrieval regardless of the query
+
+            classifier. `default` keeps historical persisted steps compatible.'
+        query:
+          type: string
+        llm_config:
+          $ref: '#/components/schemas/LlmConfig'
+        sources_filters: {}
+        sources_literal_filters: {}
+        resolved_sources_literal_filters: {}
+        limit:
+          type: integer
+          format: int32
+          minimum: 0
+        max_model_documents:
+          type:
+          - integer
+          - 'null'
+          format: int32
+          description: 'Cap on documents sent to the model after reranking and budget
+
+            stripping (pinned documents keep priority). Experimentation knob for
+
+            quality/cost sweeps; absent or zero means no cap.'
+          minimum: 0
+        kind:
+          type: string
+    LlmConfig:
       type: object
       required:
-      - id
-      - created_at
+      - model_name
       properties:
-        id:
+        model_name:
           type: string
-        title:
+        api_key:
           type:
           - string
           - 'null'
-        created_at:
-          type: string
-          format: date-time
-        slug:
+        max_context_length:
           type:
-          - string
+          - integer
           - 'null'
+          minimum: 0
+    FullConversation:
+      type: object
+      required:
+      - conversation_metadata
+      - conversation_steps
+      properties:
+        conversation_metadata:
+          $ref: '#/components/schemas/ConversationMetadata'
+        conversation_steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationStep'
+    QueryDetails:
+      type: object
+      properties:
         query:
           type:
           - string
           - 'null'
-        user_id:
+        queries:
+          type: array
+          items:
+            type: string
+        incomplete_queries:
+          type: array
+          items:
+            type: string
+        retrieved:
           type:
           - integer
           - 'null'
-          format: int64
-        preview:
+          minimum: 0
+        compared:
           type:
-          - string
+          - integer
           - 'null'
-    EditStepRequest:
-      type: object
-      required:
-      - new_query
-      properties:
-        new_query:
-          type: string
-          description: Replacement query for the selected request step.
+          minimum: 0
+        selected:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        planning_fallback:
+          type: boolean
+        ranking_fallback:
+          type: boolean
   securitySchemes:
     api_key:
       type: apiKey
@@ -628,9 +603,6 @@ components:
       scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
-x-refined-from:
-- machinelibrary-ai-openapi.json
-- machinelibrary-ai-openapi.yml
 x-service-info:
   categories:
   - data

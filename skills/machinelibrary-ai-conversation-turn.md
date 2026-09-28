@@ -1,6 +1,6 @@
 ---
-name: Run and revise a retrieval-augmented conversation
-description: Ask a question that Machine Library answers with retrieved sources, stream or fetch the result, revise an earlier step, and delete the conversation when done.
+name: machinelibrary-ai-conversation-turn
+description: Perform a retrieval-augmented conversation with the Machine Library agent, allowing iterative refinement of queries and responses based on retrieved documents and supporting streaming, editing, and deletion of conversations.
 api: openapi/machinelibrary-ai-openapi.yml
 operations: [createConversationTurn, streamConversationTurn, getConversation, editConversationStep, deleteConversation]
 generated: '2026-09-19'

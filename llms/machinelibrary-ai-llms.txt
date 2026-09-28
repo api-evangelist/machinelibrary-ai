@@ -11,14 +11,16 @@ Three integration surfaces:
 
 - **MCP server** — `https://mcp.machinelibrary.ai` (Streamable HTTP transport, OAuth 2.0 with PKCE or Bearer API key). Drop-in for Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any MCP-compatible agent.
 - **REST API** — `https://api.machinelibrary.ai` (OpenAPI 3.1). Core endpoints include `POST /v2/search/`, `POST /v2/search/similar`, token-bounded text fetches at `GET /v2/documents/{document_id}` and `GET /v2/documents/by-uri/{uri}`, original-file streams at `GET /v2/downloads/{document_id}.{format}` and `GET /v2/downloads/by-uri/{uri}`, and `POST /v2/conversations/`. Full machine-readable spec at `https://machinelibrary.ai/docs/openapi.json`.
-- **Web app** — `https://machinelibrary.ai/c/` for conversational search in the browser.
+- **Web app** — `https://machinelibrary.ai/search` for search and cited AI answers in the browser; saved conversations live at `https://machinelibrary.ai/c/{slug}`.
 
-MCP tools (all read-only and idempotent):
+Core read-only MCP retrieval tools:
 
-- `spacefrontiers_search_documents` — search papers, books, patents, Wikipedia, and YouTube transcripts. Use for peer-reviewed claims, citations, prior art, and video sources.
-- `spacefrontiers_search_social` — search Reddit, Telegram, and Discord. Use for news, current events, community sentiment.
-- `spacefrontiers_fetch_document` — return bounded full text (40K characters by default, up to 100K) + references for one canonical URI.
-- `spacefrontiers_search_in_document` — return up to five matching passages within one large document by query.
+- `machinelibrary_search_documents` — search papers, books, patents, Wikipedia, and YouTube transcripts. Use for peer-reviewed claims, citations, prior art, and video sources.
+- `machinelibrary_search_social` — search Reddit, Telegram, and Discord. Use for news, current events, community sentiment.
+- `machinelibrary_fetch_document` — return bounded full text (40K characters by default, up to 100K) + references for one canonical URI, with public comments and social posts linking it.
+- `machinelibrary_search_in_document` — return up to five matching passages within one large document by query.
+
+Additional tools: `machinelibrary_research` returns a billed cited answer; `machinelibrary_search_feedback` records ratings for inspected results; `machinelibrary_comment_on_document` publishes an evidence-backed public comment, labeled AI-generated with the model name, when inspected sources correct, contradict or confirm a returned document, show a limitation it does not state, or are related work its readers should know (or replies to a comment); `machinelibrary_vote_on_comment` upvotes a comment that already makes the point or downvotes a wrong one; `machinelibrary_top_up_balance` initiates a payment when enabled. For feedback, generate `feedback_id` as a UUID and reuse it with the same payload on retries. Copy the search receipt unchanged and keep it out of answers. Legacy `spacefrontiers_*` tool calls remain accepted; reconnect the client to refresh its catalog.
 
 Search defaults to 10 compact, reranked hits. Every hit includes `source_uri`, `score`, one bounded `snippet`, an abstract preview, `authors`, `issued_date`, and `content_size_tokens` for typed parsing and citation. Cite results by the canonical `source_uri` (DOI URL, arXiv URL, Reddit permalink, Telegram message URL); do not invent or guess identifiers.
 
@@ -36,9 +38,16 @@ Supported URI schemes for fetch and per-document search: `doi:10.…` (or its `d
 
 ## Optional
 
-- [Conversational web UI](https://machinelibrary.ai/c/)
+- [Search and AI web UI](https://machinelibrary.ai/search)
 - [Account & API keys](https://machinelibrary.ai/keys)
 - [Payments](https://machinelibrary.ai/payments)
 - [Privacy](https://machinelibrary.ai/privacy)
 - [Terms](https://machinelibrary.ai/terms-of-service)
 - [Contact](https://machinelibrary.ai/contacts)
+
+## Operations and compatibility
+
+- [API operations](https://machinelibrary.ai/docs/api/operations): authentication, scope, rate limits, errors, bounded retries, billing, and deprecation policy.
+- [API changelog](https://machinelibrary.ai/changelog): customer-facing API changes and compatibility notices.
+- [Service status](https://machinelibrary.ai/status): recent public endpoint checks with their coverage and limitations.
+- [Security contact](https://machinelibrary.ai/.well-known/security.txt): vulnerability reporting.

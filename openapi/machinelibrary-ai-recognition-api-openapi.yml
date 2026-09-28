@@ -1,8 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Machinelibrary Ai Recognition API
-  version: '1.0'
-  description: 'Operations tagged Recognition across 3 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml, machinelibrary-ai-recognition-openapi.yml. Each path carries the servers of the definition it was published in.'
+  title: Machine Library Recognition API
+  description: 'Search, retrieve, and synthesize scholarly and public-interest documents through Machine Library, the search and AI product by Space Frontiers Company. Document recognition endpoints (`/v1/recognitions`: PDF, EPUB, and DJVU to structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at https://machinelibrary.ai/docs/api/reference presents both specs merged.'
+  license:
+    name: MIT
+    identifier: MIT
+  version: 0.1.0
 servers:
 - url: https://api.machinelibrary.ai
   description: Machine Library
@@ -63,11 +66,6 @@ paths:
       summary: Submit a document for recognition
       tags:
       - Recognition
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v1/recognitions/{id}:
     get:
       operationId: get_recognition
@@ -90,11 +88,6 @@ paths:
       summary: Job status
       tags:
       - Recognition
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v1/recognitions/{id}/report:
     get:
       description: Quality verdict, score, rejection reasons, structured extraction (sections, references), and the processing route.
@@ -118,11 +111,6 @@ paths:
       summary: Structured recognition report
       tags:
       - Recognition
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v1/recognitions/{id}/result:
     get:
       operationId: get_recognition_result
@@ -145,13 +133,36 @@ paths:
       summary: Recognized Markdown
       tags:
       - Recognition
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
 components:
   schemas:
+    RecognitionError:
+      description: The shared Machine Library error envelope.
+      properties:
+        detail:
+          type: string
+        status:
+          enum:
+          - error
+          type: string
+      type: object
+    RecognitionSubmission:
+      properties:
+        deduplicated:
+          description: True when this exact content was already submitted by you; no new charge applies.
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        status:
+          enum:
+          - pending
+          - processing
+          - completed
+          - failed
+          - quarantined
+          - cancelled
+          type: string
+      type: object
     RecognitionJobStatus:
       properties:
         completed_at:
@@ -192,79 +203,6 @@ components:
         status:
           type: string
       type: object
-    RecognitionSubmission:
-      properties:
-        deduplicated:
-          description: True when this exact content was already submitted by you; no new charge applies.
-          type: boolean
-        id:
-          format: uuid
-          type: string
-        status:
-          enum:
-          - pending
-          - processing
-          - completed
-          - failed
-          - quarantined
-          - cancelled
-          type: string
-      type: object
-    RecognitionError:
-      description: The shared Machine Library error envelope.
-      properties:
-        detail:
-          type: string
-        status:
-          enum:
-          - error
-          type: string
-      type: object
-    RecognitionJobStatus_2:
-      properties:
-        completed_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        created_at:
-          format: date-time
-          type: string
-        error_class:
-          type:
-          - string
-          - 'null'
-        has_result:
-          type: boolean
-        id:
-          format: uuid
-          type: string
-        input_format:
-          enum:
-          - pdf
-          - epub
-          - djvu
-          type: string
-        languages:
-          items:
-            type: string
-          type: array
-        report_url:
-          type:
-          - string
-          - 'null'
-        result_url:
-          type:
-          - string
-          - 'null'
-        started_at:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        status:
-          type: string
-      type: object
   securitySchemes:
     api_key:
       type: apiKey
@@ -276,10 +214,6 @@ components:
       scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
-x-refined-from:
-- machinelibrary-ai-openapi.json
-- machinelibrary-ai-openapi.yml
-- machinelibrary-ai-recognition-openapi.yml
 x-service-info:
   categories:
   - data

@@ -1,0 +1,90 @@
+generated: '2026-09-28'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 5
+  own: 3
+  other_domain: 1
+  platform: 1
+  roles:
+  - api
+  - other
+  - source
+  - website
+hosts:
+- host: api.machinelibrary.ai
+  found_by:
+  - apis[]
+  - probed
+  - contract-discovery
+  - well-known
+  types: []
+  serves:
+  - api
+  registrable_domain: machinelibrary.ai
+  role: api
+  relation: own
+- host: api.spacefrontiers.org
+  found_by:
+  - contract-discovery
+  types: []
+  serves: []
+  registrable_domain: spacefrontiers.org
+  role: api
+  relation: other-domain
+- host: github.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - GitHubOrganization
+  serves:
+  - docs
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: machinelibrary.ai
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - docs-index
+  - spec-found
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - StatusPage
+  - Website
+  - Documentation
+  - APIReference
+  - GettingStarted
+  - Pricing
+  - Support
+  - Newsroom
+  - SignUp
+  - Login
+  - TermsOfService
+  - PrivacyPolicy
+  serves:
+  - docs
+  - api
+  - spec
+  - cdn
+  vendor: cloudflare
+  registrable_domain: machinelibrary.ai
+  role: website
+  relation: own
+- host: mcp.machinelibrary.ai
+  found_by:
+  - apis[]
+  - probed
+  - contract-discovery
+  - well-known
+  types: []
+  serves:
+  - api
+  registrable_domain: machinelibrary.ai
+  role: other
+  relation: own

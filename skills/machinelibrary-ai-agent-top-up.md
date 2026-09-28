@@ -1,5 +1,5 @@
 ---
-name: Fund the prepaid balance as an agent (Stripe MPP)
+name: machinelibrary-ai-agent-top-up
 description: Add prepaid USD credit to the authenticated Machine Library account from an agent with an MPP-capable payment client, using the challenge-then-retry flow the spec documents.
 api: openapi/machinelibrary-ai-openapi.yml
 operations: [createMppBalanceTopUp]

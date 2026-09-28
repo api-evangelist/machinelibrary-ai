@@ -2,8 +2,7 @@
   "provider": "machinelibrary-ai",
   "sources": [
     "_original/machinelibrary-ai-openapi.json",
-    "machinelibrary-ai-openapi.yml",
-    "machinelibrary-ai-recognition-openapi.yml"
+    "machinelibrary-ai-conversations-api-openapi.json"
   ],
   "outputs": [
     "machinelibrary-ai-conversations-api-openapi.yml",
@@ -14,28 +13,32 @@
     "machinelibrary-ai-search-api-openapi.yml"
   ],
   "archived": [
-    "archived openapi/machinelibrary-ai-openapi.yml",
-    "archived openapi/machinelibrary-ai-recognition-openapi.yml"
+    "deleted 1 superseded output(s) from the previous generation"
   ],
   "errors": [],
-  "warnings": [],
+  "warnings": [
+    "machinelibrary-ai-conversations-api-openapi.json: previously refined output kept for 4 operation(s) no archived document covers (e.g. /v2/documents/trending get, /v2/documents/{document_id}/activity get, /v2/search/comments post); its other 19 operation(s) came from the archive and were dropped from it. The archive is incomplete for this provider \u2014 re-harvest to restore _original/ as the full source of truth."
+  ],
   "notes": [
-    "1 archived document(s) dropped as subsets of other archived documents",
+    "3 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "machinelibrary-ai-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "machinelibrary-ai-openapi.json: declared missing tag: Payments",
-    "machinelibrary-ai-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "machinelibrary-ai-openapi.yml: declared missing tag: Payments",
-    "machinelibrary-ai-recognition-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
-    "tag 'Conversations' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
-    "tag 'Documents' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
-    "tag 'Payments' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
-    "tag 'Raw document downloads' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
-    "tag 'Recognition' spans 3 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml, machinelibrary-ai-recognition-openapi.yml): per-path servers applied",
-    "tag 'Search' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+6 apis, 9 total)"
+    "machinelibrary-ai-conversations-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tag 'Documents' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-conversations-api-openapi.json): per-path servers applied",
+    "tag 'Search' spans 2 source specs (machinelibrary-ai-openapi.json, machinelibrary-ai-conversations-api-openapi.json): per-path servers applied",
+    "superseded outputs removed: machinelibrary-ai-conversations-api-openapi.json",
+    "apis.yml register: written (+1 apis, 9 total)"
   ],
   "skipped": [
-    "_original/machinelibrary-ai-recognition-openapi.json: archived document superseded by a larger archived document"
+    "_original/machinelibrary-ai-recognition-openapi.yml: archived document superseded by a larger archived document",
+    "_original/machinelibrary-ai-recognition-openapi.json: archived document superseded by a larger archived document",
+    "_original/machinelibrary-ai-openapi.yml: archived document superseded by a larger archived document",
+    "machinelibrary-ai-conversations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "machinelibrary-ai-documents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "machinelibrary-ai-payments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "machinelibrary-ai-raw-document-downloads-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "machinelibrary-ai-recognition-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "machinelibrary-ai-search-api-openapi.yml: previously refined output, superseded by openapi/_original/"
   ]
 }

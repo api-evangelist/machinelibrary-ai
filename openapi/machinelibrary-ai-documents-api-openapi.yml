@@ -2,10 +2,7 @@ openapi: 3.2.0
 info:
   title: Machinelibrary Ai Documents API
   version: 0.1.0
-  license:
-    name: MIT
-    identifier: MIT
-  description: 'Operations tagged Documents across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Documents across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-conversations-api-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.machinelibrary.ai
   description: Machine Library
@@ -105,229 +102,222 @@ paths:
       description: Machine Library
     - url: https://api.spacefrontiers.org
       description: Space Frontiers (compatible endpoint)
+  /v2/documents/trending:
+    get:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
+      operationId: getTrendingDocuments
+      parameters:
+      - description: week (default) or month.
+        in: query
+        name: period
+        required: false
+        schema:
+          $ref: '#/components/schemas/TrendingPeriod'
+      - description: 1..50, default 20.
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          minimum: 0
+          type: integer
+      - description: 'Only paper-like types: journal and proceedings articles, preprints and posted content, book chapters, monographs, dissertations, reports and standards.'
+        in: query
+        name: scholarly
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrendingResponse'
+          description: Documents ordered by weighted interest, without content.
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Missing or invalid credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Invalid limit or period.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      summary: Documents with the most reader and agent interest
+      tags:
+      - Documents
+    servers:
+    - description: Machine Library
+      url: https://api.machinelibrary.ai
+    - description: Space Frontiers (compatible endpoint)
+      url: https://api.spacefrontiers.org
+  /v2/documents/{document_id}/activity:
+    get:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
+      operationId: getDocumentActivity
+      parameters:
+      - description: Machine Library document ID.
+        in: path
+        name: document_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentActivityResponse'
+          description: Activity counters, refreshed every 15 minutes, and live comment counts.
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Missing or invalid credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Invalid document ID.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: A required service is temporarily unavailable.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      summary: 30- and 7-day counters for one document. All zero when it has none
+      tags:
+      - Documents
+    servers:
+    - description: Machine Library
+      url: https://api.machinelibrary.ai
+    - description: Space Frontiers (compatible endpoint)
+      url: https://api.spacefrontiers.org
 components:
   schemas:
-    Scoring:
-      type: object
-      required:
-      - target
-      - correction_weight
-      properties:
-        target:
-          $ref: '#/components/schemas/PredictionTarget'
-        correction_weight:
-          type: number
-          format: double
-      additionalProperties: false
-    V2DocumentResponse:
-      type: object
-      required:
-      - id
-      - uris
-      - document
-      properties:
-        id:
-          type: string
-        uris:
-          type: array
-          items:
-            type: string
-        document: {}
-    ByUriResponse:
-      oneOf:
-      - $ref: '#/components/schemas/V2SearchResponse'
-      - $ref: '#/components/schemas/V2DocumentResponse'
-      description: 'by-uri endpoints return either a document or (with `text_filter`) a
-
-        search response, matching the Python union return type.'
-    VectorCombiner:
-      type: object
-      description: 'Exact multi-value reduction used by vector nomination and document features.
-
-        This is separate from the reduction of final L1 passage predictions.
-
-        The v4 body-binary branch uses fixed MAX, bound by the profile name.'
-      required:
-      - name
-      - temperature
-      - top_k
-      - decay
-      properties:
-        name:
-          type: string
-        temperature:
-          type: number
-          format: float
-        top_k:
-          type: integer
-          format: int32
-          minimum: 0
-        decay:
-          type: number
-          format: float
-      additionalProperties: false
-    RankingMode:
-      type: string
-      description: 'Relevance objective, independent of corpus and lexical/vector retrieval.
-
-        Results remain document groups for both objectives.'
-      enum:
-      - auto
-      - documents
-      - passages
-    CorpusRankingInfo:
-      type: object
-      required:
-      - corpus
-      - model_sha256
-      - scoring
-      - input_documents
-      - input_rows
-      properties:
-        corpus:
-          type: string
-        model_sha256:
-          type: string
-        scoring:
-          $ref: '#/components/schemas/Scoring'
-        input_documents:
-          type: integer
-          minimum: 0
-        input_rows:
-          type: integer
-          minimum: 0
-    Snippet:
-      type: object
-      description: One highlighted passage of a search hit.
-      required:
-      - field
-      - text
-      properties:
-        field:
-          type: string
-        text:
-          type: string
-        score:
-          type: number
-          format: double
-        chunk_id:
-          type:
-          - integer
-          - 'null'
-          format: int64
-        evidence:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/SnippetEvidence'
-    SparseQueryPolicy:
-      type: object
-      required:
-      - max_query_dims
-      - weight_threshold
-      - heap_factor
-      - pruning
-      properties:
-        max_query_dims:
-          type: integer
-          format: int32
-          minimum: 0
-        weight_threshold:
-          type: number
-          format: float
-        heap_factor:
-          type: number
-          format: float
-        pruning:
-          type: number
-          format: float
-      additionalProperties: false
-    BatchInfo:
-      type: object
-      required:
-      - enabled
-      - as_of
-      - computed_at
-      - observed_documents
-      - requested_documents
-      - elapsed_us
-      properties:
-        enabled:
-          type: boolean
-        as_of:
-          type: string
-          format: date-time
-        computed_at:
-          type: string
-          format: date-time
-        observed_documents:
-          type: integer
-          minimum: 0
-        requested_documents:
-          type: integer
-          minimum: 0
-        elapsed_us:
-          type: integer
-          format: int64
-          minimum: 0
-    RrfAttribution:
-      type: object
-      required:
-      - score
-      - contributions
-      properties:
-        score:
-          type: number
-          format: float
-        contributions:
-          type: array
-          items:
-            type: object
-    V2SearchResponse:
-      type: object
-      required:
-      - ranking_mode
-      - hits
-      - total_hits
-      - has_next
-      properties:
-        ranking_mode:
-          $ref: '#/components/schemas/RankingMode'
-          description: Resolved relevance objective. Auto is a request routing policy only.
-        retrieval_traces:
-          type: array
-          items: {}
-        trajectory:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/SearchTrajectory'
-        candidate_ranking:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/CandidateRankingInfo'
-        hits:
-          type: array
-          items:
-            $ref: '#/components/schemas/V2Hit'
-        total_hits:
-          type: integer
-          format: int64
-          minimum: 0
-        has_next:
-          type: boolean
-        timings:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/V2Timings'
-        embed_ms:
-          type:
-          - integer
-          - 'null'
-          format: int64
-          minimum: 0
-        corrected_query:
-          type:
-          - string
-          - 'null'
     V2Hit:
       type: object
       required:
@@ -354,6 +344,38 @@ components:
           items:
             $ref: '#/components/schemas/Snippet'
         document: {}
+    Snippet:
+      type: object
+      description: One highlighted passage of a search hit.
+      required:
+      - field
+      - text
+      properties:
+        field:
+          type: string
+        text:
+          type: string
+        score:
+          type: number
+          format: double
+        chunk_id:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        evidence:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetEvidence'
+    RankingMode:
+      type: string
+      description: 'Relevance objective, independent of corpus and lexical/vector retrieval.
+
+        Results remain document groups for both objectives.'
+      enum:
+      - auto
+      - documents
+      - passages
     FeatureContract:
       type: object
       description: Feature identity includes query construction, not only column names.
@@ -403,6 +425,52 @@ components:
         sparse_query:
           $ref: '#/components/schemas/SparseQueryPolicy'
       additionalProperties: false
+    V2SearchResponse:
+      type: object
+      required:
+      - ranking_mode
+      - hits
+      - total_hits
+      - has_next
+      properties:
+        ranking_mode:
+          $ref: '#/components/schemas/RankingMode'
+          description: Resolved relevance objective. Auto is a request routing policy only.
+        retrieval_traces:
+          type: array
+          items: {}
+        trajectory:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SearchTrajectory'
+        candidate_ranking:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/CandidateRankingInfo'
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2Hit'
+        total_hits:
+          type: integer
+          format: int64
+          minimum: 0
+        has_next:
+          type: boolean
+        timings:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/V2Timings'
+        embed_ms:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          minimum: 0
+        corrected_query:
+          type:
+          - string
+          - 'null'
     RankingInfo:
       type: object
       required:
@@ -444,24 +512,154 @@ components:
           minimum: 0
         engagement:
           $ref: '#/components/schemas/BatchInfo'
-    CandidateRankingInfo:
+    VectorCombiner:
+      type: object
+      description: 'Exact multi-value reduction used by vector nomination and document features.
+
+        This is separate from the reduction of final L1 passage predictions.
+
+        The v4 body-binary branch uses fixed MAX, bound by the profile name.'
+      required:
+      - name
+      - temperature
+      - top_k
+      - decay
+      properties:
+        name:
+          type: string
+        temperature:
+          type: number
+          format: float
+        top_k:
+          type: integer
+          format: int32
+          minimum: 0
+        decay:
+          type: number
+          format: float
+      additionalProperties: false
+    BatchInfo:
       type: object
       required:
-      - method
-      - contract
+      - enabled
+      - as_of
+      - computed_at
+      - observed_documents
+      - requested_documents
+      - elapsed_us
       properties:
-        l2:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/RankingInfo'
-        method:
+        enabled:
+          type: boolean
+        as_of:
           type: string
-        model_sha256:
+          format: date-time
+        computed_at:
+          type: string
+          format: date-time
+        observed_documents:
+          type: integer
+          minimum: 0
+        requested_documents:
+          type: integer
+          minimum: 0
+        elapsed_us:
+          type: integer
+          format: int64
+          minimum: 0
+    SearchTrajectory:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: string
+        feedback_token:
           type:
           - string
           - 'null'
-        contract:
-          $ref: '#/components/schemas/FeatureContract'
+          description: A bounded, expiring capability to rate results of this retrieval.
+    PredictionTarget:
+      type: string
+      enum:
+      - teacher_score
+    RrfAttribution:
+      type: object
+      required:
+      - score
+      - contributions
+      properties:
+        score:
+          type: number
+          format: float
+        contributions:
+          type: array
+          items:
+            type: object
+    SparseQueryPolicy:
+      type: object
+      required:
+      - max_query_dims
+      - weight_threshold
+      - heap_factor
+      - pruning
+      properties:
+        max_query_dims:
+          type: integer
+          format: int32
+          minimum: 0
+        weight_threshold:
+          type: number
+          format: float
+        heap_factor:
+          type: number
+          format: float
+        pruning:
+          type: number
+          format: float
+      additionalProperties: false
+    PassageScores:
+      type: object
+      required:
+      - ordinal
+      - scores
+      properties:
+        ordinal:
+          type: integer
+          format: int32
+          minimum: 0
+        scores:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          propertyNames:
+            type: string
+        l1_score:
+          type:
+          - number
+          - 'null'
+          format: float
+    CorpusRankingInfo:
+      type: object
+      required:
+      - corpus
+      - model_sha256
+      - scoring
+      - input_documents
+      - input_rows
+      properties:
+        corpus:
+          type: string
+        model_sha256:
+          type: string
+        scoring:
+          $ref: '#/components/schemas/Scoring'
+        input_documents:
+          type: integer
+          minimum: 0
+        input_rows:
+          type: integer
+          minimum: 0
     CandidateScores:
       type: object
       required:
@@ -485,40 +683,74 @@ components:
           type: integer
           format: int32
           minimum: 0
-    SearchTrajectory:
+    Scoring:
+      type: object
+      required:
+      - target
+      - correction_weight
+      properties:
+        target:
+          $ref: '#/components/schemas/PredictionTarget'
+        correction_weight:
+          type: number
+          format: double
+      additionalProperties: false
+    V2DocumentResponse:
       type: object
       required:
       - id
+      - uris
+      - document
       properties:
         id:
           type: string
-        feedback_token:
+        uris:
+          type: array
+          items:
+            type: string
+        document: {}
+    SnippetEvidence:
+      type: object
+      description: A reranker-selected, verbatim window within the original snippet.
+      required:
+      - text
+      - start_char
+      - score
+      properties:
+        text:
+          type: string
+        start_char:
+          type: integer
+          description: Unicode scalar values, relative to the full `Snippet.text`.
+          minimum: 0
+        score:
+          type: number
+          format: double
+    ByUriResponse:
+      oneOf:
+      - $ref: '#/components/schemas/V2SearchResponse'
+      - $ref: '#/components/schemas/V2DocumentResponse'
+      description: 'by-uri endpoints return either a document or (with `text_filter`) a
+
+        search response, matching the Python union return type.'
+    CandidateRankingInfo:
+      type: object
+      required:
+      - method
+      - contract
+      properties:
+        l2:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/RankingInfo'
+        method:
+          type: string
+        model_sha256:
           type:
           - string
           - 'null'
-          description: A bounded, expiring capability to rate results of this retrieval.
-    PassageScores:
-      type: object
-      required:
-      - ordinal
-      - scores
-      properties:
-        ordinal:
-          type: integer
-          format: int32
-          minimum: 0
-        scores:
-          type: object
-          additionalProperties:
-            type: number
-            format: float
-          propertyNames:
-            type: string
-        l1_score:
-          type:
-          - number
-          - 'null'
-          format: float
+        contract:
+          $ref: '#/components/schemas/FeatureContract'
     V2Timings:
       type: object
       required:
@@ -538,27 +770,216 @@ components:
           type: integer
           format: int64
           minimum: 0
-    PredictionTarget:
-      type: string
-      enum:
-      - teacher_score
-    SnippetEvidence:
-      type: object
-      description: A reranker-selected, verbatim window within the original snippet.
-      required:
-      - text
-      - start_char
-      - score
+    CommentStats:
+      description: Visible comments (not deleted, approved authors) on one document.
       properties:
-        text:
-          type: string
-        start_char:
+        comments:
+          description: Comments and replies, all time.
+          format: int64
           type: integer
-          description: Unicode scalar values, relative to the full `Snippet.text`.
+        comments_30d:
+          format: int64
+          type: integer
+        comments_7d:
+          format: int64
+          type: integer
+        contributions:
+          description: Comments with a kind, by kind, most comments first.
+          items:
+            $ref: '#/components/schemas/ContributionStats'
+          type: array
+        votes:
+          description: Sum of votes over those comments.
+          format: int64
+          type: integer
+      required:
+      - comments
+      - comments_7d
+      - comments_30d
+      - votes
+      - contributions
+      type: object
+    DocumentActivity:
+      properties:
+        agent_reads_30d:
+          format: int64
           minimum: 0
+          type: integer
+        agent_reads_7d:
+          description: MCP agents fetched the document or searched inside it.
+          format: int64
+          minimum: 0
+          type: integer
+        ai_citations_30d:
+          format: int64
+          minimum: 0
+          type: integer
+        ai_citations_7d:
+          description: Cited in generated answers.
+          format: int64
+          minimum: 0
+          type: integer
+        as_of:
+          description: Snapshot time (RFC 3339); null when the document has no recorded activity.
+          type:
+          - string
+          - 'null'
+        document_id:
+          type: string
+        positive_ratings_30d:
+          format: int64
+          minimum: 0
+          type: integer
+        positive_ratings_7d:
+          description: Relevance feedback graded 2 or 3.
+          format: int64
+          minimum: 0
+          type: integer
+        shown_30d:
+          format: int64
+          minimum: 0
+          type: integer
+        shown_7d:
+          description: Times returned by authenticated searches.
+          format: int64
+          minimum: 0
+          type: integer
+        views_30d:
+          format: int64
+          minimum: 0
+          type: integer
+        views_7d:
+          description: Page views, once per visitor and UTC day.
+          format: int64
+          minimum: 0
+          type: integer
+      required:
+      - document_id
+      - views_7d
+      - views_30d
+      - shown_7d
+      - shown_30d
+      - agent_reads_7d
+      - agent_reads_30d
+      - ai_citations_7d
+      - ai_citations_30d
+      - positive_ratings_7d
+      - positive_ratings_30d
+      type: object
+    TrendingPeriod:
+      enum:
+      - week
+      - month
+      type: string
+    TrendingDocument:
+      properties:
+        activity:
+          $ref: '#/components/schemas/DocumentActivity'
+        comments:
+          $ref: '#/components/schemas/CommentStats'
+        document:
+          type: object
+        id:
+          type: string
         score:
-          type: number
+          description: 'Weighted interest in the period: views + 2×agent reads + 3×AI
+
+            citations + 3×positive ratings + 3×comments posted.'
           format: double
+          type: number
+        uris:
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      - uris
+      - document
+      - activity
+      - comments
+      - score
+      type: object
+    ContributionStats:
+      properties:
+        comments:
+          format: int64
+          type: integer
+        contribution:
+          $ref: '#/components/schemas/Contribution'
+        votes:
+          description: Sum of votes over these comments.
+          format: int64
+          type: integer
+      required:
+      - contribution
+      - comments
+      - votes
+      type: object
+    Contribution:
+      description: 'What a comment says about the document. The kinds do not overlap: take
+
+        the first that applies — correction (the paper or its record is wrong),
+
+        contradicts / supports (independent work tests the same claim), limitation
+
+        (a weakness visible in the paper itself), related work (other work that
+
+        neither confirms nor refutes), review (an appraisal across several points),
+
+        question (people only). Optional for people, required for agents.'
+      enum:
+      - correction
+      - contradicts
+      - supports
+      - limitation
+      - related_work
+      - review
+      - question
+      type: string
+    TrendingResponse:
+      properties:
+        as_of:
+          type:
+          - string
+          - 'null'
+        documents:
+          items:
+            $ref: '#/components/schemas/TrendingDocument'
+          type: array
+        period:
+          $ref: '#/components/schemas/TrendingPeriod'
+      required:
+      - period
+      - documents
+      type: object
+    DocumentActivityResponse:
+      allOf:
+      - $ref: '#/components/schemas/DocumentActivity'
+      - properties:
+          comments:
+            $ref: '#/components/schemas/CommentStats'
+        required:
+        - comments
+        type: object
+      description: Activity counters plus the document's visible comments.
+    ApiError:
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - additionalProperties: true
+            properties:
+              code:
+                type: string
+            type: object
+        status:
+          enum:
+          - error
+          type: string
+      required:
+      - status
+      - detail
+      type: object
   securitySchemes:
     api_key:
       type: apiKey
@@ -570,9 +991,22 @@ components:
       scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+    oauth2:
+      description: Authorization code with mandatory S256 PKCE. Public clients use dynamic registration; see https://machinelibrary.ai/auth.md. Access spends the consenting account's credits.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+          refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+          scopes:
+            search: Search and retrieve research documents using your account credits.
+          tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      type: oauth2
+externalDocs:
+  description: Authentication, limits, errors, retries, and API lifecycle
+  url: https://machinelibrary.ai/docs/api/operations
 x-refined-from:
 - machinelibrary-ai-openapi.json
-- machinelibrary-ai-openapi.yml
+- machinelibrary-ai-conversations-api-openapi.json
 x-service-info:
   categories:
   - data

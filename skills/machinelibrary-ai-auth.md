@@ -1,3 +1,10 @@
+---
+name: machinelibrary-ai-auth
+description: Guide for authenticating agents and users to Machine Library via OAuth 2.1, PKCE, and service_auth flows, including discovery, registration, token handling, and revocation.
+method: generated
+generated: '2026-09-19'
+---
+
 # auth.md
 
 Machine Library, the search and AI product by Space Frontiers Company, supports agentic registration for its read-only research search

@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Machinelibrary Ai Raw document downloads API
-  version: 0.1.0
+  title: Machine Library Raw document downloads API
+  description: 'Search, retrieve, and synthesize scholarly and public-interest documents through Machine Library, the search and AI product by Space Frontiers Company. Document recognition endpoints (`/v1/recognitions`: PDF, EPUB, and DJVU to structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at https://machinelibrary.ai/docs/api/reference presents both specs merged.'
   license:
     name: MIT
     identifier: MIT
-  description: 'Operations tagged Raw document downloads across 2 of this provider''s published API definitions: machinelibrary-ai-openapi.json, machinelibrary-ai-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 0.1.0
 servers:
 - url: https://api.machinelibrary.ai
   description: Machine Library
@@ -205,11 +205,6 @@ paths:
                   status:
                     type: string
                     example: error
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
   /v2/downloads/by-uri/{uri}:
     get:
       tags:
@@ -411,11 +406,6 @@ paths:
                   status:
                     type: string
                     example: error
-    servers:
-    - url: https://api.machinelibrary.ai
-      description: Machine Library
-    - url: https://api.spacefrontiers.org
-      description: Space Frontiers (compatible endpoint)
 components:
   securitySchemes:
     api_key:
@@ -428,9 +418,6 @@ components:
       scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
-x-refined-from:
-- machinelibrary-ai-openapi.json
-- machinelibrary-ai-openapi.yml
 x-service-info:
   categories:
   - data

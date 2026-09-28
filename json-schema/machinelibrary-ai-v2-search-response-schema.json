@@ -1,0 +1,656 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-v2-search-response-schema.json",
+  "title": "V2SearchResponse",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/V2SearchResponse",
+  "properties": {
+    "candidate_ranking": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/CandidateRankingInfo"
+        }
+      ]
+    },
+    "corrected_query": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "embed_ms": {
+      "format": "int64",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "has_next": {
+      "type": "boolean"
+    },
+    "hits": {
+      "items": {
+        "$ref": "#/$defs/V2Hit"
+      },
+      "type": "array"
+    },
+    "ranking_mode": {
+      "$ref": "#/$defs/RankingMode",
+      "description": "Resolved relevance objective. Auto is a request routing policy only."
+    },
+    "retrieval_traces": {
+      "items": {},
+      "type": "array"
+    },
+    "timings": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/V2Timings"
+        }
+      ]
+    },
+    "total_hits": {
+      "format": "int64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "trajectory": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/SearchTrajectory"
+        }
+      ]
+    }
+  },
+  "required": [
+    "ranking_mode",
+    "hits",
+    "total_hits",
+    "has_next"
+  ],
+  "type": "object",
+  "$defs": {
+    "BatchInfo": {
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "computed_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "elapsed_us": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "observed_documents": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "requested_documents": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "enabled",
+        "as_of",
+        "computed_at",
+        "observed_documents",
+        "requested_documents",
+        "elapsed_us"
+      ],
+      "type": "object"
+    },
+    "CandidateRankingInfo": {
+      "properties": {
+        "contract": {
+          "$ref": "#/$defs/FeatureContract"
+        },
+        "l2": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RankingInfo"
+            }
+          ]
+        },
+        "method": {
+          "type": "string"
+        },
+        "model_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "contract"
+      ],
+      "type": "object"
+    },
+    "CandidateScores": {
+      "properties": {
+        "document": {
+          "additionalProperties": {
+            "format": "float",
+            "type": "number"
+          },
+          "description": "Absent field data is omitted; valid zero and negative scores are retained.",
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "passages": {
+          "items": {
+            "$ref": "#/$defs/PassageScores"
+          },
+          "type": "array"
+        },
+        "scored_passages": {
+          "format": "int32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "document",
+        "passages",
+        "scored_passages"
+      ],
+      "type": "object"
+    },
+    "CorpusRankingInfo": {
+      "properties": {
+        "corpus": {
+          "type": "string"
+        },
+        "input_documents": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_rows": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "model_sha256": {
+          "type": "string"
+        },
+        "scoring": {
+          "$ref": "#/$defs/Scoring"
+        }
+      },
+      "required": [
+        "corpus",
+        "model_sha256",
+        "scoring",
+        "input_documents",
+        "input_rows"
+      ],
+      "type": "object"
+    },
+    "FeatureContract": {
+      "additionalProperties": false,
+      "description": "Feature identity includes query construction, not only column names.",
+      "properties": {
+        "backfill": {
+          "type": "boolean"
+        },
+        "candidate_depth": {
+          "description": "Fixed per-branch, per-shard nomination depth for this feature population.",
+          "format": "int32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "document_reduction": {
+          "type": "string"
+        },
+        "features": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phrase_policy": {
+          "description": "Whole query phrase plus mean of explicit quoted-span phrase scores.",
+          "type": "string"
+        },
+        "rrf_policy": {
+          "type": "string"
+        },
+        "score_policy": {
+          "type": "string"
+        },
+        "sparse_query": {
+          "$ref": "#/$defs/SparseQueryPolicy"
+        },
+        "teacher_input": {
+          "type": "string"
+        },
+        "tokenizer_policy": {
+          "description": "Single language hint using indexed original forms when undetermined.",
+          "type": "string"
+        },
+        "vector_combiner": {
+          "$ref": "#/$defs/VectorCombiner"
+        }
+      },
+      "required": [
+        "name",
+        "features",
+        "score_policy",
+        "rrf_policy",
+        "backfill",
+        "candidate_depth",
+        "phrase_policy",
+        "tokenizer_policy",
+        "document_reduction",
+        "teacher_input",
+        "vector_combiner",
+        "sparse_query"
+      ],
+      "type": "object"
+    },
+    "PassageScores": {
+      "properties": {
+        "l1_score": {
+          "format": "float",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ordinal": {
+          "format": "int32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scores": {
+          "additionalProperties": {
+            "format": "float",
+            "type": "number"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "ordinal",
+        "scores"
+      ],
+      "type": "object"
+    },
+    "PredictionTarget": {
+      "enum": [
+        "teacher_score"
+      ],
+      "type": "string"
+    },
+    "RankingInfo": {
+      "properties": {
+        "artifact_sha256": {
+          "type": "string"
+        },
+        "corpus_models": {
+          "items": {
+            "$ref": "#/$defs/CorpusRankingInfo"
+          },
+          "type": "array"
+        },
+        "elapsed_us": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "engagement": {
+          "$ref": "#/$defs/BatchInfo"
+        },
+        "feature_version": {
+          "type": "string"
+        },
+        "input_documents": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_rows": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "method": {
+          "type": "string"
+        },
+        "model_sha256": {
+          "type": "string"
+        },
+        "output_documents": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "method",
+        "artifact_sha256",
+        "model_sha256",
+        "feature_version",
+        "corpus_models",
+        "input_documents",
+        "input_rows",
+        "output_documents",
+        "elapsed_us",
+        "engagement"
+      ],
+      "type": "object"
+    },
+    "RankingMode": {
+      "description": "Relevance objective, independent of corpus and lexical/vector retrieval.\nResults remain document groups for both objectives.",
+      "enum": [
+        "auto",
+        "documents",
+        "passages"
+      ],
+      "type": "string"
+    },
+    "RrfAttribution": {
+      "properties": {
+        "contributions": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "score": {
+          "format": "float",
+          "type": "number"
+        }
+      },
+      "required": [
+        "score",
+        "contributions"
+      ],
+      "type": "object"
+    },
+    "Scoring": {
+      "additionalProperties": false,
+      "properties": {
+        "correction_weight": {
+          "format": "double",
+          "type": "number"
+        },
+        "target": {
+          "$ref": "#/$defs/PredictionTarget"
+        }
+      },
+      "required": [
+        "target",
+        "correction_weight"
+      ],
+      "type": "object"
+    },
+    "SearchTrajectory": {
+      "properties": {
+        "feedback_token": {
+          "description": "A bounded, expiring capability to rate results of this retrieval.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "Snippet": {
+      "description": "One highlighted passage of a search hit.",
+      "properties": {
+        "chunk_id": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "evidence": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SnippetEvidence"
+            }
+          ]
+        },
+        "field": {
+          "type": "string"
+        },
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SnippetSource"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "text"
+      ],
+      "type": "object"
+    },
+    "SnippetEvidence": {
+      "description": "A reranker-selected, verbatim window within the original snippet.",
+      "properties": {
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "start_char": {
+          "description": "Unicode scalar values, relative to the full `Snippet.text`.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "start_char",
+        "score"
+      ],
+      "type": "object"
+    },
+    "SnippetSource": {
+      "description": "Location of a verbatim snippet in the original stored field. All positions\ncount Unicode scalar values; `end_char` is exclusive.",
+      "properties": {
+        "end_char": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "field_length": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_char": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_char",
+        "end_char",
+        "field_length"
+      ],
+      "type": "object"
+    },
+    "SparseQueryPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "heap_factor": {
+          "format": "float",
+          "type": "number"
+        },
+        "max_query_dims": {
+          "format": "int32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pruning": {
+          "format": "float",
+          "type": "number"
+        },
+        "weight_threshold": {
+          "format": "float",
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_query_dims",
+        "weight_threshold",
+        "heap_factor",
+        "pruning"
+      ],
+      "type": "object"
+    },
+    "V2Hit": {
+      "properties": {
+        "candidate_scores": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/CandidateScores"
+            }
+          ]
+        },
+        "document": {},
+        "id": {
+          "type": "string"
+        },
+        "rrf": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RrfAttribution"
+            }
+          ]
+        },
+        "score": {
+          "format": "double",
+          "type": "number"
+        },
+        "snippets": {
+          "items": {
+            "$ref": "#/$defs/Snippet"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "score",
+        "snippets",
+        "document"
+      ],
+      "type": "object"
+    },
+    "V2Timings": {
+      "properties": {
+        "load_us": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "search_us": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total_us": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "search_us",
+        "load_us",
+        "total_us"
+      ],
+      "type": "object"
+    },
+    "VectorCombiner": {
+      "additionalProperties": false,
+      "description": "Exact multi-value reduction used by vector nomination and document features.\nThis is separate from the reduction of final L1 passage predictions.\nThe v4 body-binary branch uses fixed MAX, bound by the profile name.",
+      "properties": {
+        "decay": {
+          "format": "float",
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "temperature": {
+          "format": "float",
+          "type": "number"
+        },
+        "top_k": {
+          "format": "int32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "temperature",
+        "top_k",
+        "decay"
+      ],
+      "type": "object"
+    }
+  }
+}

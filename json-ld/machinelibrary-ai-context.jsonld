@@ -1,0 +1,869 @@
+{
+  "@context": {
+    "@vocab": "https://machinelibrary.ai/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "machinelibrary": "https://machinelibrary.ai/schema#",
+    "AgentCommentAccepted": "machinelibrary:AgentCommentAccepted",
+    "comment_id": {
+      "@id": "machinelibrary:comment_id",
+      "@type": "xsd:integer"
+    },
+    "duplicate": {
+      "@id": "machinelibrary:duplicate",
+      "@type": "xsd:boolean"
+    },
+    "status": {
+      "@id": "machinelibrary:status",
+      "@type": "@id"
+    },
+    "AgentCommentStatus": "machinelibrary:AgentCommentStatus",
+    "AgentCommentSubmission": "machinelibrary:AgentCommentSubmission",
+    "content": {
+      "@id": "machinelibrary:content",
+      "@type": "xsd:string"
+    },
+    "contribution": {
+      "@id": "machinelibrary:contribution",
+      "@type": "@id"
+    },
+    "document_id": {
+      "@id": "machinelibrary:document_id",
+      "@type": "xsd:string"
+    },
+    "evidence": {
+      "@id": "machinelibrary:evidence",
+      "@container": "@list"
+    },
+    "feedback_token": {
+      "@id": "machinelibrary:feedback_token",
+      "@type": "xsd:string"
+    },
+    "model": {
+      "@id": "machinelibrary:model",
+      "@type": "xsd:string"
+    },
+    "reply_to_comment_id": {
+      "@id": "machinelibrary:reply_to_comment_id",
+      "@type": "xsd:integer"
+    },
+    "trajectory_id": {
+      "@id": "machinelibrary:trajectory_id",
+      "@type": "xsd:string"
+    },
+    "ApiError": "machinelibrary:ApiError",
+    "detail": {
+      "@id": "machinelibrary:detail"
+    },
+    "BatchInfo": "machinelibrary:BatchInfo",
+    "as_of": {
+      "@id": "machinelibrary:as_of",
+      "@type": "xsd:dateTime"
+    },
+    "computed_at": {
+      "@id": "machinelibrary:computed_at",
+      "@type": "xsd:dateTime"
+    },
+    "elapsed_us": {
+      "@id": "machinelibrary:elapsed_us",
+      "@type": "xsd:integer"
+    },
+    "enabled": {
+      "@id": "machinelibrary:enabled",
+      "@type": "xsd:boolean"
+    },
+    "observed_documents": {
+      "@id": "machinelibrary:observed_documents",
+      "@type": "xsd:integer"
+    },
+    "requested_documents": {
+      "@id": "machinelibrary:requested_documents",
+      "@type": "xsd:integer"
+    },
+    "CandidateRanking": "machinelibrary:CandidateRanking",
+    "CandidateRankingInfo": "machinelibrary:CandidateRankingInfo",
+    "contract": {
+      "@id": "machinelibrary:contract",
+      "@type": "@id"
+    },
+    "l2": {
+      "@id": "machinelibrary:l2"
+    },
+    "method": {
+      "@id": "machinelibrary:method",
+      "@type": "xsd:string"
+    },
+    "model_sha256": {
+      "@id": "machinelibrary:model_sha256",
+      "@type": "xsd:string"
+    },
+    "CandidateScores": "machinelibrary:CandidateScores",
+    "document": {
+      "@id": "machinelibrary:document"
+    },
+    "passages": {
+      "@id": "machinelibrary:passages",
+      "@container": "@list"
+    },
+    "scored_passages": {
+      "@id": "machinelibrary:scored_passages",
+      "@type": "xsd:integer"
+    },
+    "CitationOccurrence": "machinelibrary:CitationOccurrence",
+    "citation_index": {
+      "@id": "machinelibrary:citation_index",
+      "@type": "xsd:integer"
+    },
+    "document_index": {
+      "@id": "machinelibrary:document_index",
+      "@type": "xsd:integer"
+    },
+    "excerpt": {
+      "@id": "machinelibrary:excerpt",
+      "@type": "xsd:string"
+    },
+    "snippet_index": {
+      "@id": "machinelibrary:snippet_index",
+      "@type": "xsd:integer"
+    },
+    "CommentEvidence": "machinelibrary:CommentEvidence",
+    "quote": {
+      "@id": "machinelibrary:quote",
+      "@type": "xsd:string"
+    },
+    "uri": {
+      "@id": "machinelibrary:uri",
+      "@type": "xsd:string"
+    },
+    "CommentStats": "machinelibrary:CommentStats",
+    "comments": {
+      "@id": "machinelibrary:comments",
+      "@type": "xsd:integer"
+    },
+    "comments_30d": {
+      "@id": "machinelibrary:comments_30d",
+      "@type": "xsd:integer"
+    },
+    "comments_7d": {
+      "@id": "machinelibrary:comments_7d",
+      "@type": "xsd:integer"
+    },
+    "contributions": {
+      "@id": "machinelibrary:contributions",
+      "@container": "@list"
+    },
+    "votes": {
+      "@id": "machinelibrary:votes",
+      "@type": "xsd:integer"
+    },
+    "CommentVote": "machinelibrary:CommentVote",
+    "vote": {
+      "@id": "machinelibrary:vote",
+      "@type": "xsd:integer"
+    },
+    "CommentVoteResult": "machinelibrary:CommentVoteResult",
+    "user_vote": {
+      "@id": "machinelibrary:user_vote",
+      "@type": "xsd:integer"
+    },
+    "Contribution": "machinelibrary:Contribution",
+    "ContributionStats": "machinelibrary:ContributionStats",
+    "ConversationMetadata": "machinelibrary:ConversationMetadata",
+    "created_at": {
+      "@id": "machinelibrary:created_at",
+      "@type": "xsd:dateTime"
+    },
+    "id": {
+      "@id": "machinelibrary:id",
+      "@type": "xsd:string"
+    },
+    "preview": {
+      "@id": "machinelibrary:preview",
+      "@type": "xsd:string"
+    },
+    "query": {
+      "@id": "machinelibrary:query",
+      "@type": "xsd:string"
+    },
+    "slug": {
+      "@id": "machinelibrary:slug",
+      "@type": "xsd:string"
+    },
+    "title": {
+      "@id": "machinelibrary:title",
+      "@type": "xsd:string"
+    },
+    "user_id": {
+      "@id": "machinelibrary:user_id",
+      "@type": "xsd:integer"
+    },
+    "ConversationRequest": "machinelibrary:ConversationRequest",
+    "conversation_id": {
+      "@id": "machinelibrary:conversation_id",
+      "@type": "xsd:string"
+    },
+    "document_ids": {
+      "@id": "machinelibrary:document_ids",
+      "@container": "@list"
+    },
+    "kind": {
+      "@id": "machinelibrary:kind",
+      "@type": "xsd:string"
+    },
+    "limit": {
+      "@id": "machinelibrary:limit",
+      "@type": "xsd:integer"
+    },
+    "llm_config": {
+      "@id": "machinelibrary:llm_config",
+      "@type": "@id"
+    },
+    "max_model_documents": {
+      "@id": "machinelibrary:max_model_documents",
+      "@type": "xsd:integer"
+    },
+    "resolved_sources_literal_filters": {
+      "@id": "machinelibrary:resolved_sources_literal_filters"
+    },
+    "sources_filters": {
+      "@id": "machinelibrary:sources_filters"
+    },
+    "sources_literal_filters": {
+      "@id": "machinelibrary:sources_literal_filters"
+    },
+    "ConversationResponse": "machinelibrary:ConversationResponse",
+    "answer": {
+      "@id": "machinelibrary:answer",
+      "@type": "xsd:string"
+    },
+    "citations": {
+      "@id": "machinelibrary:citations",
+      "@container": "@list"
+    },
+    "model_name": {
+      "@id": "machinelibrary:model_name",
+      "@type": "xsd:string"
+    },
+    "query_details": {
+      "@id": "machinelibrary:query_details"
+    },
+    "search_documents": {
+      "@id": "machinelibrary:search_documents",
+      "@container": "@list"
+    },
+    "trajectory": {
+      "@id": "machinelibrary:trajectory"
+    },
+    "CorpusRankingInfo": "machinelibrary:CorpusRankingInfo",
+    "corpus": {
+      "@id": "machinelibrary:corpus",
+      "@type": "xsd:string"
+    },
+    "input_documents": {
+      "@id": "machinelibrary:input_documents",
+      "@type": "xsd:integer"
+    },
+    "input_rows": {
+      "@id": "machinelibrary:input_rows",
+      "@type": "xsd:integer"
+    },
+    "scoring": {
+      "@id": "machinelibrary:scoring",
+      "@type": "@id"
+    },
+    "DocumentActivity": "machinelibrary:DocumentActivity",
+    "agent_reads_30d": {
+      "@id": "machinelibrary:agent_reads_30d",
+      "@type": "xsd:integer"
+    },
+    "agent_reads_7d": {
+      "@id": "machinelibrary:agent_reads_7d",
+      "@type": "xsd:integer"
+    },
+    "ai_citations_30d": {
+      "@id": "machinelibrary:ai_citations_30d",
+      "@type": "xsd:integer"
+    },
+    "ai_citations_7d": {
+      "@id": "machinelibrary:ai_citations_7d",
+      "@type": "xsd:integer"
+    },
+    "positive_ratings_30d": {
+      "@id": "machinelibrary:positive_ratings_30d",
+      "@type": "xsd:integer"
+    },
+    "positive_ratings_7d": {
+      "@id": "machinelibrary:positive_ratings_7d",
+      "@type": "xsd:integer"
+    },
+    "shown_30d": {
+      "@id": "machinelibrary:shown_30d",
+      "@type": "xsd:integer"
+    },
+    "shown_7d": {
+      "@id": "machinelibrary:shown_7d",
+      "@type": "xsd:integer"
+    },
+    "views_30d": {
+      "@id": "machinelibrary:views_30d",
+      "@type": "xsd:integer"
+    },
+    "views_7d": {
+      "@id": "machinelibrary:views_7d",
+      "@type": "xsd:integer"
+    },
+    "EditStepRequest": "machinelibrary:EditStepRequest",
+    "new_query": {
+      "@id": "machinelibrary:new_query",
+      "@type": "xsd:string"
+    },
+    "FeatureContract": "machinelibrary:FeatureContract",
+    "backfill": {
+      "@id": "machinelibrary:backfill",
+      "@type": "xsd:boolean"
+    },
+    "candidate_depth": {
+      "@id": "machinelibrary:candidate_depth",
+      "@type": "xsd:integer"
+    },
+    "document_reduction": {
+      "@id": "machinelibrary:document_reduction",
+      "@type": "xsd:string"
+    },
+    "features": {
+      "@id": "machinelibrary:features",
+      "@container": "@list"
+    },
+    "name": {
+      "@id": "machinelibrary:name",
+      "@type": "xsd:string"
+    },
+    "phrase_policy": {
+      "@id": "machinelibrary:phrase_policy",
+      "@type": "xsd:string"
+    },
+    "rrf_policy": {
+      "@id": "machinelibrary:rrf_policy",
+      "@type": "xsd:string"
+    },
+    "score_policy": {
+      "@id": "machinelibrary:score_policy",
+      "@type": "xsd:string"
+    },
+    "sparse_query": {
+      "@id": "machinelibrary:sparse_query",
+      "@type": "@id"
+    },
+    "teacher_input": {
+      "@id": "machinelibrary:teacher_input",
+      "@type": "xsd:string"
+    },
+    "tokenizer_policy": {
+      "@id": "machinelibrary:tokenizer_policy",
+      "@type": "xsd:string"
+    },
+    "vector_combiner": {
+      "@id": "machinelibrary:vector_combiner",
+      "@type": "@id"
+    },
+    "FeedbackAccepted": "machinelibrary:FeedbackAccepted",
+    "event_id": {
+      "@id": "machinelibrary:event_id",
+      "@type": "xsd:string"
+    },
+    "FormulaRanking": "machinelibrary:FormulaRanking",
+    "formula": {
+      "@id": "machinelibrary:formula",
+      "@type": "xsd:string"
+    },
+    "missing_values": {
+      "@id": "machinelibrary:missing_values"
+    },
+    "FullConversation": "machinelibrary:FullConversation",
+    "conversation_metadata": {
+      "@id": "machinelibrary:conversation_metadata",
+      "@type": "@id"
+    },
+    "conversation_steps": {
+      "@id": "machinelibrary:conversation_steps",
+      "@container": "@list"
+    },
+    "L2Rerank": "machinelibrary:L2Rerank",
+    "ListConversationsResponse": "machinelibrary:ListConversationsResponse",
+    "conversations": {
+      "@id": "machinelibrary:conversations",
+      "@container": "@list"
+    },
+    "LlmConfig": "machinelibrary:LlmConfig",
+    "api_key": {
+      "@id": "machinelibrary:api_key",
+      "@type": "xsd:string"
+    },
+    "max_context_length": {
+      "@id": "machinelibrary:max_context_length",
+      "@type": "xsd:integer"
+    },
+    "PassageScores": "machinelibrary:PassageScores",
+    "l1_score": {
+      "@id": "machinelibrary:l1_score",
+      "@type": "xsd:decimal"
+    },
+    "ordinal": {
+      "@id": "machinelibrary:ordinal",
+      "@type": "xsd:integer"
+    },
+    "scores": {
+      "@id": "machinelibrary:scores"
+    },
+    "PredictionTarget": "machinelibrary:PredictionTarget",
+    "Query": "machinelibrary:Query",
+    "classified_aspects": {
+      "@id": "machinelibrary:classified_aspects",
+      "@container": "@list"
+    },
+    "content_type": {
+      "@id": "machinelibrary:content_type",
+      "@type": "xsd:string"
+    },
+    "date": {
+      "@id": "machinelibrary:date",
+      "@container": "@list"
+    },
+    "date_expression": {
+      "@id": "machinelibrary:date_expression",
+      "@type": "xsd:string"
+    },
+    "filters": {
+      "@id": "machinelibrary:filters"
+    },
+    "instruction": {
+      "@id": "machinelibrary:instruction",
+      "@type": "xsd:string"
+    },
+    "is_event": {
+      "@id": "machinelibrary:is_event",
+      "@type": "xsd:boolean"
+    },
+    "is_recent": {
+      "@id": "machinelibrary:is_recent",
+      "@type": "xsd:boolean"
+    },
+    "keywords": {
+      "@id": "machinelibrary:keywords",
+      "@container": "@list"
+    },
+    "knowledge_source": {
+      "@id": "machinelibrary:knowledge_source",
+      "@type": "xsd:string"
+    },
+    "original_query": {
+      "@id": "machinelibrary:original_query",
+      "@type": "xsd:string"
+    },
+    "query_language": {
+      "@id": "machinelibrary:query_language",
+      "@type": "xsd:string"
+    },
+    "reformulated_query": {
+      "@id": "machinelibrary:reformulated_query",
+      "@type": "xsd:string"
+    },
+    "related_queries": {
+      "@id": "machinelibrary:related_queries",
+      "@container": "@list"
+    },
+    "QueryDetails": "machinelibrary:QueryDetails",
+    "compared": {
+      "@id": "machinelibrary:compared",
+      "@type": "xsd:integer"
+    },
+    "incomplete_queries": {
+      "@id": "machinelibrary:incomplete_queries",
+      "@container": "@list"
+    },
+    "planning_fallback": {
+      "@id": "machinelibrary:planning_fallback",
+      "@type": "xsd:boolean"
+    },
+    "queries": {
+      "@id": "machinelibrary:queries",
+      "@container": "@list"
+    },
+    "ranking_fallback": {
+      "@id": "machinelibrary:ranking_fallback",
+      "@type": "xsd:boolean"
+    },
+    "retrieved": {
+      "@id": "machinelibrary:retrieved",
+      "@type": "xsd:integer"
+    },
+    "selected": {
+      "@id": "machinelibrary:selected",
+      "@type": "xsd:integer"
+    },
+    "RankingInfo": "machinelibrary:RankingInfo",
+    "artifact_sha256": {
+      "@id": "machinelibrary:artifact_sha256",
+      "@type": "xsd:string"
+    },
+    "corpus_models": {
+      "@id": "machinelibrary:corpus_models",
+      "@container": "@list"
+    },
+    "engagement": {
+      "@id": "machinelibrary:engagement",
+      "@type": "@id"
+    },
+    "feature_version": {
+      "@id": "machinelibrary:feature_version",
+      "@type": "xsd:string"
+    },
+    "output_documents": {
+      "@id": "machinelibrary:output_documents",
+      "@type": "xsd:integer"
+    },
+    "RankingMode": "machinelibrary:RankingMode",
+    "RelevanceRating": "machinelibrary:RelevanceRating",
+    "relevance": {
+      "@id": "machinelibrary:relevance",
+      "@type": "xsd:integer"
+    },
+    "RrfAttribution": "machinelibrary:RrfAttribution",
+    "score": {
+      "@id": "machinelibrary:score",
+      "@type": "xsd:decimal"
+    },
+    "Scoring": "machinelibrary:Scoring",
+    "correction_weight": {
+      "@id": "machinelibrary:correction_weight",
+      "@type": "xsd:decimal"
+    },
+    "target": {
+      "@id": "machinelibrary:target",
+      "@type": "@id"
+    },
+    "SearchDocument": "machinelibrary:SearchDocument",
+    "snippets": {
+      "@id": "machinelibrary:snippets",
+      "@container": "@list"
+    },
+    "source": {
+      "@id": "machinelibrary:source",
+      "@type": "xsd:string"
+    },
+    "SearchFeedback": "machinelibrary:SearchFeedback",
+    "comment": {
+      "@id": "machinelibrary:comment",
+      "@type": "xsd:string"
+    },
+    "feedback_id": {
+      "@id": "machinelibrary:feedback_id",
+      "@type": "xsd:string"
+    },
+    "ratings": {
+      "@id": "machinelibrary:ratings",
+      "@container": "@list"
+    },
+    "useful": {
+      "@id": "machinelibrary:useful",
+      "@type": "xsd:boolean"
+    },
+    "SearchMode": "machinelibrary:SearchMode",
+    "SearchRequestV2": "machinelibrary:SearchRequestV2",
+    "candidate_ranking": {
+      "@id": "machinelibrary:candidate_ranking",
+      "@type": "@id"
+    },
+    "combiner": {
+      "@id": "machinelibrary:combiner",
+      "@type": "xsd:string"
+    },
+    "combiner_decay": {
+      "@id": "machinelibrary:combiner_decay",
+      "@type": "xsd:decimal"
+    },
+    "combiner_temperature": {
+      "@id": "machinelibrary:combiner_temperature",
+      "@type": "xsd:decimal"
+    },
+    "combiner_top_k": {
+      "@id": "machinelibrary:combiner_top_k",
+      "@type": "xsd:integer"
+    },
+    "cross_rerank": {
+      "@id": "machinelibrary:cross_rerank",
+      "@type": "xsd:boolean"
+    },
+    "cross_rerank_candidates": {
+      "@id": "machinelibrary:cross_rerank_candidates",
+      "@type": "xsd:integer"
+    },
+    "deduplicate": {
+      "@id": "machinelibrary:deduplicate",
+      "@type": "xsd:boolean"
+    },
+    "filter_issns": {
+      "@id": "machinelibrary:filter_issns",
+      "@container": "@list"
+    },
+    "filter_issued_after": {
+      "@id": "machinelibrary:filter_issued_after",
+      "@type": "xsd:integer"
+    },
+    "filter_issued_before": {
+      "@id": "machinelibrary:filter_issued_before",
+      "@type": "xsd:integer"
+    },
+    "filter_languages": {
+      "@id": "machinelibrary:filter_languages",
+      "@container": "@list"
+    },
+    "filter_publisher": {
+      "@id": "machinelibrary:filter_publisher",
+      "@type": "xsd:string"
+    },
+    "filter_types": {
+      "@id": "machinelibrary:filter_types",
+      "@container": "@list"
+    },
+    "filter_uri_prefixes": {
+      "@id": "machinelibrary:filter_uri_prefixes",
+      "@container": "@list"
+    },
+    "fulltext_phrase_boost": {
+      "@id": "machinelibrary:fulltext_phrase_boost",
+      "@type": "xsd:decimal"
+    },
+    "fulltext_weight": {
+      "@id": "machinelibrary:fulltext_weight",
+      "@type": "xsd:decimal"
+    },
+    "heap_factor": {
+      "@id": "machinelibrary:heap_factor",
+      "@type": "xsd:decimal"
+    },
+    "include_candidate_scores": {
+      "@id": "machinelibrary:include_candidate_scores",
+      "@type": "xsd:boolean"
+    },
+    "include_rrf_scores": {
+      "@id": "machinelibrary:include_rrf_scores",
+      "@type": "xsd:boolean"
+    },
+    "index_names": {
+      "@id": "machinelibrary:index_names",
+      "@container": "@list"
+    },
+    "l1": {
+      "@id": "machinelibrary:l1"
+    },
+    "l2_rerank": {
+      "@id": "machinelibrary:l2_rerank",
+      "@type": "@id"
+    },
+    "max_query_dims": {
+      "@id": "machinelibrary:max_query_dims",
+      "@type": "xsd:integer"
+    },
+    "mode": {
+      "@id": "machinelibrary:mode"
+    },
+    "offset": {
+      "@id": "machinelibrary:offset",
+      "@type": "xsd:integer"
+    },
+    "possible_languages": {
+      "@id": "machinelibrary:possible_languages",
+      "@container": "@list"
+    },
+    "pruning": {
+      "@id": "machinelibrary:pruning",
+      "@type": "xsd:decimal"
+    },
+    "ranking_mode": {
+      "@id": "machinelibrary:ranking_mode"
+    },
+    "referenced_by_uri": {
+      "@id": "machinelibrary:referenced_by_uri"
+    },
+    "return_documents": {
+      "@id": "machinelibrary:return_documents",
+      "@type": "xsd:boolean"
+    },
+    "rrf_k": {
+      "@id": "machinelibrary:rrf_k",
+      "@type": "xsd:decimal"
+    },
+    "tracing": {
+      "@id": "machinelibrary:tracing",
+      "@type": "xsd:boolean"
+    },
+    "weight_threshold": {
+      "@id": "machinelibrary:weight_threshold",
+      "@type": "xsd:decimal"
+    },
+    "SearchTrajectory": "machinelibrary:SearchTrajectory",
+    "SimilarRequestV2": "machinelibrary:SimilarRequestV2",
+    "Snippet": "machinelibrary:Snippet",
+    "chunk_id": {
+      "@id": "machinelibrary:chunk_id",
+      "@type": "xsd:integer"
+    },
+    "field": {
+      "@id": "machinelibrary:field",
+      "@type": "xsd:string"
+    },
+    "text": {
+      "@id": "machinelibrary:text",
+      "@type": "xsd:string"
+    },
+    "SnippetEvidence": "machinelibrary:SnippetEvidence",
+    "start_char": {
+      "@id": "machinelibrary:start_char",
+      "@type": "xsd:integer"
+    },
+    "SnippetSource": "machinelibrary:SnippetSource",
+    "end_char": {
+      "@id": "machinelibrary:end_char",
+      "@type": "xsd:integer"
+    },
+    "field_length": {
+      "@id": "machinelibrary:field_length",
+      "@type": "xsd:integer"
+    },
+    "SparseQueryPolicy": "machinelibrary:SparseQueryPolicy",
+    "TrendingDocument": "machinelibrary:TrendingDocument",
+    "activity": {
+      "@id": "machinelibrary:activity",
+      "@type": "@id"
+    },
+    "uris": {
+      "@id": "machinelibrary:uris",
+      "@container": "@list"
+    },
+    "TrendingPeriod": "machinelibrary:TrendingPeriod",
+    "TrendingResponse": "machinelibrary:TrendingResponse",
+    "documents": {
+      "@id": "machinelibrary:documents",
+      "@container": "@list"
+    },
+    "period": {
+      "@id": "machinelibrary:period",
+      "@type": "@id"
+    },
+    "V2DocumentResponse": "machinelibrary:V2DocumentResponse",
+    "V2Hit": "machinelibrary:V2Hit",
+    "candidate_scores": {
+      "@id": "machinelibrary:candidate_scores"
+    },
+    "rrf": {
+      "@id": "machinelibrary:rrf"
+    },
+    "V2SearchResponse": "machinelibrary:V2SearchResponse",
+    "corrected_query": {
+      "@id": "machinelibrary:corrected_query",
+      "@type": "xsd:string"
+    },
+    "embed_ms": {
+      "@id": "machinelibrary:embed_ms",
+      "@type": "xsd:integer"
+    },
+    "has_next": {
+      "@id": "machinelibrary:has_next",
+      "@type": "xsd:boolean"
+    },
+    "hits": {
+      "@id": "machinelibrary:hits",
+      "@container": "@list"
+    },
+    "retrieval_traces": {
+      "@id": "machinelibrary:retrieval_traces",
+      "@container": "@list"
+    },
+    "timings": {
+      "@id": "machinelibrary:timings"
+    },
+    "total_hits": {
+      "@id": "machinelibrary:total_hits",
+      "@type": "xsd:integer"
+    },
+    "V2Timings": "machinelibrary:V2Timings",
+    "load_us": {
+      "@id": "machinelibrary:load_us",
+      "@type": "xsd:integer"
+    },
+    "search_us": {
+      "@id": "machinelibrary:search_us",
+      "@type": "xsd:integer"
+    },
+    "total_us": {
+      "@id": "machinelibrary:total_us",
+      "@type": "xsd:integer"
+    },
+    "VectorCombiner": "machinelibrary:VectorCombiner",
+    "decay": {
+      "@id": "machinelibrary:decay",
+      "@type": "xsd:decimal"
+    },
+    "temperature": {
+      "@id": "machinelibrary:temperature",
+      "@type": "xsd:decimal"
+    },
+    "top_k": {
+      "@id": "machinelibrary:top_k",
+      "@type": "xsd:integer"
+    },
+    "RecognitionError": "machinelibrary:RecognitionError",
+    "RecognitionJobStatus": "machinelibrary:RecognitionJobStatus",
+    "completed_at": {
+      "@id": "machinelibrary:completed_at",
+      "@type": "xsd:dateTime"
+    },
+    "error_class": {
+      "@id": "machinelibrary:error_class",
+      "@type": "xsd:string"
+    },
+    "has_result": {
+      "@id": "machinelibrary:has_result",
+      "@type": "xsd:boolean"
+    },
+    "input_format": {
+      "@id": "machinelibrary:input_format",
+      "@type": "xsd:string"
+    },
+    "languages": {
+      "@id": "machinelibrary:languages",
+      "@container": "@list"
+    },
+    "report_url": {
+      "@id": "machinelibrary:report_url",
+      "@type": "xsd:string"
+    },
+    "result_url": {
+      "@id": "machinelibrary:result_url",
+      "@type": "xsd:string"
+    },
+    "started_at": {
+      "@id": "machinelibrary:started_at",
+      "@type": "xsd:dateTime"
+    },
+    "RecognitionSubmission": "machinelibrary:RecognitionSubmission",
+    "deduplicated": {
+      "@id": "machinelibrary:deduplicated",
+      "@type": "xsd:boolean"
+    },
+    "RecognitionJobStatus_2": "machinelibrary:RecognitionJobStatus_2"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Space Frontiers API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Space Frontiers's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-09-28) from openapi/machinelibrary-ai-conversations-api-openapi.json, openapi/machinelibrary-ai-conversations-api-openapi.yml, openapi/machinelibrary-ai-documents-api-openapi.yml.",
+  "dcterms:created": "2026-09-28",
+  "dcterms:source": [
+    "openapi/machinelibrary-ai-conversations-api-openapi.json",
+    "openapi/machinelibrary-ai-conversations-api-openapi.yml",
+    "openapi/machinelibrary-ai-documents-api-openapi.yml",
+    "openapi/machinelibrary-ai-openapi.json",
+    "openapi/machinelibrary-ai-payments-api-openapi.yml"
+  ]
+}

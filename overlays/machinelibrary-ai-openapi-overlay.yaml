@@ -8,7 +8,7 @@ info:
     Generated from artifacts harvested in this repo (rate-limit headers observed live, the error envelope
     observed on a live 401, the x-service-info and llms.txt links the provider publishes, and the terms /
     pricing pages). Applied to openapi/machinelibrary-ai-openapi.yml; the original spec is never mutated.
-extends: ./openapi/machinelibrary-ai-openapi.yml
+extends: ../openapi/_original/machinelibrary-ai-openapi.yml
 actions:
 - target: $.info
   description: Add contact, terms and external docs the provider publishes elsewhere on its site.

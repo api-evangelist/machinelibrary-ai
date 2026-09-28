@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-search-feedback-schema.json",
+  "title": "SearchFeedback",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-search-api-openapi.yml#/components/schemas/SearchFeedback",
+  "type": "object",
+  "required": [
+    "trajectory_id",
+    "feedback_token",
+    "feedback_id",
+    "ratings"
+  ],
+  "properties": {
+    "trajectory_id": {
+      "type": "string"
+    },
+    "feedback_token": {
+      "type": "string"
+    },
+    "feedback_id": {
+      "type": "string",
+      "description": "Caller-generated UUID, reused on retries. Analytics deduplicates by this ID."
+    },
+    "ratings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RelevanceRating"
+      }
+    },
+    "useful": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "comment": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "RelevanceRating": {
+      "type": "object",
+      "required": [
+        "document_id",
+        "relevance"
+      ],
+      "properties": {
+        "document_id": {
+          "type": "string"
+        },
+        "ordinal": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32",
+          "description": "Omit for document relevance; specify a returned chunk for passage relevance.",
+          "minimum": 0
+        },
+        "relevance": {
+          "type": "integer",
+          "format": "int32",
+          "description": "0 irrelevant, 1 tangential, 2 useful but partial, 3 directly relevant.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

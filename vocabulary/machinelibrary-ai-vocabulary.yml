@@ -1,0 +1,367 @@
+generated: '2026-09-28'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/machinelibrary-ai-conversations-api-openapi.json
+- openapi/machinelibrary-ai-conversations-api-openapi.yml
+- openapi/machinelibrary-ai-documents-api-openapi.yml
+- openapi/machinelibrary-ai-payments-api-openapi.yml
+- openapi/machinelibrary-ai-raw-document-downloads-api-openapi.yml
+vocabulary:
+  name: Space Frontiers Domain Vocabulary
+  description: 'Terms declared by Space Frontiers''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-09-28'
+  terms:
+  - term: Search
+    definition: Ranked retrieval and document similarity.
+    tags:
+    - Resource Group
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json
+  - term: Documents
+    definition: Fetch documents by ID or canonical URI.
+    tags:
+    - Resource Group
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json
+  - term: Conversations
+    definition: Retrieval-augmented conversation workflows.
+    tags:
+    - Resource Group
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json
+  - term: Recognition
+    definition: 'Document recognition: PDF, EPUB, and DJVU to structured Markdown with quality reports.'
+    tags:
+    - Resource Group
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json
+  - term: Raw document downloads
+    definition: Authenticated, feature-gated streaming of PDF, EPUB, and DJVU library originals.
+    tags:
+    - Resource Group
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json
+  - term: AgentCommentAccepted
+    definition: 'Object declared by the contract with fields: comment_id, duplicate, status.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/AgentCommentAccepted
+  - term: AgentCommentStatus
+    definition: 'Enumeration declared by the contract with values: published, pending_review, removed.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/AgentCommentStatus
+  - term: AgentCommentSubmission
+    definition: 'Public `POST /v2/search/comments` body: the comment plus the search receipt that returned the document.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/AgentCommentSubmission
+  - term: ApiError
+    definition: 'Object declared by the contract with fields: detail, status.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ApiError
+  - term: BatchInfo
+    definition: 'Object declared by the contract with fields: as_of, computed_at, elapsed_us, enabled, observed_documents, requested_documents.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/BatchInfo
+  - term: ByUriResponse
+    definition: by-uri endpoints return either a document or (with `text_filter`) a search response, matching the Python union return type.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ByUriResponse
+  - term: CandidateRanking
+    definition: 'Enumeration declared by the contract with values: auto, rrf, formula.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CandidateRanking
+  - term: CandidateRankingInfo
+    definition: 'Object declared by the contract with fields: contract, l2, method, model_sha256.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CandidateRankingInfo
+  - term: CandidateScores
+    definition: 'Object declared by the contract with fields: document, passages, scored_passages.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CandidateScores
+  - term: CitationOccurrence
+    definition: 'Object declared by the contract with fields: citation_index, document_index, excerpt, snippet_index.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CitationOccurrence
+  - term: CommentEvidence
+    definition: 'Object declared by the contract with fields: quote, uri.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CommentEvidence
+  - term: CommentStats
+    definition: Visible comments (not deleted, approved authors) on one document.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CommentStats
+  - term: CommentVote
+    definition: A ±1 vote on a comment.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CommentVote
+  - term: CommentVoteResult
+    definition: 'Object declared by the contract with fields: comment_id, user_vote, votes.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CommentVoteResult
+  - term: Contribution
+    definition: 'What a comment says about the document. The kinds do not overlap: take the first that applies — correction (the paper or its
+      record is wrong), contradicts / supports (independent work tests the same claim), limitation (a weakness visible in the paper itself), related
+      work (other work that neither confirms nor refutes), review (an appraisal across several points), question (people only). Optional f'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/Contribution
+  - term: ContributionStats
+    definition: 'Object declared by the contract with fields: comments, contribution, votes.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ContributionStats
+  - term: ConversationMetadata
+    definition: 'Object declared by the contract with fields: created_at, id, preview, query, slug, title, user_id.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationMetadata
+  - term: ConversationRequest
+    definition: 'Object declared by the contract with fields: conversation_id, document_ids, id, kind, limit, llm_config, max_model_documents,
+      query, resolved_sources_literal_filters, sources_filters, sources_literal_filters.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationRequest
+  - term: ConversationResponse
+    definition: 'Object declared by the contract with fields: answer, citations, conversation_id, id, kind, model_name, query, query_details,
+      search_documents, trajectory.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationResponse
+  - term: ConversationStep
+    definition: 'Discriminated on `kind`: "request" | "response".'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationStep
+  - term: CorpusRankingInfo
+    definition: 'Object declared by the contract with fields: corpus, input_documents, input_rows, model_sha256, scoring.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/CorpusRankingInfo
+  - term: DocumentActivity
+    definition: 'Object declared by the contract with fields: agent_reads_30d, agent_reads_7d, ai_citations_30d, ai_citations_7d, as_of, document_id,
+      positive_ratings_30d, positive_ratings_7d, shown_30d, shown_7d, views_30d, views_7d.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/DocumentActivity
+  - term: DocumentActivityResponse
+    definition: Activity counters plus the document's visible comments.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/DocumentActivityResponse
+  - term: EditStepRequest
+    definition: 'Object declared by the contract with fields: new_query.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/EditStepRequest
+  - term: FeatureContract
+    definition: Feature identity includes query construction, not only column names.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/FeatureContract
+  - term: FeedbackAccepted
+    definition: 'Object declared by the contract with fields: event_id, trajectory_id.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/FeedbackAccepted
+  - term: FormulaRanking
+    definition: 'Object declared by the contract with fields: backfill, formula, missing_values.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/FormulaRanking
+  - term: FullConversation
+    definition: 'Object declared by the contract with fields: conversation_metadata, conversation_steps.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/FullConversation
+  - term: L2Rerank
+    definition: 'Enumeration declared by the contract with values: auto, off, catboost.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/L2Rerank
+  - term: ListConversationsResponse
+    definition: 'Object declared by the contract with fields: conversations.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ListConversationsResponse
+  - term: LlmConfig
+    definition: 'Object declared by the contract with fields: api_key, max_context_length, model_name.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/LlmConfig
+  - term: PassageScores
+    definition: 'Object declared by the contract with fields: l1_score, ordinal, scores.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/PassageScores
+  - term: PredictionTarget
+    definition: 'Enumeration declared by the contract with values: teacher_score.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/PredictionTarget
+  - term: Query
+    definition: Classifier state object (spacefrontiers `Query`).
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/Query
+  - term: QueryDetails
+    definition: 'Object declared by the contract with fields: compared, incomplete_queries, planning_fallback, queries, query, ranking_fallback,
+      retrieved, selected.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/QueryDetails
+  - term: RankingInfo
+    definition: 'Object declared by the contract with fields: artifact_sha256, corpus_models, elapsed_us, engagement, feature_version, input_documents,
+      input_rows, method, model_sha256, output_documents.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RankingInfo
+  - term: RankingMode
+    definition: Relevance objective, independent of corpus and lexical/vector retrieval. Results remain document groups for both objectives.
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RankingMode
+  - term: ReferencedBy
+    definition: One identifier or several identifiers of the same cited work.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ReferencedBy
+  - term: RelevanceRating
+    definition: 'Object declared by the contract with fields: document_id, ordinal, relevance.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RelevanceRating
+  - term: RrfAttribution
+    definition: 'Object declared by the contract with fields: contributions, score.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RrfAttribution
+  - term: Scoring
+    definition: 'Object declared by the contract with fields: correction_weight, target.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/Scoring
+  - term: SearchDocument
+    definition: 'One search hit: the stored document plus its snippets and score.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchDocument
+  - term: SearchFeedback
+    definition: 'Object declared by the contract with fields: comment, feedback_id, feedback_token, ratings, trajectory_id, useful.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchFeedback
+  - term: SearchMode
+    definition: 'Enumeration declared by the contract with values: sparse, short_document, binary, hybrid, fulltext.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchMode
+  - term: SearchRequestV2
+    definition: 'Object declared by the contract with fields: candidate_ranking, combiner, combiner_decay, combiner_temperature, combiner_top_k,
+      cross_rerank, cross_rerank_candidates, deduplicate, filter_issns, filter_issued_after, filter_issued_before, filter_languages. (24 more)'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchRequestV2
+  - term: SearchTrajectory
+    definition: 'Object declared by the contract with fields: feedback_token, id.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SearchTrajectory
+  - term: SimilarRequestV2
+    definition: 'Object declared by the contract with fields: document_id, filter_languages, filter_types, limit.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SimilarRequestV2
+  - term: Snippet
+    definition: One highlighted passage of a search hit.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/Snippet
+  - term: SnippetEvidence
+    definition: A reranker-selected, verbatim window within the original snippet.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SnippetEvidence
+  - term: SnippetSource
+    definition: Location of a verbatim snippet in the original stored field. All positions count Unicode scalar values; `end_char` is exclusive.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SnippetSource
+  - term: SparseQueryPolicy
+    definition: 'Object declared by the contract with fields: heap_factor, max_query_dims, pruning, weight_threshold.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/SparseQueryPolicy
+  - term: TrendingDocument
+    definition: 'Object declared by the contract with fields: activity, comments, document, id, score, uris.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/TrendingDocument
+  - term: TrendingPeriod
+    definition: 'Enumeration declared by the contract with values: week, month.'
+    tags:
+    - Enumeration
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/TrendingPeriod
+  - term: TrendingResponse
+    definition: 'Object declared by the contract with fields: as_of, documents, period.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/TrendingResponse
+  - term: V2DocumentResponse
+    definition: 'Object declared by the contract with fields: document, id, uris.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/V2DocumentResponse
+  - term: V2Hit
+    definition: 'Object declared by the contract with fields: candidate_scores, document, id, rrf, score, snippets.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/V2Hit
+  - term: V2SearchResponse
+    definition: 'Object declared by the contract with fields: candidate_ranking, corrected_query, embed_ms, has_next, hits, ranking_mode, retrieval_traces,
+      timings, total_hits, trajectory.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/V2SearchResponse
+  - term: V2Timings
+    definition: 'Object declared by the contract with fields: load_us, search_us, total_us.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/V2Timings
+  - term: VectorCombiner
+    definition: Exact multi-value reduction used by vector nomination and document features. This is separate from the reduction of final L1 passage
+      predictions. The v4 body-binary branch uses fixed MAX, bound by the profile name.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/VectorCombiner
+  - term: RecognitionError
+    definition: The shared Machine Library error envelope.
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RecognitionError
+  - term: RecognitionJobStatus
+    definition: 'Object declared by the contract with fields: completed_at, created_at, error_class, has_result, id, input_format, languages,
+      report_url, result_url, started_at, status.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RecognitionJobStatus
+  - term: RecognitionSubmission
+    definition: 'Object declared by the contract with fields: deduplicated, id, status.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/RecognitionSubmission
+  - term: RecognitionJobStatus_2
+    definition: 'Object declared by the contract with fields: completed_at, created_at, error_class, has_result, id, input_format, languages,
+      report_url, result_url, started_at, status.'
+    tags:
+    - Object
+    source: openapi/machinelibrary-ai-recognition-api-openapi.yml#/components/schemas/RecognitionJobStatus_2

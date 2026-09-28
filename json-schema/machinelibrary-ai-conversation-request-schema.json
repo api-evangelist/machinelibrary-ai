@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-conversation-request-schema.json",
+  "title": "ConversationRequest",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-conversations-api-openapi.json#/components/schemas/ConversationRequest",
+  "properties": {
+    "conversation_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "document_ids": {
+      "description": "Exact Nexus documents to merge into retrieval regardless of the query\nclassifier. `default` keeps historical persisted steps compatible.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "kind": {
+      "type": "string"
+    },
+    "limit": {
+      "format": "int32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "llm_config": {
+      "$ref": "#/$defs/LlmConfig"
+    },
+    "max_model_documents": {
+      "description": "Cap on documents sent to the model after reranking and budget\nstripping (pinned documents keep priority). Experimentation knob for\nquality/cost sweeps; absent or zero means no cap.",
+      "format": "int32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "query": {
+      "type": "string"
+    },
+    "resolved_sources_literal_filters": {},
+    "sources_filters": {},
+    "sources_literal_filters": {}
+  },
+  "required": [
+    "query",
+    "llm_config"
+  ],
+  "type": "object",
+  "$defs": {
+    "LlmConfig": {
+      "properties": {
+        "api_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_context_length": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "model_name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_name"
+      ],
+      "type": "object"
+    }
+  }
+}

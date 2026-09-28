@@ -1,6 +1,6 @@
 ---
-name: Grounded research with citations over REST
-description: Search the Machine Library corpus, pick sources, pull bounded full text or matching passages, and cite the canonical source_uri — without guessing identifiers.
+name: machinelibrary-ai-grounded-research
+description: Perform grounded research using Machine Library's REST API, retrieving documents with citations and source references for each answer, searching the corpus and citing canonical source URIs without guessing identifiers.
 api: openapi/machinelibrary-ai-openapi.yml
 operations: [searchDocuments, getDocumentByUri, getDocument, findSimilarDocuments]
 generated: '2026-09-19'

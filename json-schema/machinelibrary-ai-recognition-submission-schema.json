@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-recognition-submission-schema.json",
+  "title": "RecognitionSubmission",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-recognition-api-openapi.yml#/components/schemas/RecognitionSubmission",
+  "properties": {
+    "deduplicated": {
+      "description": "True when this exact content was already submitted by you; no new charge applies.",
+      "type": "boolean"
+    },
+    "id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "quarantined",
+        "cancelled"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

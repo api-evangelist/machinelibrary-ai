@@ -1,0 +1,654 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-by-uri-response-schema.json",
+  "title": "ByUriResponse",
+  "description": "by-uri endpoints return either a document or (with `text_filter`) a\nsearch response, matching the Python union return type.",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-documents-api-openapi.yml#/components/schemas/ByUriResponse",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/V2SearchResponse"
+    },
+    {
+      "$ref": "#/$defs/V2DocumentResponse"
+    }
+  ],
+  "$defs": {
+    "BatchInfo": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "as_of",
+        "computed_at",
+        "observed_documents",
+        "requested_documents",
+        "elapsed_us"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observed_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requested_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "elapsed_us": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        }
+      }
+    },
+    "CandidateRankingInfo": {
+      "type": "object",
+      "required": [
+        "method",
+        "contract"
+      ],
+      "properties": {
+        "l2": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RankingInfo"
+            }
+          ]
+        },
+        "method": {
+          "type": "string"
+        },
+        "model_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contract": {
+          "$ref": "#/$defs/FeatureContract"
+        }
+      }
+    },
+    "CandidateScores": {
+      "type": "object",
+      "required": [
+        "document",
+        "passages",
+        "scored_passages"
+      ],
+      "properties": {
+        "document": {
+          "type": "object",
+          "description": "Absent field data is omitted; valid zero and negative scores are retained.",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          },
+          "propertyNames": {
+            "type": "string"
+          }
+        },
+        "passages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PassageScores"
+          }
+        },
+        "scored_passages": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        }
+      }
+    },
+    "CorpusRankingInfo": {
+      "type": "object",
+      "required": [
+        "corpus",
+        "model_sha256",
+        "scoring",
+        "input_documents",
+        "input_rows"
+      ],
+      "properties": {
+        "corpus": {
+          "type": "string"
+        },
+        "model_sha256": {
+          "type": "string"
+        },
+        "scoring": {
+          "$ref": "#/$defs/Scoring"
+        },
+        "input_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input_rows": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "FeatureContract": {
+      "type": "object",
+      "description": "Feature identity includes query construction, not only column names.",
+      "required": [
+        "name",
+        "features",
+        "score_policy",
+        "rrf_policy",
+        "backfill",
+        "candidate_depth",
+        "phrase_policy",
+        "tokenizer_policy",
+        "document_reduction",
+        "teacher_input",
+        "vector_combiner",
+        "sparse_query"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "score_policy": {
+          "type": "string"
+        },
+        "rrf_policy": {
+          "type": "string"
+        },
+        "backfill": {
+          "type": "boolean"
+        },
+        "candidate_depth": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Fixed per-branch, per-shard nomination depth for this feature population.",
+          "minimum": 0
+        },
+        "phrase_policy": {
+          "type": "string",
+          "description": "Whole query phrase plus mean of explicit quoted-span phrase scores."
+        },
+        "tokenizer_policy": {
+          "type": "string",
+          "description": "Single language hint using indexed original forms when undetermined."
+        },
+        "document_reduction": {
+          "type": "string"
+        },
+        "teacher_input": {
+          "type": "string"
+        },
+        "vector_combiner": {
+          "$ref": "#/$defs/VectorCombiner"
+        },
+        "sparse_query": {
+          "$ref": "#/$defs/SparseQueryPolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PassageScores": {
+      "type": "object",
+      "required": [
+        "ordinal",
+        "scores"
+      ],
+      "properties": {
+        "ordinal": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
+        "scores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "float"
+          },
+          "propertyNames": {
+            "type": "string"
+          }
+        },
+        "l1_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      }
+    },
+    "PredictionTarget": {
+      "type": "string",
+      "enum": [
+        "teacher_score"
+      ]
+    },
+    "RankingInfo": {
+      "type": "object",
+      "required": [
+        "method",
+        "artifact_sha256",
+        "model_sha256",
+        "feature_version",
+        "corpus_models",
+        "input_documents",
+        "input_rows",
+        "output_documents",
+        "elapsed_us",
+        "engagement"
+      ],
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "type": "string"
+        },
+        "model_sha256": {
+          "type": "string"
+        },
+        "feature_version": {
+          "type": "string"
+        },
+        "corpus_models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CorpusRankingInfo"
+          }
+        },
+        "input_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_documents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "elapsed_us": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "engagement": {
+          "$ref": "#/$defs/BatchInfo"
+        }
+      }
+    },
+    "RankingMode": {
+      "type": "string",
+      "description": "Relevance objective, independent of corpus and lexical/vector retrieval.\nResults remain document groups for both objectives.",
+      "enum": [
+        "auto",
+        "documents",
+        "passages"
+      ]
+    },
+    "RrfAttribution": {
+      "type": "object",
+      "required": [
+        "score",
+        "contributions"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "contributions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Scoring": {
+      "type": "object",
+      "required": [
+        "target",
+        "correction_weight"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/PredictionTarget"
+        },
+        "correction_weight": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SearchTrajectory": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "feedback_token": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A bounded, expiring capability to rate results of this retrieval."
+        }
+      }
+    },
+    "Snippet": {
+      "type": "object",
+      "description": "One highlighted passage of a search hit.",
+      "required": [
+        "field",
+        "text"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "double"
+        },
+        "chunk_id": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "evidence": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SnippetEvidence"
+            }
+          ]
+        }
+      }
+    },
+    "SnippetEvidence": {
+      "type": "object",
+      "description": "A reranker-selected, verbatim window within the original snippet.",
+      "required": [
+        "text",
+        "start_char",
+        "score"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "start_char": {
+          "type": "integer",
+          "description": "Unicode scalar values, relative to the full `Snippet.text`.",
+          "minimum": 0
+        },
+        "score": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "SparseQueryPolicy": {
+      "type": "object",
+      "required": [
+        "max_query_dims",
+        "weight_threshold",
+        "heap_factor",
+        "pruning"
+      ],
+      "properties": {
+        "max_query_dims": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
+        "weight_threshold": {
+          "type": "number",
+          "format": "float"
+        },
+        "heap_factor": {
+          "type": "number",
+          "format": "float"
+        },
+        "pruning": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "additionalProperties": false
+    },
+    "V2DocumentResponse": {
+      "type": "object",
+      "required": [
+        "id",
+        "uris",
+        "document"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "uris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "document": {}
+      }
+    },
+    "V2Hit": {
+      "type": "object",
+      "required": [
+        "id",
+        "score",
+        "snippets",
+        "document"
+      ],
+      "properties": {
+        "rrf": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/RrfAttribution"
+            }
+          ]
+        },
+        "candidate_scores": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/CandidateScores"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "double"
+        },
+        "snippets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Snippet"
+          }
+        },
+        "document": {}
+      }
+    },
+    "V2SearchResponse": {
+      "type": "object",
+      "required": [
+        "ranking_mode",
+        "hits",
+        "total_hits",
+        "has_next"
+      ],
+      "properties": {
+        "ranking_mode": {
+          "$ref": "#/$defs/RankingMode",
+          "description": "Resolved relevance objective. Auto is a request routing policy only."
+        },
+        "retrieval_traces": {
+          "type": "array",
+          "items": {}
+        },
+        "trajectory": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SearchTrajectory"
+            }
+          ]
+        },
+        "candidate_ranking": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/CandidateRankingInfo"
+            }
+          ]
+        },
+        "hits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/V2Hit"
+          }
+        },
+        "total_hits": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "timings": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/V2Timings"
+            }
+          ]
+        },
+        "embed_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "minimum": 0
+        },
+        "corrected_query": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "V2Timings": {
+      "type": "object",
+      "required": [
+        "search_us",
+        "load_us",
+        "total_us"
+      ],
+      "properties": {
+        "search_us": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "load_us": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "total_us": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        }
+      }
+    },
+    "VectorCombiner": {
+      "type": "object",
+      "description": "Exact multi-value reduction used by vector nomination and document features.\nThis is separate from the reduction of final L1 passage predictions.\nThe v4 body-binary branch uses fixed MAX, bound by the profile name.",
+      "required": [
+        "name",
+        "temperature",
+        "top_k",
+        "decay"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "number",
+          "format": "float"
+        },
+        "top_k": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
+        "decay": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

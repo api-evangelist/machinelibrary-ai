@@ -1,19 +1,19 @@
 aid: machinelibrary-ai
+
 name: Space Frontiers
-description: >-
-  Space Frontiers is a Wyoming corporation whose search and AI product, Machine Library (formerly Space
-  Frontiers search, moved to machinelibrary.ai on 2026-09-12), is a full-text retrieval API and hosted MCP
-  server over a corpus of roughly 2.9 billion records: peer-reviewed papers (CrossRef, PubMed, arXiv), books,
-  USPTO patents, Wikipedia, technical standards, YouTube transcripts, and live Reddit, Telegram and Discord
-  posts. It is built for AI agents doing literature review, fact-checking, citation walking and grounded
-  research synthesis, returning compact reranked hits with canonical source URIs (DOI, arXiv, PMID, ISBN)
-  and token-bounded full text. Three surfaces share one account and API key: a REST API at
-  api.machinelibrary.ai (OpenAPI 3.1, pay-as-you-go), a Streamable-HTTP MCP server at mcp.machinelibrary.ai
-  (OAuth 2.1 with PKCE and RFC 7591 dynamic registration, or a Bearer API key), and an A2A agent at
-  machinelibrary.ai/a2a. It also ships a PDF/EPUB/DJVU-to-Markdown recognition API and Stripe-settled
-  prepaid credit packages for agents (ACP checkout, MPP top-up). The company also publishes Hermes, an
-  open-source Rust search engine with a gRPC contract and Python/TypeScript clients.
+
+description: 'Space Frontiers is a Wyoming corporation whose search and AI product, Machine Library (formerly Space Frontiers search, moved to
+  machinelibrary.ai on 2026-09-12), is a full-text retrieval API and hosted MCP server over a corpus of roughly 2.9 billion records: peer-reviewed
+  papers (CrossRef, PubMed, arXiv), books, USPTO patents, Wikipedia, technical standards, YouTube transcripts, and live Reddit, Telegram and Discord
+  posts. It is built for AI agents doing literature review, fact-checking, citation walking and grounded research synthesis, returning compact
+  reranked hits with canonical source URIs (DOI, arXiv, PMID, ISBN) and token-bounded full text. Three surfaces share one account and API key:
+  a REST API at api.machinelibrary.ai (OpenAPI 3.1, pay-as-you-go), a Streamable-HTTP MCP server at mcp.machinelibrary.ai (OAuth 2.1 with PKCE
+  and RFC 7591 dynamic registration, or a Bearer API key), and an A2A agent at machinelibrary.ai/a2a. It also ships a PDF/EPUB/DJVU-to-Markdown
+  recognition API and Stripe-settled prepaid credit packages for agents (ACP checkout, MPP top-up). The company also publishes Hermes, an open-source
+  Rust search engine with a gRPC contract and Python/TypeScript clients.'
+
 url: https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/refs/heads/main/apis.yml
+
 deliveryModel:
   model: saas
   license_evidence:
@@ -31,18 +31,34 @@ deliveryModel:
   - repository-not-product
   generated: '2026-09-25'
   method: derived
+
 image: https://machinelibrary.ai/press/icon-512.png
+
 x-type: company
+
 x-source: harvest:a2a-registry
+
 x-tier: profiled
-x-tier-reason: enrichment pipeline local-v3 pass on 2026-09-19 found a live OpenAPI 3.1, hosted MCP server, A2A agent card, llms.txt, RFC 8414/9728 metadata and an RFC 9727 api-catalog
+
+x-tier-reason: enrichment pipeline local-v3 pass on 2026-09-19 found a live OpenAPI 3.1, hosted MCP server, A2A agent card, llms.txt, RFC 8414/9728
+  metadata and an RFC 9727 api-catalog
+
+website: https://machinelibrary.ai
+
 x-legal-name: Space Frontiers
+
 x-headquarters: Sheridan, Wyoming, United States
+
 x-product-name: Machine Library
+
 x-former-domain: spacefrontiers.org
+
 specificationVersion: '0.20'
+
 created: '2026-09-19'
+
 modified: '2026-09-19'
+
 tags:
 - Research
 - Scholarly Search
@@ -59,6 +75,7 @@ tags:
 - AI Agents
 - Data
 - Search
+
 tags_raw:
 - research
 - scholarly-search
@@ -75,6 +92,103 @@ tags_raw:
 - ai-agents
 - data
 - search
+
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
+
+common:
+- type: AgenticAccess
+  url: agentic-access/machinelibrary-ai-agentic-access.yml
+- type: Spectral
+  url: rules/machinelibrary-ai-rules.yml
+- type: JSONLD
+  url: json-ld/machinelibrary-ai-context.jsonld
+- type: Vocabulary
+  url: vocabulary/machinelibrary-ai-vocabulary.yml
+- type: Security
+  url: security/machinelibrary-ai-vulnerability-disclosure.yml
+- type: Hosts
+  url: hosts/machinelibrary-ai-hosts.yml
+- type: Vendors
+  url: vendors/machinelibrary-ai-vendors.yml
+- type: StatusPage
+  url: https://machinelibrary.ai/status
+- type: VulnerabilityDisclosure
+  url: security/machinelibrary-ai-vulnerability-disclosure.yml
+- type: Overlay
+  url: overlays/machinelibrary-ai-openapi-overlay.yaml
+- type: Website
+  url: https://machinelibrary.ai/
+- type: Documentation
+  url: https://machinelibrary.ai/docs/api
+- type: APIReference
+  url: https://machinelibrary.ai/docs/api/reference
+- type: GettingStarted
+  url: https://machinelibrary.ai/docs/api
+- type: Pricing
+  url: https://machinelibrary.ai/pricing
+- type: Support
+  url: https://machinelibrary.ai/contacts
+- type: Newsroom
+  url: https://machinelibrary.ai/press
+- type: GitHubOrganization
+  url: https://github.com/SpaceFrontiers
+- type: SignUp
+  url: https://machinelibrary.ai/auth/signup
+- type: Login
+  url: https://machinelibrary.ai/auth/signin
+- type: TermsOfService
+  url: https://machinelibrary.ai/terms-of-service
+- type: PrivacyPolicy
+  url: https://machinelibrary.ai/privacy
+- type: LLMsTxt
+  url: llms/machinelibrary-ai-llms.txt
+- type: MCPServer
+  url: mcp/machinelibrary-ai-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/machinelibrary-ai-tool-crosswalk.yml
+- type: AgentCard
+  url: a2a/machinelibrary-ai-a2a.yml
+- type: WellKnown
+  url: well-known/machinelibrary-ai-well-known.yml
+- type: Packages
+  url: packages/machinelibrary-ai-packages.yml
+- type: SDKs
+  url: packages/machinelibrary-ai-packages.yml
+- type: Conformance
+  url: conformance/machinelibrary-ai-conformance.yml
+- type: Authentication
+  url: authentication/machinelibrary-ai-authentication.yml
+- type: OAuthScopes
+  url: scopes/machinelibrary-ai-scopes.yml
+- type: Conventions
+  url: conventions/machinelibrary-ai-conventions.yml
+- type: Idempotency
+  url: conventions/machinelibrary-ai-conventions.yml
+- type: ErrorCatalog
+  url: errors/machinelibrary-ai-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/machinelibrary-ai-lifecycle.yml
+- type: DomainSecurity
+  url: security/machinelibrary-ai-domain-security.yml
+- type: Plans
+  url: plans/machinelibrary-ai-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/machinelibrary-ai-rate-limits.yml
+- type: ChangeLog
+  url: changelog/machinelibrary-ai-changelog.yml
+- type: DataModel
+  url: data-model/machinelibrary-ai-data-model.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: RegulatoryPosture
+  url: regulatory/machinelibrary-ai-regulatory-posture.yml
+- type: Protobuf
+  url: grpc/machinelibrary-ai-hermes.proto
+
 apis:
 - name: Machine Library MCP Server
   description: >-
@@ -110,6 +224,7 @@ apis:
     url: https://github.com/SpaceFrontiers/mcp
   - type: MCPRegistry
     url: https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers
+  aid: machinelibrary-ai:machine-library-mcp-server
 - name: Machine Library A2A Agent
   description: >-
     A2A (protocolVersion 0.3.0) research and commerce agent at https://machinelibrary.ai/a2a over JSON-RPC:
@@ -137,6 +252,7 @@ apis:
     url: a2a/machinelibrary-ai-a2a.yml
   - type: Documentation
     url: https://api.machinelibrary.ai/auth.md
+  aid: machinelibrary-ai:machine-library-a2a-agent
 - name: Hermes Search Engine gRPC API
   description: >-
     Self-hosted, MIT-licensed Rust search engine published by Space Frontiers (github.com/SpaceFrontiers/hermes)
@@ -169,38 +285,7 @@ apis:
     url: https://github.com/SpaceFrontiers/hermes/blob/main/hermes-proto/README.md
   - type: SourceCode
     url: https://github.com/SpaceFrontiers/hermes
-- aid: machinelibrary-ai:machinelibrary-ai-conversations-api
-  name: Space Frontiers Conversations API
-  description: Retrieval-augmented conversation workflows.
-  humanURL: https://machinelibrary.ai/docs/api
-  baseURL: https://api.machinelibrary.ai
-  tags:
-  - Conversations
-  properties:
-  - type: OpenAPI
-    url: openapi/machinelibrary-ai-conversations-api-openapi.yml
-  - type: Documentation
-    url: https://machinelibrary.ai/docs/api
-  - type: APIReference
-    url: https://machinelibrary.ai/docs/api/reference
-  - type: Authentication
-    url: authentication/machinelibrary-ai-authentication.yml
-  - type: OAuthScopes
-    url: scopes/machinelibrary-ai-scopes.yml
-  - type: Conventions
-    url: conventions/machinelibrary-ai-conventions.yml
-  - type: Idempotency
-    url: conventions/machinelibrary-ai-conventions.yml
-  - type: ErrorCatalog
-    url: errors/machinelibrary-ai-problem-types.yml
-  - type: DataModel
-    url: data-model/machinelibrary-ai-data-model.yml
-  - type: RateLimits
-    url: rate-limits/machinelibrary-ai-rate-limits.yml
-  - type: Plans
-    url: plans/machinelibrary-ai-plans-pricing.yml
-  - type: Pricing
-    url: https://api.machinelibrary.ai/v1/pricing
+  aid: machinelibrary-ai:hermes-search-engine-grpc-api
 - aid: machinelibrary-ai:machinelibrary-ai-documents-api
   name: Space Frontiers Documents API
   description: Fetch documents by ID or canonical URI.
@@ -233,6 +318,10 @@ apis:
     url: plans/machinelibrary-ai-plans-pricing.yml
   - type: Pricing
     url: https://api.machinelibrary.ai/v1/pricing
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-by-uri-response-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-v2-document-response-schema.json
 - aid: machinelibrary-ai:machinelibrary-ai-payments-api
   name: Space Frontiers Payments API
   description: The Payments API from Space Frontiers — 1 operation(s) for payments.
@@ -329,6 +418,10 @@ apis:
     url: plans/machinelibrary-ai-plans-pricing.yml
   - type: Pricing
     url: https://api.machinelibrary.ai/v1/pricing
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-recognition-job-status-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-recognition-submission-schema.json
 - aid: machinelibrary-ai:machinelibrary-ai-search-api
   name: Space Frontiers Search API
   description: Ranked retrieval and document similarity.
@@ -361,112 +454,89 @@ apis:
     url: plans/machinelibrary-ai-plans-pricing.yml
   - type: Pricing
     url: https://api.machinelibrary.ai/v1/pricing
-maintainers:
-- FN: Kin Lane
-  email: kin@apievangelist.com
-- FN: APIs.json
-  email: info@apis.io
-common:
-- type: Overlay
-  url: overlays/machinelibrary-ai-openapi-overlay.yaml
-- type: Website
-  url: https://machinelibrary.ai/
-- type: Documentation
-  url: https://machinelibrary.ai/docs/api
-- type: APIReference
-  url: https://machinelibrary.ai/docs/api/reference
-- type: GettingStarted
-  url: https://machinelibrary.ai/docs/api
-- type: Pricing
-  url: https://machinelibrary.ai/pricing
-- type: Support
-  url: https://machinelibrary.ai/contacts
-- type: Newsroom
-  url: https://machinelibrary.ai/press
-- type: GitHubOrganization
-  url: https://github.com/SpaceFrontiers
-- type: SignUp
-  url: https://machinelibrary.ai/auth/signup
-- type: Login
-  url: https://machinelibrary.ai/auth/signin
-- type: TermsOfService
-  url: https://machinelibrary.ai/terms-of-service
-- type: PrivacyPolicy
-  url: https://machinelibrary.ai/privacy
-- type: LLMsTxt
-  url: llms/machinelibrary-ai-llms.txt
-- type: MCPServer
-  url: mcp/machinelibrary-ai-mcp.yml
-- type: ToolCrosswalk
-  url: mcp/machinelibrary-ai-tool-crosswalk.yml
-- type: AgentCard
-  url: a2a/machinelibrary-ai-a2a.yml
-- type: WellKnown
-  url: well-known/machinelibrary-ai-well-known.yml
-- type: Packages
-  url: packages/machinelibrary-ai-packages.yml
-- type: SDKs
-  url: packages/machinelibrary-ai-packages.yml
-- type: Conformance
-  url: conformance/machinelibrary-ai-conformance.yml
-- type: Authentication
-  url: authentication/machinelibrary-ai-authentication.yml
-- type: OAuthScopes
-  url: scopes/machinelibrary-ai-scopes.yml
-- type: Conventions
-  url: conventions/machinelibrary-ai-conventions.yml
-- type: Idempotency
-  url: conventions/machinelibrary-ai-conventions.yml
-- type: ErrorCatalog
-  url: errors/machinelibrary-ai-problem-types.yml
-- type: Lifecycle
-  url: lifecycle/machinelibrary-ai-lifecycle.yml
-- type: DomainSecurity
-  url: security/machinelibrary-ai-domain-security.yml
-- type: Plans
-  url: plans/machinelibrary-ai-plans-pricing.yml
-- type: RateLimits
-  url: rate-limits/machinelibrary-ai-rate-limits.yml
-- type: ChangeLog
-  url: changelog/machinelibrary-ai-changelog.yml
-- type: DataModel
-  url: data-model/machinelibrary-ai-data-model.yml
-- type: AgentSkill
-  url: skills/_index.yml
-- type: RegulatoryPosture
-  url: regulatory/machinelibrary-ai-regulatory-posture.yml
-- type: Protobuf
-  url: grpc/machinelibrary-ai-hermes.proto
-x-enrichment:
-  date: '2026-09-19'
-  status: enriched
-  artifacts_added: 47
-  pass: local-v3
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-search-request-v2-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-v2-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-similar-request-v2-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-search-feedback-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-feedback-accepted-schema.json
+- aid: machinelibrary-ai:machinelibrary-ai-conversations-api
+  name: Space Frontiers Conversations API
+  description: Retrieval-augmented conversation workflows.
+  humanURL: https://machinelibrary.ai/mcp
+  baseURL: https://mcp.machinelibrary.ai
+  tags:
+  - Conversations
+  properties:
+  - type: OpenAPI
+    url: openapi/machinelibrary-ai-conversations-api-openapi.yml
+  - type: Documentation
+    url: https://machinelibrary.ai/docs/api
+  - type: APIReference
+    url: https://machinelibrary.ai/docs/api/reference
+  - type: Authentication
+    url: authentication/machinelibrary-ai-authentication.yml
+  - type: OAuthScopes
+    url: scopes/machinelibrary-ai-scopes.yml
+  - type: Conventions
+    url: conventions/machinelibrary-ai-conventions.yml
+  - type: Idempotency
+    url: conventions/machinelibrary-ai-conventions.yml
+  - type: ErrorCatalog
+    url: errors/machinelibrary-ai-problem-types.yml
+  - type: DataModel
+    url: data-model/machinelibrary-ai-data-model.yml
+  - type: RateLimits
+    url: rate-limits/machinelibrary-ai-rate-limits.yml
+  - type: Plans
+    url: plans/machinelibrary-ai-plans-pricing.yml
+  - type: Pricing
+    url: https://api.machinelibrary.ai/v1/pricing
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-search-request-v2-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-conversation-response-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-conversation-request-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-v2-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-agent-comment-submission-schema.json
+  - type: JSONSchema
+    url: json-schema/machinelibrary-ai-recognition-job-status-schema.json
 x-a2a:
   verified: true
   probed: '2026-09-26'
-  url: "https://machinelibrary.ai/.well-known/agent-card.json"
-  grade: "conformant"
-  protocol_version: "0.3.0"
+  url: https://machinelibrary.ai/.well-known/agent-card.json
+  grade: conformant
+  protocol_version: 0.3.0
   control: 404
+
 x-correction-request:
   requested: '2026-09-28'
   source:
   - https://github.com/api-evangelist/machinelibrary-ai/pull/1
-  request: 'Provider PR #1 (ppodolsky, 2026-09-26), verified live 2026-09-28; not merged because it predates the
-    09-27 per-area OpenAPI split. Its rate-limits file is committed (12/60/30 requests per minute per source IP;
-    https://machinelibrary.ai/docs/api/operations#limits). Capture: OAuth authorization server issuer https://api.machinelibrary.ai,
-    scopes_supported [search], PKCE S256, dynamic client registration at /v2/oauth/register, protected-resource
-    metadata on mcp.machinelibrary.ai naming that issuer (legacy spacefrontiers hosts serve the same issuer); pages
-    Operations https://machinelibrary.ai/docs/api/operations, ChangeLog https://machinelibrary.ai/changelog, StatusPage
-    https://machinelibrary.ai/status, Datasets https://machinelibrary.ai/datasets; security.txt and api-catalog.
-    MCP tools are renamed machinelibrary_* and number 9 in the live llms.txt (comment_on_document, vote_on_comment
-    added); live OpenAPI https://machinelibrary.ai/docs/openapi.json has 21 paths. Note: their api-catalog links
-    mcp.machinelibrary.ai/.well-known/mcp/server-card.json, which returns 404.'
+  request: 'Provider PR #1 (ppodolsky, 2026-09-26), verified live 2026-09-28; not merged because it predates the 09-27 per-area OpenAPI split.
+    Its rate-limits file is committed (12/60/30 requests per minute per source IP; https://machinelibrary.ai/docs/api/operations#limits). Capture:
+    OAuth authorization server issuer https://api.machinelibrary.ai, scopes_supported [search], PKCE S256, dynamic client registration at /v2/oauth/register,
+    protected-resource metadata on mcp.machinelibrary.ai naming that issuer (legacy spacefrontiers hosts serve the same issuer); pages Operations
+    https://machinelibrary.ai/docs/api/operations, ChangeLog https://machinelibrary.ai/changelog, StatusPage https://machinelibrary.ai/status,
+    Datasets https://machinelibrary.ai/datasets; security.txt and api-catalog. MCP tools are renamed machinelibrary_* and number 9 in the live
+    llms.txt (comment_on_document, vote_on_comment added); live OpenAPI https://machinelibrary.ai/docs/openapi.json has 21 paths. Note: their
+    api-catalog links mcp.machinelibrary.ai/.well-known/mcp/server-card.json, which returns 404.'
   earlier:
     requested: '2026-09-27'
     source: https://github.com/api-search/inbox/issues/39
-    request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1 --
-      review, do NOT merge wholesale): provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/
-      which 404s -- use the current MCP product name so a working server page is generated; fix inconsistent counts
-      and stale scope data. Re-profile from current sources.'
+    request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1 -- review, do NOT merge wholesale):
+      provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/ which 404s -- use the current MCP product name
+      so a working server page is generated; fix inconsistent counts and stale scope data. Re-profile from current sources.'
+x-enrichment:
+  date: '2026-09-28'
+  status: enriched
+  artifacts_added: 21
+  pass: modular-v1
+  engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local

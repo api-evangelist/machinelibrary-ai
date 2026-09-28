@@ -1,20 +1,16 @@
 generated: '2026-09-19'
 method: searched
-source: >-
-  https://machinelibrary.ai/docs/api ("Python Client Library — pip install spacefrontiers-clients"), PyPI / npm / crates.io
-  registry metadata endpoints fetched 2026-09-19, and the github.com/SpaceFrontiers organization (4 public repos: mcp,
-  hermes, quality, ai-overmind). Registry sweeps of npm and PyPI for "machinelibrary" returned nothing.
+source: 'https://machinelibrary.ai/docs/api ("Python Client Library — pip install spacefrontiers-clients"), PyPI / npm / crates.io registry metadata
+  endpoints fetched 2026-09-19, and the github.com/SpaceFrontiers organization (4 public repos: mcp, hermes, quality, ai-overmind). Registry sweeps
+  of npm and PyPI for "machinelibrary" returned nothing.'
 summary:
   first_party_sdk_count: 1
   first_party_package_count: 9
-  note: >-
-    One official client for the Machine Library API (spacefrontiers-clients on PyPI, named by the provider's docs).
-    The remaining packages are first-party but belong to Hermes, Space Frontiers' open-source search engine — clients,
-    server, broker and CLI for a self-hosted gRPC server, not for the hosted Machine Library API. The MCP server source
-    (spacefrontiers-mcp) is published on GitHub only.
-  currency_signal: >-
-    spacefrontiers-clients last released 2026-03-12 (110 releases), six months before the 2026-09-12 rename and after
-    the current v2 REST surface; Hermes packages were all released 2026-09-19. No package predates the API it wraps.
+  note: One official client for the Machine Library API (spacefrontiers-clients on PyPI, named by the provider's docs). The remaining packages
+    are first-party but belong to Hermes, Space Frontiers' open-source search engine — clients, server, broker and CLI for a self-hosted gRPC
+    server, not for the hosted Machine Library API. The MCP server source (spacefrontiers-mcp) is published on GitHub only.
+  currency_signal: spacefrontiers-clients last released 2026-03-12 (110 releases), six months before the 2026-09-12 rename and after the current
+    v2 REST surface; Hermes packages were all released 2026-09-19. No package predates the API it wraps.
 github_organization:
   found: true
   url: https://github.com/SpaceFrontiers
@@ -28,12 +24,14 @@ packages:
   name: spacefrontiers-clients
   url: https://pypi.org/project/spacefrontiers-clients/
   install: pip install spacefrontiers-clients
-  official: true
+  official: false
   version: 0.0.115
   published: '2026-03-12'
   scope: Machine Library REST API client (SearchApiClient.search_v2 in the docs example)
-  metadata_gaps: PyPI summary is "Add your description here", no author, license or project_urls set on the release; depends on aiogrpcclient / izihawa-textutils.
+  metadata_gaps: PyPI summary is "Add your description here", no author, license or project_urls set on the release; depends on aiogrpcclient
+    / izihawa-textutils.
   evidence: https://machinelibrary.ai/docs/api names it as "our official Python client".
+  ownership_audit: 'registry metadata names neither the provider''s domain nor its GitHub org: official downgraded (harvest-packages.py --audit)'
 - language: python
   registry: github
   name: spacefrontiers-mcp
@@ -42,35 +40,39 @@ packages:
   official: true
   version: 0.3.1
   published: '2026-09-12'
-  published_note: version from pyproject.toml on main; date is the repo's last push and the MCP-registry 0.3.1 publish date. NOT on PyPI (pypi.org/pypi/spacefrontiers-mcp 404).
+  published_note: version from pyproject.toml on main; date is the repo's last push and the MCP-registry 0.3.1 publish date. NOT on PyPI (pypi.org/pypi/spacefrontiers-mcp
+    404).
   scope: MCP server source (also the hosted server's code); MIT.
 - language: python
   registry: pypi
   name: hermes-client-python
   url: https://pypi.org/project/hermes-client-python/
   install: pip install hermes-client-python
-  official: true
+  official: false
   version: 1.8.148
   published: '2026-09-19'
   scope: Async gRPC client for the self-hosted Hermes search server (not the Machine Library API)
+  ownership_audit: 'registry metadata names neither the provider''s domain nor its GitHub org: official downgraded (harvest-packages.py --audit)'
 - language: javascript
   registry: npm
   name: hermes-client-typescript
   url: https://www.npmjs.com/package/hermes-client-typescript
   install: npm install hermes-client-typescript
-  official: true
+  official: false
   version: 1.8.148
   published: '2026-09-19'
   scope: Node.js gRPC client for Hermes
+  ownership_audit: 'registry metadata names neither the provider''s domain nor its GitHub org: official downgraded (harvest-packages.py --audit)'
 - language: javascript
   registry: npm
   name: hermes-wasm
   url: https://www.npmjs.com/package/hermes-wasm
   install: npm install hermes-wasm
-  official: true
+  official: false
   version: 1.8.148
   published: '2026-09-19'
   scope: WASM bindings — browser search and local indexing
+  ownership_audit: 'registry metadata names neither the provider''s domain nor its GitHub org: official downgraded (harvest-packages.py --audit)'
 - language: rust
   registry: crates.io
   name: hermes-core
@@ -106,9 +108,23 @@ packages:
   official: true
   version: 1.8.148
   published: '2026-09-19'
-  scope: CLI for Hermes index management and JSONL processing (a CLI for the self-hosted engine, not for the Machine Library API — hence no cli/ artifact)
+  scope: CLI for Hermes index management and JSONL processing (a CLI for the self-hosted engine, not for the Machine Library API — hence no cli/
+    artifact)
 not_found:
-- {registry: npm, query: machinelibrary, result: 0 packages}
-- {registry: pypi, names: [machinelibrary, spacefrontiers, spacefrontiers-sdk, machinelibrary-sdk, spacefrontiers-mcp], result: 404}
-- {registry: crates.io, query: spacefrontiers, result: 0 (hermes crates are found by name)}
-- {registry: pypi, name: hermes-client, result: 'exists but belongs to the Swiss Seismological Service (ETH) — a different HERMES; NOT this provider'}
+- registry: npm
+  query: machinelibrary
+  result: 0 packages
+- registry: pypi
+  names:
+  - machinelibrary
+  - spacefrontiers
+  - spacefrontiers-sdk
+  - machinelibrary-sdk
+  - spacefrontiers-mcp
+  result: 404
+- registry: crates.io
+  query: spacefrontiers
+  result: 0 (hermes crates are found by name)
+- registry: pypi
+  name: hermes-client
+  result: exists but belongs to the Swiss Seismological Service (ETH) — a different HERMES; NOT this provider

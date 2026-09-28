@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/machinelibrary-ai/main/json-schema/machinelibrary-ai-similar-request-v2-schema.json",
+  "title": "SimilarRequestV2",
+  "x-generated": "2026-09-28",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/machinelibrary-ai-search-api-openapi.yml#/components/schemas/SimilarRequestV2",
+  "type": "object",
+  "required": [
+    "document_id"
+  ],
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "Source document whose whole-document representation seeds similarity retrieval."
+    },
+    "limit": {
+      "type": "integer",
+      "format": "int32",
+      "default": 10,
+      "maximum": 100,
+      "minimum": 1
+    },
+    "filter_types": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Restrict results to document types."
+    },
+    "filter_languages": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Restrict results to ISO language codes."
+    }
+  }
+}

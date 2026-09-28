@@ -1,6 +1,7 @@
 generated: '2026-09-19'
 method: probed
 source: https://api.machinelibrary.ai/v1/pricing
+name: Space Frontiers API Plans
 sources:
 - https://api.machinelibrary.ai/v1/pricing (machine-readable; identical at https://machinelibrary.ai/api/pricing and https://api.spacefrontiers.org/v1/pricing)
 - https://machinelibrary.ai/pricing (pricing model text; per-endpoint table is rendered from the endpoint above)
