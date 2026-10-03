@@ -1,3 +1,10 @@
+---
+name: machinelibrary-ai-install
+description: Machine Library's own installation guide, addressed to an AI coding agent - install the Machine Library MCP server (https://mcp.machinelibrary.ai) with OAuth in Claude Code, Claude Desktop, Cursor/Windsurf or other HTTP clients, add credits, and verify the connection.
+method: searched
+source: https://machinelibrary.ai/install.md
+---
+
 # Machine Library MCP — Installation Guide
 
 You are reading this because a user asked you to install the Machine Library MCP server.

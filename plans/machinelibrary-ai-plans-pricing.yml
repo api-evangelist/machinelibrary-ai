@@ -62,9 +62,11 @@ plans:
     fetch_document: $0.05
     search_in_document: $0.015
     referenced_by: adds a separately billed search
-  limits: x-ratelimit-* headers (see rate-limits/); offset + limit <= 500 per search
+  limits:
+  - x-ratelimit-* headers (see rate-limits/)
+  - offset + limit <= 500 per search
 - name: Pro
-  price: null
+  price: unpublished
   currency: USD
   billing_period: monthly, auto-renewing via Stripe
   cta: Manage subscription

@@ -1,34 +1,37 @@
-- name: Public API metadata, pricing and OAuth
-  type: Endpoint
-  limit: 12
-  metric: request
-  timeframe: minute
-  description: Public metadata, pricing and OAuth routes. Shared per source IP at each gateway replica, not a per-account
-    allowance. Additional capacity controls can apply. Honor Retry-After when present; otherwise use bounded backoff.
-  domains:
-  - api.machinelibrary.ai
-  url: https://machinelibrary.ai/docs/api/operations#limits
-  source_date: '2026-09-26'
-- name: MCP protocol and discovery
-  type: Endpoint
-  limit: 60
-  metric: request
-  timeframe: minute
-  description: MCP discovery and protocol requests. Shared per source IP at each gateway replica, not a per-account
-    allowance. Additional capacity controls can apply. Honor Retry-After when present; otherwise use bounded backoff.
-  domains:
-  - mcp.machinelibrary.ai
-  url: https://machinelibrary.ai/docs/api/operations#limits
-  source_date: '2026-09-26'
-- name: Recognition requests
-  type: Endpoint
-  limit: 30
-  metric: request
-  timeframe: minute
-  description: Recognition routes; concurrent active-job limits also apply. Shared per source IP at each gateway
-    replica, not a per-account allowance. Additional capacity controls can apply. Honor Retry-After when present;
-    otherwise use bounded backoff.
-  domains:
-  - api.machinelibrary.ai
-  url: https://machinelibrary.ai/docs/api/operations#limits
-  source_date: '2026-09-26'
+name: Machine Library API Rate Limits
+source: https://machinelibrary.ai/docs/api/operations#limits
+limits:
+  - name: Public API metadata, pricing and OAuth
+    type: Endpoint
+    limit: 12
+    metric: request
+    timeframe: minute
+    description: Public metadata, pricing and OAuth routes. Shared per source IP at each gateway replica, not a per-account
+      allowance. Additional capacity controls can apply. Honor Retry-After when present; otherwise use bounded backoff.
+    domains:
+    - api.machinelibrary.ai
+    url: https://machinelibrary.ai/docs/api/operations#limits
+    source_date: '2026-09-26'
+  - name: MCP protocol and discovery
+    type: Endpoint
+    limit: 60
+    metric: request
+    timeframe: minute
+    description: MCP discovery and protocol requests. Shared per source IP at each gateway replica, not a per-account
+      allowance. Additional capacity controls can apply. Honor Retry-After when present; otherwise use bounded backoff.
+    domains:
+    - mcp.machinelibrary.ai
+    url: https://machinelibrary.ai/docs/api/operations#limits
+    source_date: '2026-09-26'
+  - name: Recognition requests
+    type: Endpoint
+    limit: 30
+    metric: request
+    timeframe: minute
+    description: Recognition routes; concurrent active-job limits also apply. Shared per source IP at each gateway
+      replica, not a per-account allowance. Additional capacity controls can apply. Honor Retry-After when present;
+      otherwise use bounded backoff.
+    domains:
+    - api.machinelibrary.ai
+    url: https://machinelibrary.ai/docs/api/operations#limits
+    source_date: '2026-09-26'

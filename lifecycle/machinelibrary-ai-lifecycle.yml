@@ -11,7 +11,7 @@ versioning:
   mcp_server_version: 0.3.1 in the MCP registry (2026-09-12); server.json on main already says 0.3.2
   header_versioning: none documented for REST; the MCP host enforces an MCP-Protocol-Version allowlist (2025-03-26, 2025-06-18, 2025-11-25)
   note: No OAuth issuer versioning; OAuth endpoints are under /v2/oauth/ on api.spacefrontiers.org.
-deprecation_policy:
+deprecation:
   published: false
   detail: >-
     No deprecation policy, Deprecation/Sunset headers or deprecated operations were found. Terms of Service 2.2 says

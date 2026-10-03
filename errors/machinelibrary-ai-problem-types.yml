@@ -24,7 +24,7 @@ problems:
 - status: 401
   title: Unauthorized
   meaning: Missing or invalid API credential (X-Api-Key or Bearer).
-  operations: all authenticated operations
+  applies_to: all authenticated operations
   remediation: Create a key at https://machinelibrary.ai/keys or complete OAuth per auth.md; on the MCP host the 401 carries WWW-Authenticate with resource_metadata.
 - status: 402
   title: Insufficient account balance

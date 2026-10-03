@@ -1,5 +1,5 @@
 ---
-name: Recognize a PDF/EPUB/DJVU into Markdown
+name: machinelibrary-ai-recognize-document
 description: Submit your own document to the asynchronous recognition API, poll the job, then fetch the Markdown result and the quality report.
 api: openapi/machinelibrary-ai-openapi.yml
 operations: [create_recognition, get_recognition, get_recognition_result, get_recognition_report]
