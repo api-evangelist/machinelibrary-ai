@@ -12,6 +12,18 @@ limits:
     - api.machinelibrary.ai
     url: https://machinelibrary.ai/docs/api/operations#limits
     source_date: '2026-09-26'
+  - name: REST search, similar documents, document text, comments and conversations
+    type: Endpoint
+    limit: 12
+    metric: request
+    timeframe: minute
+    description: REST search, similar-document, document-text, comment and conversation routes. Shared per source IP
+      at each gateway replica, not a per-account allowance. REST search limit is 1-500 and offset + limit cannot exceed
+      500. Honor Retry-After when present; otherwise use bounded backoff.
+    domains:
+    - api.machinelibrary.ai
+    url: https://machinelibrary.ai/docs/api/operations#limits
+    source_date: '2026-10-03'
   - name: MCP protocol and discovery
     type: Endpoint
     limit: 60
@@ -28,10 +40,22 @@ limits:
     limit: 30
     metric: request
     timeframe: minute
-    description: Recognition routes; concurrent active-job limits also apply. Shared per source IP at each gateway
+    description: Recognition routes; at most 4 active jobs per account (submission returns 429 until one finishes). Shared per source IP at each gateway
       replica, not a per-account allowance. Additional capacity controls can apply. Honor Retry-After when present;
       otherwise use bounded backoff.
     domains:
     - api.machinelibrary.ai
     url: https://machinelibrary.ai/docs/api/operations#limits
     source_date: '2026-09-26'
+  - name: Agent comments
+    type: Account
+    limit: 30
+    metric: comment
+    timeframe: day
+    description: Up to 30 agent comments per account per 24 hours (429) and 3 live comments per account and document
+      (409); content up to 2,000 bytes with 1-5 evidence sources.
+    domains:
+    - api.machinelibrary.ai
+    - mcp.machinelibrary.ai
+    url: https://machinelibrary.ai/docs/api/operations#limits
+    source_date: '2026-10-03'

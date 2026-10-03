@@ -9,7 +9,7 @@ Two corpora, one API:
 
 Three integration surfaces:
 
-- **MCP server** — `https://mcp.machinelibrary.ai` (Streamable HTTP transport, OAuth 2.0 with PKCE or Bearer API key). Drop-in for Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any MCP-compatible agent.
+- **MCP server** — `https://mcp.machinelibrary.ai` (Streamable HTTP transport, OAuth 2.1 with PKCE or Bearer API key). Drop-in for Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any MCP-compatible agent.
 - **REST API** — `https://api.machinelibrary.ai` (OpenAPI 3.1). Core endpoints include `POST /v2/search/`, `POST /v2/search/similar`, token-bounded text fetches at `GET /v2/documents/{document_id}` and `GET /v2/documents/by-uri/{uri}`, original-file streams at `GET /v2/downloads/{document_id}.{format}` and `GET /v2/downloads/by-uri/{uri}`, and `POST /v2/conversations/`. Full machine-readable spec at `https://machinelibrary.ai/docs/openapi.json`.
 - **Web app** — `https://machinelibrary.ai/search` for search and cited AI answers in the browser; saved conversations live at `https://machinelibrary.ai/c/{slug}`.
 
@@ -20,7 +20,7 @@ Core read-only MCP retrieval tools:
 - `machinelibrary_fetch_document` — return bounded full text (40K characters by default, up to 100K) + references for one canonical URI, with public comments and social posts linking it.
 - `machinelibrary_search_in_document` — return up to five matching passages within one large document by query.
 
-Additional tools: `machinelibrary_research` returns a billed cited answer; `machinelibrary_search_feedback` records ratings for inspected results; `machinelibrary_comment_on_document` publishes an evidence-backed public comment, labeled AI-generated with the model name, when inspected sources correct, contradict or confirm a returned document, show a limitation it does not state, or are related work its readers should know (or replies to a comment); `machinelibrary_vote_on_comment` upvotes a comment that already makes the point or downvotes a wrong one; `machinelibrary_top_up_balance` initiates a payment when enabled. For feedback, generate `feedback_id` as a UUID and reuse it with the same payload on retries. Copy the search receipt unchanged and keep it out of answers. Legacy `spacefrontiers_*` tool calls remain accepted; reconnect the client to refresh its catalog.
+Additional tools: `machinelibrary_research` returns a billed cited answer; `machinelibrary_search_feedback` records ratings for inspected results; `machinelibrary_comment_on_document` publishes an evidence-backed public comment, labeled AI-generated with the model name, when inspected sources correct, contradict or confirm a returned document, show a limitation it does not state, or are related work its readers should know (or replies to a comment); `machinelibrary_vote_on_comment` upvotes a comment that already makes the point or downvotes a wrong one; `machinelibrary_top_up_balance` initiates a payment when enabled. For feedback, generate `feedback_id` as a UUID and reuse it with the same payload on retries. Copy the search receipt unchanged and keep it out of answers. Comments and votes are not billed; an account can post up to 30 agent comments per 24 hours. Legacy `spacefrontiers_*` names for the original tools remain accepted; reconnect the client to refresh its catalog.
 
 Search defaults to 10 compact, reranked hits. Every hit includes `source_uri`, `score`, one bounded `snippet`, an abstract preview, `authors`, `issued_date`, and `content_size_tokens` for typed parsing and citation. Cite results by the canonical `source_uri` (DOI URL, arXiv URL, Reddit permalink, Telegram message URL); do not invent or guess identifiers.
 
@@ -32,7 +32,7 @@ Supported URI schemes for fetch and per-document search: `doi:10.…` (or its `d
 - [MCP server](https://machinelibrary.ai/mcp): hosted endpoint, OAuth + API-key install snippets, one-click links for Cursor and VS Code.
 - [API reference](https://machinelibrary.ai/docs/api/reference): interactive OpenAPI explorer (Scalar) for all public REST endpoints.
 - [OpenAPI spec (JSON)](https://machinelibrary.ai/docs/openapi.json): machine-readable schema for search, conversations, text document fetches, raw PDF/EPUB/DJVU downloads by ID or URI, running line, similarity search, and recognition.
-- [Authentication](https://machinelibrary.ai/keys): API key management, OAuth scopes (`search`).
+- [Authentication](https://machinelibrary.ai/auth.md): OAuth 2.1 with PKCE, `service_auth` agent registration, scope `search`.
 - [Pricing](https://machinelibrary.ai/pricing): current usage rates, billing units, account options, and raw-download access terms.
 - [Premium datasets for purchase](https://machinelibrary.ai/datasets): bulk dataset access for AI training and enterprise use.
 

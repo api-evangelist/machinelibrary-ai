@@ -1,18 +1,21 @@
-generated: '2026-09-19'
+generated: '2026-10-03'
 method: searched
-source: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+source: https://api.machinelibrary.ai/.well-known/oauth-authorization-server
 docs: https://api.machinelibrary.ai/auth.md
 sources:
 - https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource (scopes_supported [search])
 - https://machinelibrary.ai/.well-known/oauth-protected-resource (scopes_supported [search])
 - https://api.machinelibrary.ai/auth.md ("Scope and policies")
-- https://machinelibrary.ai/llms.txt ("OAuth scopes (search)")
+- https://machinelibrary.ai/llms.txt ("scope `search`")
+- https://machinelibrary.ai/docs/api/operations ("OAuth uses the search scope ... mandatory S256 PKCE"; re-read 2026-10-03)
+- https://api.spacefrontiers.org/.well-known/oauth-authorization-server (legacy host; names issuer https://api.machinelibrary.ai on 2026-10-03)
 note: >-
   The OpenAPI declares no oauth2 securityScheme (derive-oauth-scopes.py correctly found nothing); OAuth 2.1 access
   tokens are accepted by the REST API through the bearer_auth http scheme ("Send the same API key, or an OAuth 2.0
   access token, as a Bearer token") and by the MCP server. The scope vocabulary therefore comes from the RFC 8414 /
-  RFC 9728 metadata and auth.md, all provider-published and fetched live on 2026-09-19.
-authorization_server: https://api.spacefrontiers.org
+  RFC 9728 metadata and auth.md, all provider-published and fetched live on 2026-09-19 and re-verified 2026-10-03,
+  when the issuer had moved from https://api.spacefrontiers.org to https://api.machinelibrary.ai.
+authorization_server: https://api.machinelibrary.ai
 resources:
 - https://mcp.machinelibrary.ai
 - https://mcp.spacefrontiers.org
@@ -24,7 +27,8 @@ scopes:
   description: Search the corpus and retrieve research documents using the user's account credits.
   source: https://api.machinelibrary.ai/auth.md ("Scope and policies")
   grants: [authorization_code, refresh_token, 'urn:workos:agent-auth:grant-type:claim', 'urn:ietf:params:oauth:grant-type:jwt-bearer']
-  mcp_tools: [spacefrontiers_search_documents, spacefrontiers_search_social, spacefrontiers_fetch_document, spacefrontiers_search_in_document]
+  mcp_tools: [machinelibrary_search_documents, machinelibrary_search_social, machinelibrary_fetch_document, machinelibrary_search_in_document, machinelibrary_research, machinelibrary_search_feedback, machinelibrary_comment_on_document, machinelibrary_vote_on_comment, machinelibrary_top_up_balance]
+  mcp_tools_note: The MCP server's only scope covers all nine machinelibrary_* tools (legacy spacefrontiers_* aliases accepted). Per docs/api/operations (2026-10-03), approval lets the application search and retrieve using account credits, and publish AI-labeled comments and votes on the user's behalf.
   note: The only scope offered; auth.md instructs clients to "request only search". Payment tools/endpoints are not covered by a distinct scope in the published metadata.
 grant_types_supported:
 - authorization_code
@@ -32,5 +36,6 @@ grant_types_supported:
 - urn:ietf:params:oauth:grant-type:jwt-bearer
 - urn:workos:agent-auth:grant-type:claim
 pkce: S256
-dynamic_client_registration: https://api.spacefrontiers.org/v2/oauth/register
+dynamic_client_registration: https://api.machinelibrary.ai/v2/oauth/register
+client_id_prefix: ml_oauth_ (new client IDs, docs/api/operations)
 token_endpoint_auth_methods_supported: [none]

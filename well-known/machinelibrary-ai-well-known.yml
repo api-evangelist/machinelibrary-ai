@@ -1,19 +1,22 @@
-generated: '2026-09-19'
+generated: '2026-10-03'
 method: probed
-source: live probes of /.well-known/ on every Machine Library / Space Frontiers host on 2026-09-19
+source: live probes of /.well-known/ on every Machine Library / Space Frontiers host on 2026-09-19, re-probed by hand 2026-10-03 for the provider correction (PR #1)
 summary: >-
   A rich, real well-known surface. The apex machinelibrary.ai (and the former apex spacefrontiers.org, which
   answers the same paths directly) serves an A2A agent card, RFC 8414 authorization-server metadata, RFC 9728
   protected-resource metadata, an RFC 9727 api-catalog linkset (application/linkset+json) pointing at the
   OpenAPI and the MCP server card, and an MCP server card at /.well-known/mcp/server-card.json. The MCP hosts
   (mcp.machinelibrary.ai and legacy mcp.spacefrontiers.org) each serve their own RFC 9728 protected-resource
-  document naming https://api.spacefrontiers.org as the authorization server, and that issuer host serves the
-  authorization-server metadata (with RFC 7591 registration_endpoint, PKCE S256, and a WorkOS agent_auth block).
-  Nothing serves security.txt, openid-configuration or ai-plugin.json.
+  document naming https://api.machinelibrary.ai as the authorization server (as of 2026-10-03; the legacy
+  spacefrontiers hosts name the same issuer), and that issuer serves the authorization-server metadata (RFC 7591
+  registration_endpoint /v2/oauth/register, PKCE S256, scopes_supported [search], and a WorkOS agent_auth block).
+  RFC 9116 security.txt is served on machinelibrary.ai, api., mcp. and spacefrontiers.org (re-probed 2026-10-03).
+  Nothing serves openid-configuration or ai-plugin.json.
 pointer_basis: >-
   WellKnown pointer emitted on the strength of nine distinct real documents (200 + parseable JSON, correct media
-  types). SecurityTxt pointer NOT emitted — RFC 9116 is unimplemented on every host (apex 404s with the Nuxt
-  HTML 404 page; API/MCP hosts 404 with an empty body).
+  types). SecurityTxt pointer emitted 2026-10-03: https://machinelibrary.ai/.well-known/security.txt answers 200
+  text/plain with Canonical, Contact mailto:contact@machinelibrary.ai, Expires 2027-09-01T00:00:00Z and
+  Preferred-Languages (saved verbatim: machinelibrary-ai-security.txt); it 404ed on every host on 2026-09-19.
 false_positive_watch: >-
   machinelibrary.ai answers unknown /.well-known/* paths with HTTP 404 and a ~250 KB HTML 404 page (a real 404,
   not a soft 200). Several non-well-known paths (/security, /changelog, /blog, /status, /payments) return a
@@ -31,17 +34,24 @@ hosts:
     status: 200
     content_type: application/json
     file: machinelibrary-ai-oauth-authorization-server.json
-    note: issuer https://api.spacefrontiers.org; registration_endpoint present (RFC 7591); code_challenge_methods S256; scopes_supported [search]; agent_auth block (WorkOS service_auth claim flow).
+    note: issuer https://api.machinelibrary.ai (2026-10-03; was api.spacefrontiers.org on 2026-09-19); registration_endpoint https://api.machinelibrary.ai/v2/oauth/register (RFC 7591); code_challenge_methods S256; scopes_supported [search]; agent_auth block (WorkOS service_auth claim flow).
   - path: /.well-known/oauth-protected-resource
     status: 200
     content_type: application/json
     file: machinelibrary-ai-oauth-protected-resource.json
-    note: resource https://machinelibrary.ai, resource_name "Machine Library by Space Frontiers", authorization_servers [https://api.spacefrontiers.org], resource_documentation https://machinelibrary.ai/auth.md.
+    note: resource https://machinelibrary.ai, resource_name "Machine Library by Space Frontiers", authorization_servers [https://api.machinelibrary.ai], resource_documentation https://machinelibrary.ai/auth.md.
   - path: /.well-known/api-catalog
     status: 200
     content_type: application/linkset+json; charset=utf-8
     file: machinelibrary-ai-api-catalog.json
-    note: RFC 9727 linkset with two anchors — https://api.machinelibrary.ai (service-desc https://machinelibrary.ai/docs/openapi.json, application/openapi+json) and https://mcp.machinelibrary.ai (service-desc /.well-known/mcp/server-card.json, application/mcp-server-card+json).
+    note: >-
+      RFC 9727 linkset with two anchors (re-probed 2026-10-03). https://api.machinelibrary.ai has service-desc
+      https://machinelibrary.ai/docs/openapi.json, service-doc /docs/api/reference and /docs/api/operations,
+      status https://machinelibrary.ai/status, and latest-version https://machinelibrary.ai/openapi.json.
+      https://mcp.machinelibrary.ai has service-desc https://machinelibrary.ai/.well-known/mcp/server-card.json
+      (200, application/mcp-server-card+json) and service-doc https://machinelibrary.ai/mcp. The correction
+      request noted the catalog linked mcp.machinelibrary.ai/.well-known/mcp/server-card.json, which 404s; that
+      path still 404s, but the live catalog now links the apex copy, which resolves.
   - path: /.well-known/mcp/server-card.json
     status: 200
     content_type: application/mcp-server-card+json; charset=utf-8
@@ -51,8 +61,10 @@ hosts:
     status: 404
     body: 'JSON 404 ("Page not found: /.well-known/agent.json")'
   - path: /.well-known/security.txt
-    status: 404
-    body: HTML 404 page
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: machinelibrary-ai-security.txt
+    note: RFC 9116; Canonical https://machinelibrary.ai/.well-known/security.txt, Contact mailto:contact@machinelibrary.ai, Expires 2027-09-01T00:00:00Z (404 on 2026-09-19, 200 on 2026-10-03).
   - path: /.well-known/openid-configuration
     status: 404
     body: HTML 404 page
@@ -95,11 +107,12 @@ hosts:
     status: 200
     content_type: application/json
     file: machinelibrary-ai-api-oauth-authorization-server.json
-    note: Same issuer document as the apex plus revocation_endpoint_auth_methods_supported; agent_auth.skill points at https://api.spacefrontiers.org/auth.md.
+    note: The issuer's own metadata (issuer https://api.machinelibrary.ai) plus revocation_endpoint_auth_methods_supported; agent_auth.skill points at https://api.machinelibrary.ai/auth.md.
   - path: /.well-known/oauth-protected-resource
     status: 404
   - path: /.well-known/security.txt
-    status: 404
+    status: 200
+    note: Same bytes as the apex security.txt (2026-10-03).
   - path: /.well-known/openid-configuration
     status: 404
   - path: /.well-known/api-catalog
@@ -117,14 +130,18 @@ hosts:
     content_type: application/json
     file: machinelibrary-ai-mcp-oauth-protected-resource.json
     note: >-
-      resource https://mcp.machinelibrary.ai, authorization_servers [https://api.spacefrontiers.org],
+      resource https://mcp.machinelibrary.ai, authorization_servers [https://api.machinelibrary.ai] (2026-10-03),
       bearer_methods_supported [header], scopes_supported [search]. This is the document the MCP endpoint's
       401 WWW-Authenticate header names via resource_metadata=... (observed live on POST tools/list).
   - path: /.well-known/oauth-authorization-server
     status: 404
-    note: Auth-server metadata lives on the issuer host https://api.spacefrontiers.org, as RFC 9728 permits.
+    note: Auth-server metadata lives on the issuer host https://api.machinelibrary.ai, as RFC 9728 permits.
   - path: /.well-known/security.txt
+    status: 200
+    note: Same bytes as the apex security.txt (2026-10-03).
+  - path: /.well-known/mcp/server-card.json
     status: 404
+    note: Re-probed 2026-10-03; the server card is served on the apex machinelibrary.ai instead, and the live api-catalog links the apex copy.
   - path: /.well-known/openid-configuration
     status: 404
   - path: /.well-known/api-catalog
@@ -148,7 +165,7 @@ hosts:
     status: 200
     content_type: application/json
     file: machinelibrary-ai-api-spacefrontiers-oauth-authorization-server.json
-    note: The OAuth ISSUER named by every protected-resource document. authorization_endpoint /v2/oauth/authorize, token_endpoint /v2/oauth/token, registration_endpoint /v2/oauth/register, revocation_endpoint /v2/oauth/revoke; token_endpoint_auth_methods_supported [none]; grant types authorization_code, refresh_token, jwt-bearer, urn:workos:agent-auth:grant-type:claim.
+    note: Legacy issuer host. On 2026-10-03 its metadata names issuer https://api.machinelibrary.ai with endpoints on that host; on 2026-09-19 it was the issuer itself. authorization_endpoint /v2/oauth/authorize, token_endpoint /v2/oauth/token, registration_endpoint /v2/oauth/register, revocation_endpoint /v2/oauth/revoke; token_endpoint_auth_methods_supported [none]; grant types authorization_code, refresh_token, jwt-bearer, urn:workos:agent-auth:grant-type:claim.
   - path: /.well-known/oauth-protected-resource
     status: 404
   - path: /.well-known/openid-configuration
@@ -185,7 +202,8 @@ hosts:
   - path: /.well-known/agent.json
     status: 404
   - path: /.well-known/security.txt
-    status: 404
+    status: 200
+    note: Served 2026-10-03 with Canonical https://spacefrontiers.org/.well-known/security.txt and the same Contact (mailto:contact@machinelibrary.ai) and Expires as the apex.
   - path: /.well-known/openid-configuration
     status: 404
   - path: /.well-known/ai-plugin.json

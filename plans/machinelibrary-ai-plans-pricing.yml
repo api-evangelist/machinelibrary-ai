@@ -79,7 +79,7 @@ plans:
 prepaid_credit_packages:
   source: openapi createMppBalanceTopUp package enum; x-payment-info amounts are in cents
   packages: [usd-5, usd-10, usd-25, usd-50, usd-100, usd-250, usd-500, usd-1000]
-  channels: [Stripe MPP top-up (POST /v2/payments/mpp/top-up), ACP checkout sessions (POST /v2/acp/checkout_sessions), A2A credit-top-up skill, MCP tool spacefrontiers_top_up_balance, human top-up at https://machinelibrary.ai/payments in an arbitrary amount (Terms 4.2)]
+  channels: [Stripe MPP top-up (POST /v2/payments/mpp/top-up), ACP checkout sessions (POST /v2/acp/checkout_sessions), A2A credit-top-up skill, MCP tool machinelibrary_top_up_balance (legacy alias spacefrontiers_top_up_balance), human top-up at https://machinelibrary.ai/payments in an arbitrary amount (Terms 4.2)]
 refunds: Unused balance is not refunded except where required by law (Terms 4.8); remaining balance is not refunded on termination (Terms 8.3).
 rate_change_notice: 30 days (Terms 3.5)
 bulk_data: Separate licensed product ("Premium datasets for purchase", https://machinelibrary.ai/datasets) scoped by source segment, use and volume; no published price; "There is no anonymous whole-corpus download."

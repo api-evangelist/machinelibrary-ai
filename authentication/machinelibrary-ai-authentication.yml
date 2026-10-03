@@ -1,4 +1,4 @@
-generated: '2026-09-19'
+generated: '2026-10-03'
 method: searched
 source: openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml (securitySchemes) upgraded with https://api.machinelibrary.ai/auth.md, the RFC 8414 / RFC 9728 metadata under well-known/, https://machinelibrary.ai/privacy (token lifetimes) and the MCP repo README/smithery.yaml (key prefix)
 docs: https://api.machinelibrary.ai/auth.md
@@ -14,7 +14,7 @@ schemes:
   in: header
   parameter: X-Api-Key
   description: Machine Library API key from https://machinelibrary.ai/keys.
-  key_prefix: sf_live_ (example shape in the MCP README and smithery.yaml exampleConfig)
+  key_prefix: ml_ followed by 48 hexadecimal characters, shown once at creation; keys issued before 2026-09-29 (id:ml_...) remain valid (docs/api/operations, 2026-10-03). The sf_live_ shape survives only in older MCP README / smithery.yaml examples.
   expiry: Long-lived; does not expire automatically, revocable from account settings (privacy policy section 4).
   sources: [openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml]
 - name: bearer_auth
@@ -25,26 +25,28 @@ schemes:
   sources: [openapi/machinelibrary-ai-openapi.yml, openapi/machinelibrary-ai-recognition-openapi.yml]
 - name: oauth2
   type: oauth2
-  issuer: https://api.spacefrontiers.org
-  metadata: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
+  issuer: https://api.machinelibrary.ai
+  issuer_note: Re-verified 2026-10-03. The issuer moved from https://api.spacefrontiers.org (2026-09-19) to https://api.machinelibrary.ai; the legacy api.spacefrontiers.org, spacefrontiers.org and mcp.spacefrontiers.org metadata all name the new issuer.
+  metadata: https://api.machinelibrary.ai/.well-known/oauth-authorization-server
   protected_resource_metadata:
   - https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource
   - https://machinelibrary.ai/.well-known/oauth-protected-resource
   flows:
     authorizationCode:
-      authorizationUrl: https://api.spacefrontiers.org/v2/oauth/authorize
-      tokenUrl: https://api.spacefrontiers.org/v2/oauth/token
-      refreshUrl: https://api.spacefrontiers.org/v2/oauth/token
-      revocationUrl: https://api.spacefrontiers.org/v2/oauth/revoke
-      registrationUrl: https://api.spacefrontiers.org/v2/oauth/register
+      authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+      tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+      revocationUrl: https://api.machinelibrary.ai/v2/oauth/revoke
+      registrationUrl: https://api.machinelibrary.ai/v2/oauth/register
       scopes:
         search: Search the corpus and retrieve research documents using the user's account credits.
       pkce: S256 required
-      client_auth: none (public clients; token_endpoint_auth_methods_supported [none])
+      client_auth: none (public clients; token_endpoint_auth_methods_supported [none]); new client IDs start with ml_oauth_
+      dynamic_client_registration: RFC 7591 at the registrationUrl; the operations page notes public client registration does not verify the application's identity
       resource_indicator: Set the OAuth resource to https://mcp.machinelibrary.ai (auth.md section 7)
     service_auth (agent claim flow):
       description: >-
-        For agents that cannot receive a browser callback. POST https://api.spacefrontiers.org/v2/agent/identity
+        For agents that cannot receive a browser callback. POST https://api.machinelibrary.ai/v2/agent/identity
         {"type":"service_auth","login_hint":"<user email>"} returns a registration_id, a secret claim_token and a
         claim {user_code (6 digits), verification_uri, expires_in 900, interval 5}. The user opens the verification
         URI, signs in with the matching verified email, confirms the code and approves; the agent polls the token
@@ -52,9 +54,9 @@ schemes:
         authorization_pending / slow_down / access_denied / expired_token. Approval yields a one-hour access_token
         plus a service-signed identity_assertion; renew with grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=...
       endpoints:
-        identity: https://api.spacefrontiers.org/v2/agent/identity (also served on api.machinelibrary.ai)
-        claim: https://api.spacefrontiers.org/v2/agent/identity/claim
-        claim_complete: https://api.spacefrontiers.org/v2/agent/identity/claim/complete (browser-only; agents must not call it)
+        identity: https://api.machinelibrary.ai/v2/agent/identity (issuer metadata, 2026-10-03)
+        claim: https://api.machinelibrary.ai/v2/agent/identity/claim
+        claim_complete: https://api.machinelibrary.ai/v2/agent/identity/claim/complete (browser-only; agents must not call it)
       constraints: Anonymous registration and external identity assertions are not accepted; the email is a login hint, not proof of identity.
   token_lifetimes:
     access_token: 3600 seconds

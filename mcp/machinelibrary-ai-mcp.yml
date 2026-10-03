@@ -1,160 +1,479 @@
-generated: '2026-09-19'
+generated: '2026-10-03'
 method: searched
 status: published
 source: https://machinelibrary.ai/mcp
 sources:
-- https://machinelibrary.ai/.well-known/mcp/server-card.json (saved verbatim: mcp/machinelibrary-ai-server-card.json)
-- https://machinelibrary.ai/install.md (saved verbatim: skills/machinelibrary-ai-install.md)
-- https://machinelibrary.ai/llms.txt (tool list)
-- https://github.com/SpaceFrontiers/mcp (MIT source: tools.py, prompts.py, resources.py, server.json, registry.json, smithery.yaml, AGENTS.md)
-- https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers (io.github.SpaceFrontiers/mcp, versions 0.2.1 -> 0.3.1)
-- https://api.machinelibrary.ai/auth.md
+- 'https://machinelibrary.ai/mcp (live 2026-10-03: the nine machinelibrary_* tools and their descriptions)'
+- 'https://machinelibrary.ai/llms.txt (live 2026-10-03: nine tools; legacy spacefrontiers_* names accepted)'
+- 'https://machinelibrary.ai/.well-known/mcp/server-card.json (saved verbatim: mcp/machinelibrary-ai-server-card.json)'
+- https://machinelibrary.ai/install.md
+- https://machinelibrary.ai/docs/api/operations (limits, aliases)
+- 'https://github.com/SpaceFrontiers/mcp @ 84638746 (2026-09-29): tools/list run in-process for the four open-source tools'
+- https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers (io.github.SpaceFrontiers/mcp)
+- https://machinelibrary.ai/auth.md
 deployment:
   mode: both
   endpoint: https://mcp.machinelibrary.ai
   legacy_endpoint: https://mcp.spacefrontiers.org
-  install: "git clone https://github.com/SpaceFrontiers/mcp.git && cd mcp && uv sync && SEARCH_API_ENDPOINT=https://api.machinelibrary.ai SPACE_FRONTIERS_API_KEY=<key> uv run fastmcp run mcp_server.py"
+  install: git clone https://github.com/SpaceFrontiers/mcp.git && cd mcp && uv sync && SEARCH_API_ENDPOINT=https://api.machinelibrary.ai
+    SPACE_FRONTIERS_API_KEY=<key> uv run fastmcp run mcp_server.py
   package: https://github.com/SpaceFrontiers/mcp
-  package_note: pyproject name spacefrontiers-mcp 0.3.1, but it is NOT published to PyPI (pypi.org/pypi/spacefrontiers-mcp 404 on 2026-09-19); the stdio path is a source checkout run with uv, exactly as the README's "Self-hosted (stdio)" section states.
+  package_note: pyproject name spacefrontiers-mcp 0.3.1, but it is NOT published to PyPI (pypi.org/pypi/spacefrontiers-mcp
+    404 on 2026-09-19); the stdio path is a source checkout run with uv, exactly as the README's "Self-hosted (stdio)" section
+    states.
   auth: oauth
-  auth_detail: OAuth 2.1 authorization code + PKCE S256 with RFC 7591 dynamic client registration against https://api.spacefrontiers.org (scope search), OR a long-lived Bearer API key from https://machinelibrary.ai/keys; the WorkOS-style service_auth claim flow is offered for clients that cannot receive a browser callback (auth.md).
+  auth_detail: OAuth 2.1 authorization code + PKCE S256 with RFC 7591 dynamic client registration at https://api.machinelibrary.ai/v2/oauth/register
+    (issuer https://api.machinelibrary.ai, scope search; the legacy spacefrontiers hosts name the same issuer), OR a Bearer
+    API key from https://machinelibrary.ai/keys; the WorkOS-style service_auth claim flow is offered for clients that cannot
+    receive a browser callback (auth.md).
   verified: probed
-  verification: >-
-    POST https://mcp.machinelibrary.ai/ with tools/list and with initialize (Accept: application/json, text/event-stream)
-    both returned HTTP 401 "Authentication required" with WWW-Authenticate: Bearer
-    resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource" and x-ratelimit-limit: 60.
-    GET / returns 405. The legacy mcp.spacefrontiers.org answers identically with its own resource_metadata URL.
-    tools/list is therefore auth-gated; the tool inventory below is taken from the provider's published sources,
-    and the input schemas from the provider's MIT-licensed server source (tools.py), not from a live introspection.
+  verification: 'Re-probed 2026-10-03: POST https://mcp.machinelibrary.ai initialize and tools/list (Accept: application/json,
+    text/event-stream) both return HTTP 401 "Authentication required" with WWW-Authenticate: Bearer resource_metadata="https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource"
+    and x-ratelimit-limit: 60. tools/list is auth-gated, so the inventory below is the provider''s live MCP page and llms.txt
+    (nine machinelibrary_* tools); the four open-source tools carry the tools/list output (descriptions, annotations, input
+    schemas) of the provider''s MIT server run in-process; the five hosted-only tools have no published input schema.'
 server:
   name: org.spacefrontiers/search
   registry_name: io.github.SpaceFrontiers/mcp
-  title: Machine Library by Space Frontiers
+  title: Machine Library
   server_info_name: Machine Library MCP Server
   version: 0.3.1
   transport: streamable-http
   url: https://mcp.machinelibrary.ai
   stateless: true
-  supported_protocol_versions: ['2025-03-26', '2025-06-18', '2025-11-25']
+  supported_protocol_versions:
+  - '2025-03-26'
+  - '2025-06-18'
+  - '2025-11-25'
   capabilities:
     tools: true
     prompts: true
     resources: false
-  capabilities_note: server-card says resources false, but the source registers one resource template (spacefrontiers://document/{uri_b64}); recorded as declared by the provider, discrepancy noted.
+  capabilities_note: server-card says resources false, but the source registers one resource template (spacefrontiers://document/{uri_b64});
+    recorded as declared by the provider, discrepancy noted.
   listings:
-  - Official MCP Registry (registry.modelcontextprotocol.io) as io.github.SpaceFrontiers/mcp — 0.2.1 (2026-05-07), 0.3.0 (2026-07-29), 0.3.1 (2026-09-12); repo server.json already says 0.3.2
+  - Official MCP Registry (registry.modelcontextprotocol.io) as io.github.SpaceFrontiers/mcp — 0.2.1 (2026-05-07), 0.3.0 (2026-07-29),
+    0.3.1 (2026-09-12); repo server.json already says 0.3.2
   - Smithery (smithery.ai/servers/@SpaceFrontiers/mcp)
   - Glama (glama.ai/mcp/servers/SpaceFrontiers/mcp)
   - one-click install links for Cursor, VS Code, VS Code Insiders on https://machinelibrary.ai/mcp
   license: MIT
+  version_note: server-card.json (live 2026-10-03) reports serverInfo version 0.1.0; the registry listing versions are 0.2.1
+    -> 0.3.1
 auth:
-  methods: [oauth2, apikey]
+  methods:
+  - oauth2
+  - apikey
   oauth2:
-    authorization_server: https://api.spacefrontiers.org
+    authorization_server: https://api.machinelibrary.ai
     protected_resource_metadata: https://mcp.machinelibrary.ai/.well-known/oauth-protected-resource
-    authorization_server_metadata: https://api.spacefrontiers.org/.well-known/oauth-authorization-server
-    scopes_supported: [search]
-    grant_types: [authorization_code, refresh_token, 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'urn:workos:agent-auth:grant-type:claim']
+    authorization_server_metadata: https://api.machinelibrary.ai/.well-known/oauth-authorization-server
+    scopes_supported:
+    - search
+    grant_types:
+    - authorization_code
+    - refresh_token
+    - urn:ietf:params:oauth:grant-type:jwt-bearer
+    - urn:workos:agent-auth:grant-type:claim
     pkce: S256
-    dynamic_client_registration: https://api.spacefrontiers.org/v2/oauth/register
-    token_endpoint_auth_methods: [none]
+    dynamic_client_registration: https://api.machinelibrary.ai/v2/oauth/register
+    token_endpoint_auth_methods:
+    - none
     discovery: well-known/machinelibrary-ai-mcp-oauth-protected-resource.json
+    legacy_issuer_note: https://api.spacefrontiers.org/.well-known/oauth-authorization-server and mcp.spacefrontiers.org protected-resource
+      metadata now name issuer https://api.machinelibrary.ai (2026-10-03)
   apikey:
     header: Authorization
     scheme: Bearer
-    key_prefix: sf_live_
+    key_prefix: ml_ (48 hex characters; keys issued before 2026-09-29 as id:ml_... remain valid; older sf_live_ examples appear
+      in the MCP README)
     keys_page: https://machinelibrary.ai/keys
-tool_count: 5
+tool_count: 9
 tools:
-- name: spacefrontiers_search_documents
+- name: machinelibrary_search_documents
   category: search
+  legacy_alias: spacefrontiers_search_documents
+  title: Search papers, books, patents, Wikipedia, YouTube transcripts
   read_only: true
   idempotent: true
-  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
-  description: Search papers, books, patents, standards, Wikipedia, and YouTube transcripts (the `documents` index). Defaults to 10 compact, reranked hits.
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: true
+  description: Search peer-reviewed papers, books, patents, Wikipedia, and YouTube transcripts. Use for citations, prior art,
+    and grounded scientific claims.
+  server_description: 'Search papers, books, patents, standards, Wikipedia, and YouTube transcripts.
+
+
+    These sources belong to the Machine Library `documents` index.
+
+
+    Use when: the user asks about scientific concepts, technical methods, prior art, citations,
+
+    a DOI / ISBN / arXiv ID / PubMed ID, or wants peer-reviewed sources.
+
+
+    Do not use when: the question is about news, current events, ongoing discussions, or social
+
+    sentiment — call `machinelibrary_search_social` instead. For general web pages or code,
+
+    use a different MCP server.
+
+
+    Examples: "crispr base editing efficiency", "doi:10.1038/s41586-023-06924-6",
+
+    "isbn:9780262033848", "arxiv:2301.00001", "transformer attention scaling laws".
+
+
+    Tips:
+
+    - Run 2-6 parallel queries with varied phrasings (synonyms, narrower/broader terms).
+
+    - Pass an empty `query` plus `filter_issns` to browse recent issues of a specific journal.
+
+    - Use the returned `source_uri` verbatim with `machinelibrary_fetch_document` for full text.'
   inputSchema:
-    source: tools.py (provider source, commit on main 2026-09-12); schema shape as FastMCP generates it from these annotated parameters
-    type: object
+    additionalProperties: false
     properties:
-      query: {type: string, maxLength: 16384, default: '', description: Free-text search query; may be empty when at least one filter is supplied}
-      limit: {type: integer, minimum: 1, maximum: 30, default: 10}
-      offset: {type: integer, minimum: 0, exclusiveMaximum: 500, default: 0, description: offset + limit must not exceed 500}
-      filter_issns: {type: [array, 'null'], items: {type: string}, description: Journal ISSN, hyphenated or plain}
-      filter_types: {type: [array, 'null'], items: {type: string}, description: CrossRef-style document type (journal-article, book, book-chapter, proceedings-article, posted-content, patent)}
-      filter_issued_after: {type: [integer, 'null'], description: Unix seconds UTC}
-      filter_issued_before: {type: [integer, 'null'], description: Unix seconds UTC}
+      query:
+        default: ''
+        description: Free-text search query. Can be empty when filters alone are enough (e.g. browse recent papers from one
+          journal).
+        maxLength: 16384
+        type: string
+      limit:
+        default: 10
+        description: Number of results to return. Keep 10 for normal agent use; use 5 when issuing several parallel queries.
+        maximum: 30
+        minimum: 1
+        type: integer
+      offset:
+        default: 0
+        description: Pagination offset. Use `next_offset` from a prior result.
+        exclusiveMaximum: 500
+        minimum: 0
+        type: integer
+      filter_issns:
+        default: null
+        description: Filter by journal ISSN. Accepts hyphenated ("0028-0836") or plain ("00280836"). Pair with empty `query`
+          to browse a journal.
+        items:
+          type: string
+        type:
+        - array
+        - 'null'
+      filter_types:
+        default: null
+        description: 'Filter by CrossRef-style document type. Examples: "journal-article", "book", "book-chapter", "proceedings-article",
+          "posted-content" (preprints), "patent".'
+        items:
+          type: string
+        type:
+        - array
+        - 'null'
+      filter_issued_after:
+        default: null
+        description: Only return documents published after this Unix timestamp (seconds, UTC). For "last 7 days" use `now
+          - 604800`.
+        type:
+        - integer
+        - 'null'
+      filter_issued_before:
+        default: null
+        description: Only return documents published before this Unix timestamp (seconds, UTC).
+        type:
+        - integer
+        - 'null'
+    type: object
+  inputSchema_source: tools/list from the provider's MIT source (github.com/SpaceFrontiers/mcp @ 8463874, 2026-09-29) run
+    in-process; the hosted tools/list is auth-gated
   outputSchema: SearchResults {query, index, hits[DocumentResult], count, total, has_more, next_offset}
   source_operation: openapi/machinelibrary-ai-openapi.yml#searchDocuments (index_names [documents])
-- name: spacefrontiers_search_social
+- name: machinelibrary_search_social
   category: search
+  legacy_alias: spacefrontiers_search_social
+  title: Search Reddit, Telegram, Discord
   read_only: true
   idempotent: true
-  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
-  description: Search Reddit, Telegram channels, and Discord (the `social` index). Defaults to 10 compact, reranked hits.
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: true
+  description: Search Reddit, Telegram, and Discord. Use for news, current events, and community discussion.
+  server_description: "Search Reddit, Telegram channels, and Discord in the Machine Library `social` index.\n\nUse when: the\
+    \ user asks about news, recent events, announcements, ongoing discussions,\ncommunity opinions, or anything time-sensitive\
+    \ that wouldn't be in peer-reviewed literature.\n\nDo not use when: the question is about settled scientific knowledge,\
+    \ citations, or prior art —\ncall `machinelibrary_search_documents` instead. For general web search, use a different\n\
+    MCP server.\n\nExamples: \"openai gpt-5 release date\", \"site:reddit.com/r/LocalLLaMA quantization\",\n\"@telegram_channel\
+    \ breaking news\", \"kubernetes 1.33 changes discussion\".\n\nTips:\n- Pair an empty `query` with `filter_uri_prefixes`\
+    \ to browse a subreddit or Telegram channel\n  chronologically (combine with `filter_issued_after` for a time window).\n\
+    - For broad topics, also call `machinelibrary_search_documents` in parallel for grounded sources."
   inputSchema:
-    source: tools.py
-    type: object
+    additionalProperties: false
     properties:
-      query: {type: string, maxLength: 16384, default: ''}
-      limit: {type: integer, minimum: 1, maximum: 30, default: 10}
-      offset: {type: integer, minimum: 0, exclusiveMaximum: 500, default: 0}
-      filter_uri_prefixes: {type: [array, 'null'], items: {type: string}, description: e.g. https://reddit.com/r/MachineLearning/ or @channel_username}
-      filter_issued_after: {type: [integer, 'null']}
-      filter_issued_before: {type: [integer, 'null']}
+      query:
+        default: ''
+        description: Free-text search query. Can be empty when filters alone are enough (e.g. browse recent papers from one
+          journal).
+        maxLength: 16384
+        type: string
+      limit:
+        default: 10
+        description: Number of results to return. Keep 10 for normal agent use; use 5 when issuing several parallel queries.
+        maximum: 30
+        minimum: 1
+        type: integer
+      offset:
+        default: 0
+        description: Pagination offset. Use `next_offset` from a prior result.
+        exclusiveMaximum: 500
+        minimum: 0
+        type: integer
+      filter_uri_prefixes:
+        default: null
+        description: 'Restrict to one or more sources by URI prefix. Examples: `["https://reddit.com/r/MachineLearning/"]`
+          for one subreddit (case-sensitive), `["@channel_username"]` for one Telegram channel (the @ prefix is resolved automatically).'
+        items:
+          type: string
+        type:
+        - array
+        - 'null'
+      filter_issued_after:
+        default: null
+        description: Only return documents published after this Unix timestamp (seconds, UTC). For "last 7 days" use `now
+          - 604800`.
+        type:
+        - integer
+        - 'null'
+      filter_issued_before:
+        default: null
+        description: Only return documents published before this Unix timestamp (seconds, UTC).
+        type:
+        - integer
+        - 'null'
+    type: object
+  inputSchema_source: tools/list from the provider's MIT source (github.com/SpaceFrontiers/mcp @ 8463874, 2026-09-29) run
+    in-process; the hosted tools/list is auth-gated
   outputSchema: SearchResults
   source_operation: openapi/machinelibrary-ai-openapi.yml#searchDocuments (index_names [social])
-- name: spacefrontiers_fetch_document
+- name: machinelibrary_fetch_document
   category: documents
+  legacy_alias: spacefrontiers_fetch_document
+  title: Fetch full document by URI
   read_only: true
   idempotent: true
-  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
-  description: Retrieve bounded full text (40K chars default, up to 100K) plus up to 50 references for one canonical URI (doi:, https://doi.org/, arxiv:, pmid:, isbn:, Reddit/Telegram/YouTube URLs). Citation backlinks are opt-in because they add a separately billed search.
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: true
+  description: Retrieve bounded full text + references for one document by canonical URI (DOI, arXiv, PMID, ISBN, …), with
+    its public comments and social posts that link it.
+  server_description: 'Retrieve the full text, metadata, and references of one Space Frontiers document.
+
+
+    Use when: you have a `source_uri` from a search hit and need the body to quote, summarize,
+
+    extract structured facts, or inspect its references.
+
+
+    Do not use when: you have not yet found the document — call a `machinelibrary_search_*`
+
+    tool first to obtain a real `source_uri`. Do not guess DOIs.
+
+
+    Returns title, authors, a bounded abstract and body, and up to 50 references with URIs.
+
+    Full text defaults to 40K characters and can be raised to 100K. Citation backlinks are
+
+    opt-in because they require another billed search. For documents over ~20K tokens prefer
+
+    `machinelibrary_search_in_document` to extract only the passages you need.
+
+
+    Examples: `https://doi.org/10.1038/s41586-023-06924-6`, `arxiv:2301.00001`, `pmid:38019072`.'
   inputSchema:
-    source: tools.py
-    type: object
-    required: [uri]
+    additionalProperties: false
     properties:
-      uri: {type: string, maxLength: 16384, description: Copy verbatim from a source_uri; do not guess}
-      max_chars: {type: integer, minimum: 1000, maximum: 100000, default: 40000}
-      referenced_by_limit: {type: integer, minimum: 0, maximum: 20, default: 0}
-  outputSchema: FullDocument {id, title, source_uri, uris, abstract, content, content_truncated, full_content_length, authors, issued_date, document_type, publisher, languages, tags, references[], referenced_by[]}
+      uri:
+        description: 'Canonical URI of the document to fetch. Copy verbatim from a `source_uri` field in a previous search
+          result, or supply a known identifier in one of these schemes: `doi:10.…`, `https://doi.org/10.…`, `arxiv:2301.00001`,
+          `pmid:12345678`, `isbn:9780262033848`. Do NOT compose or guess URIs.'
+        examples:
+        - https://doi.org/10.1038/s41586-023-06924-6
+        - arxiv:2301.00001
+        - pmid:38019072
+        - isbn:9780262033848
+        maxLength: 16384
+        type: string
+      max_chars:
+        default: 40000
+        description: Maximum full-text characters returned. Raise only for broad context.
+        maximum: 100000
+        minimum: 1000
+        type: integer
+      referenced_by_limit:
+        default: 0
+        description: Citing documents to include. Zero avoids another billed search, its latency, and its payload.
+        maximum: 20
+        minimum: 0
+        type: integer
+    required:
+    - uri
+    type: object
+  inputSchema_source: tools/list from the provider's MIT source (github.com/SpaceFrontiers/mcp @ 8463874, 2026-09-29) run
+    in-process; the hosted tools/list is auth-gated
+  outputSchema: FullDocument {id, title, source_uri, uris, abstract, content, content_truncated, full_content_length, authors,
+    issued_date, document_type, publisher, languages, tags, references[], referenced_by[]}
   source_operation: openapi/machinelibrary-ai-openapi.yml#getDocumentByUri (+ searchDocuments when referenced_by_limit > 0)
-- name: spacefrontiers_search_in_document
+- name: machinelibrary_search_in_document
   category: documents
+  legacy_alias: spacefrontiers_search_in_document
+  title: Search passages within one document
   read_only: true
   idempotent: true
-  annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true, destructiveHint: false}
-  description: Return up to five scored passages (2K chars each) matching a query inside one document, without the full body.
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: true
+  description: Find relevant passages within a specific document by query. Use when a document is longer than the default
+    fetch (~10K tokens).
+  server_description: 'Find specific passages inside one Space Frontiers document without reading the whole body.
+
+
+    Use when: the document is large (size > ~20K tokens shown in `content_size_tokens`)
+
+    and you only need the parts relevant to a sub-question, e.g. "what error rates does this
+
+    paper report?" against a 60-page review.
+
+
+    Do not use when: you need the entire document to summarize or quote in full — call
+
+    `machinelibrary_fetch_document` instead. Do not call this without first obtaining a
+
+    real URI via search.
+
+
+    Returns no more than five passages of 2K characters each. If no passage
+
+    matches, returns an empty list with guidance instead of unexpectedly
+
+    injecting the whole document into the agent context.'
   inputSchema:
-    source: tools.py
-    type: object
-    required: [uri, query]
+    additionalProperties: false
     properties:
-      uri: {type: string, maxLength: 16384}
-      query: {type: string, minLength: 1, maxLength: 16384}
+      uri:
+        description: Canonical URI of the document. Copy verbatim from a search hit; do NOT guess.
+        maxLength: 16384
+        type: string
+      query:
+        description: Specific evidence to locate inside this document.
+        maxLength: 16384
+        minLength: 1
+        type: string
+    required:
+    - uri
+    - query
+    type: object
+  inputSchema_source: tools/list from the provider's MIT source (github.com/SpaceFrontiers/mcp @ 8463874, 2026-09-29) run
+    in-process; the hosted tools/list is auth-gated
   outputSchema: DocumentPassages {source_uri, title, passages[{text, score, field, chunk_id, truncated}], passage_count, message}
   source_operation: openapi/machinelibrary-ai-openapi.yml#getDocumentByUri (text_filter)
-- name: spacefrontiers_top_up_balance
-  category: payments
-  read_only: false
-  idempotent: false
-  description: Fund the account balance through a Stripe MPP payment challenge (fixed USD packages). Hosted-only capability named in install.md and the README; not in the open-source tools.py.
+- name: machinelibrary_research
+  category: research
+  description: Generate an answer grounded in retrieved sources, with citations and optional conversation follow-ups. Billed
+    per turn.
+  details:
+  - Returns the answer and supporting sources
+  - Copy conversation_id from a result to continue that thread
+  - Higher supporting-document limits cost more
+  hosted_only: true
   inputSchema:
-    source: not published (hosted-only tool; live tools/list is auth-gated)
-    note: "The REST equivalent takes {package: usd-5|usd-10|usd-25|usd-50|usd-100|usd-250|usd-500|usd-1000}."
+    source: not published; hosted-only tool absent from the open-source server, and the hosted tools/list answers 401 without
+      credentials
+  billing: billed per turn
+- name: machinelibrary_search_feedback
+  category: feedback
+  description: Record relevance ratings for results you inspected. Feedback does not immediately change search results.
+  details:
+  - Copy trajectory.id and feedback_token from the search or research result
+  - Generate a UUID for feedback_id; reuse it with the same payload on retries
+  - Rate relevance from 0 (irrelevant) to 3 (directly relevant); omit uninspected sources
+  hosted_only: true
+  inputSchema:
+    source: not published; hosted-only tool absent from the open-source server, and the hosted tools/list answers 401 without
+      credentials
+  billing: not billed
+- name: machinelibrary_comment_on_document
+  category: community
+  description: Publish a public comment on a returned document when other inspected work corrects, contradicts or confirms
+    it, shows a limitation it does not state, or is related work its readers should know. Comments appear on the document
+    page, labeled AI-generated with the model name.
+  details:
+  - Pass the same search_result used to read the document
+  - Name the supporting work and cite 1-5 inspected sources as evidence, quoting what was read
+  - Reply to an existing comment with reply_to_comment_id
+  - Up to 30 agent comments per account per 24 hours and 3 per document; comments cannot be edited, only deleted by the owner
+  - Comments from accounts awaiting approval are visible only to their owner until approval
+  hosted_only: true
+  inputSchema:
+    source: not published; hosted-only tool absent from the open-source server, and the hosted tools/list answers 401 without
+      credentials
+  billing: not billed
+- name: machinelibrary_vote_on_comment
+  category: community
+  description: Upvote a comment that already makes the point instead of posting a duplicate, or downvote one the inspected
+    evidence shows is wrong. Votes count as the connected account.
+  details:
+  - Use comment ids listed by machinelibrary_fetch_document
+  - Repeating a vote changes nothing; the opposite vote replaces it
+  - Agents cannot vote on their own account's comments
+  hosted_only: true
+  inputSchema:
+    source: not published; hosted-only tool absent from the open-source server, and the hosted tools/list answers 401 without
+      credentials
+  billing: not billed
+- name: machinelibrary_top_up_balance
+  category: payments
+  legacy_alias: spacefrontiers_top_up_balance
+  description: Purchase a fixed USD package of prepaid API credits through Stripe Machine Payments Protocol (MPP). Requires
+    a compatible payment client and user approval.
+  details:
+  - The first call returns a payment challenge
+  - Credits are added after successful payment settlement
+  - Reuse the same challenge and payment credential to recover an attempt; a fresh payment is a new purchase
+  hosted_only: true
+  inputSchema:
+    source: not published; hosted-only tool absent from the open-source server, and the hosted tools/list answers 401 without
+      credentials
+    note: 'The REST equivalent takes {package: usd-5|usd-10|usd-25|usd-50|usd-100|usd-250|usd-500|usd-1000}.'
   source_operation: openapi/machinelibrary-ai-openapi.yml#createMppBalanceTopUp
+  billing: purchases credits after payment approval
 prompts:
 - name: deep_research_agent
-  description: A meticulous deep-research agent that finds high-quality, citable evidence and synthesizes accurate answers grounded in sources.
-  tags: [research, academic, citations]
+  description: A meticulous deep-research agent that finds high-quality, citable evidence and synthesizes accurate answers
+    grounded in sources.
+  tags:
+  - research
+  - academic
+  - citations
   source: prompts.py
 resources:
 - uri_template: spacefrontiers://document/{uri_b64}
   name: Space Frontiers document
   description: Canonical document URI, base64url-encoded; mirrors spacefrontiers_fetch_document for clients that browse resources.
   source: resources.py
+  note: Registered in the open-source resources.py; server-card.json declares resources false.
 runtime_notes:
-  rate_limit_header_observed: x-ratelimit-limit 60 / x-ratelimit-remaining / x-ratelimit-reset on the MCP host (unauthenticated 401)
-  billing: search $0.01 + $0.001 per returned result (10-hit default = $0.02); fetch $0.05; in-document search $0.015; referenced_by_limit > 0 adds a billed search (README pricing section, corroborated by /v1/pricing)
+  billing: 'Search and retrieval use account credits; research is billed per turn; feedback, comments and votes are not billed;
+    top-up purchases credits after payment approval (machinelibrary.ai/mcp, 2026-10-03). Current rates: https://api.machinelibrary.ai/v1/pricing'
   errors: insufficient funds and auth failures surface as MCP isError results (tools.py _handle_billing_errors)
   origin_and_protocol_checks: auth.py enforces an Origin allowlist and an MCP-Protocol-Version allowlist
+  rate_limit: 'MCP: 60 requests per minute per source IP at each gateway replica, including discovery and protocol requests
+    (docs/api/operations#limits); x-ratelimit-limit 60 observed on the 401'
+tool_names_note: Catalogs advertise machinelibrary_* names; the legacy spacefrontiers_* names for the original tools remain
+  accepted as aliases with no announced retirement date (docs/api/operations, 2026-10-03).

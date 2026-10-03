@@ -3,12 +3,12 @@ aid: machinelibrary-ai
 name: Space Frontiers
 
 description: 'Space Frontiers is a Wyoming corporation whose search and AI product, Machine Library (formerly Space Frontiers search, moved to
-  machinelibrary.ai on 2026-09-12), is a full-text retrieval API and hosted MCP server over a corpus of roughly 2.9 billion records: peer-reviewed
+  machinelibrary.ai on 2026-09-12), is a full-text retrieval API and hosted MCP server over a corpus the provider describes as multi-billion documents: peer-reviewed
   papers (CrossRef, PubMed, arXiv), books, USPTO patents, Wikipedia, technical standards, YouTube transcripts, and live Reddit, Telegram and Discord
   posts. It is built for AI agents doing literature review, fact-checking, citation walking and grounded research synthesis, returning compact
   reranked hits with canonical source URIs (DOI, arXiv, PMID, ISBN) and token-bounded full text. Three surfaces share one account and API key:
   a REST API at api.machinelibrary.ai (OpenAPI 3.1, pay-as-you-go), a Streamable-HTTP MCP server at mcp.machinelibrary.ai (OAuth 2.1 with PKCE
-  and RFC 7591 dynamic registration, or a Bearer API key), and an A2A agent at machinelibrary.ai/a2a. It also ships a PDF/EPUB/DJVU-to-Markdown
+  and RFC 7591 dynamic registration against the issuer api.machinelibrary.ai, scope search, or a Bearer API key), and an A2A agent at machinelibrary.ai/a2a. It also ships a PDF/EPUB/DJVU-to-Markdown
   recognition API and Stripe-settled prepaid credit packages for agents (ACP checkout, MPP top-up). The company also publishes Hermes, an open-source
   Rust search engine with a gRPC contract and Python/TypeScript clients.'
 
@@ -116,6 +116,18 @@ common:
   url: vendors/machinelibrary-ai-vendors.yml
 - type: StatusPage
   url: https://machinelibrary.ai/status
+- type: Operations
+  url: https://machinelibrary.ai/docs/api/operations
+- type: ChangeLog
+  url: https://machinelibrary.ai/changelog
+- type: Datasets
+  url: https://machinelibrary.ai/datasets
+- type: SecurityTxt
+  url: https://machinelibrary.ai/.well-known/security.txt
+- type: APICatalog
+  url: https://machinelibrary.ai/.well-known/api-catalog
+- type: OpenAPI
+  url: https://machinelibrary.ai/docs/openapi.json
 - type: VulnerabilityDisclosure
   url: security/machinelibrary-ai-vulnerability-disclosure.yml
 - type: Overlay
@@ -193,11 +205,15 @@ apis:
 - name: Machine Library MCP Server
   description: >-
     Hosted Streamable-HTTP MCP server at https://mcp.machinelibrary.ai (legacy https://mcp.spacefrontiers.org
-    still served) exposing four read-only, idempotent retrieval tools (spacefrontiers_search_documents,
-    spacefrontiers_search_social, spacefrontiers_fetch_document, spacefrontiers_search_in_document), a
-    hosted spacefrontiers_top_up_balance payment tool, a deep_research_agent prompt and a spacefrontiers://document/{uri_b64}
-    resource template. OAuth 2.1 with PKCE and RFC 7591 dynamic client registration against https://api.spacefrontiers.org,
-    or a Bearer API key. Listed in the official MCP registry as io.github.SpaceFrontiers/mcp; source is
+    still served) exposing nine machinelibrary_* tools: four read-only, idempotent retrieval tools
+    (machinelibrary_search_documents, machinelibrary_search_social, machinelibrary_fetch_document,
+    machinelibrary_search_in_document), machinelibrary_research for cited answers billed per turn,
+    machinelibrary_search_feedback for relevance ratings, machinelibrary_comment_on_document and
+    machinelibrary_vote_on_comment for AI-labeled public comments and votes on documents, and
+    machinelibrary_top_up_balance for Stripe MPP credit purchases. The legacy spacefrontiers_* names remain
+    accepted as aliases. OAuth 2.1 with PKCE S256 and RFC 7591 dynamic client registration against the issuer
+    https://api.machinelibrary.ai (scope search), or a Bearer API key; 60 requests per minute per source IP.
+    Listed in the official MCP registry as io.github.SpaceFrontiers/mcp; the four retrieval tools are
     MIT-licensed on GitHub.
   humanURL: https://machinelibrary.ai/mcp
   baseURL: https://mcp.machinelibrary.ai
@@ -224,6 +240,12 @@ apis:
     url: https://github.com/SpaceFrontiers/mcp
   - type: MCPRegistry
     url: https://registry.modelcontextprotocol.io/v0/servers?search=spacefrontiers
+  - type: MCPServerCard
+    url: https://machinelibrary.ai/.well-known/mcp/server-card.json
+  - type: RateLimits
+    url: rate-limits/machinelibrary-ai-rate-limits.yml
+  - type: OAuthScopes
+    url: scopes/machinelibrary-ai-scopes.yml
   aid: machinelibrary-ai:machine-library-mcp-server
 - name: Machine Library A2A Agent
   description: >-
@@ -534,6 +556,8 @@ x-correction-request:
     request: 'Correction (with source-artifact PR https://github.com/api-evangelist/machinelibrary-ai/pull/1 -- review, do NOT merge wholesale):
       provider page links https://apis.io/servers/machinelibrary-ai/space-frontiers-mcp-server/ which 404s -- use the current MCP product name
       so a working server page is generated; fix inconsistent counts and stale scope data. Re-profile from current sources.'
+  applied: '2026-10-03'
+  applied_note: 'Hand-applied after the local re-profile ignored this block; every fact re-probed live 2026-10-03. Applied: MCP manifest rebuilt with the nine machinelibrary_* tools and their descriptions from machinelibrary.ai/mcp and llms.txt (live tools/list answers 401 without credentials, so the four open-source tools carry tools/list output from the provider''s MIT server run in-process, the five hosted-only tools have no published input schema); legacy spacefrontiers_* aliases recorded; rate limits 12/12/60/30 plus 30 agent comments per day; OAuth issuer moved to https://api.machinelibrary.ai (scope search, PKCE S256, DCR /v2/oauth/register) in authentication, scopes and well-known; Operations, ChangeLog, StatusPage, Datasets, SecurityTxt, APICatalog and live OpenAPI pointers; security.txt (now 200) and refreshed well-known captures, llms.txt. Live OpenAPI has 21 paths; the committed six-area split already covers exactly those 21, so no re-pull. inbox#39: MCP API entry already named Machine Library MCP Server and the description now uses current tool names and counts; the corpus count is now the provider''s own ''multi-billion documents'' wording. The api-catalog no longer links the 404ing mcp-host server card (it links the apex copy, which resolves). Not applied: the apis.io server-page 404 is a site rebuild, not a repo fix.'
 x-enrichment:
   date: '2026-09-28'
   status: enriched

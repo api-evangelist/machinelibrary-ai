@@ -1,0 +1,4 @@
+Canonical: https://machinelibrary.ai/.well-known/security.txt
+Contact: mailto:contact@machinelibrary.ai
+Expires: 2027-09-01T00:00:00Z
+Preferred-Languages: en
