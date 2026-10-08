@@ -83,3 +83,22 @@ prepaid_credit_packages:
 refunds: Unused balance is not refunded except where required by law (Terms 4.8); remaining balance is not refunded on termination (Terms 8.3).
 rate_change_notice: 30 days (Terms 3.5)
 bulk_data: Separate licensed product ("Premium datasets for purchase", https://machinelibrary.ai/datasets) scoped by source segment, use and volume; no published price; "There is no anonymous whole-corpus download."
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  units: []
+  plans:
+  - name: Pay-as-you-go API access
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
+  - name: Pro
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
