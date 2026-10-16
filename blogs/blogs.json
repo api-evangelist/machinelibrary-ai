@@ -1,0 +1,14 @@
+{
+  "repo": "machinelibrary-ai",
+  "feeds": [
+    {
+      "source": "https://machinelibrary.ai/api/search/rss",
+      "feed_url": "https://machinelibrary.ai/api/search/rss",
+      "title": "",
+      "saved": 60,
+      "method": "feed"
+    }
+  ],
+  "post_count": 60,
+  "fetched": "2026-10-10T13:15:00Z"
+}

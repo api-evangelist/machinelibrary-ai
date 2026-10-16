@@ -2,23 +2,21 @@
 kin_checks:
   slug: machinelibrary-ai
   schema_version: 0.23.0
-  scored_at: '2026-10-03'
-  run_ts: 2026-10-03T024842
+  scored_at: '2026-10-11'
+  run_ts: 2026-10-11T110117
   note: Actionable checks (missed + partial) in `checks`, plus the ids that did not
     apply in `na`. Everything else in rubric/scoring-0.23.0.yml was earned; counts
     below let you verify that.
   counts:
     total: 153
-    earned: 45
-    partial: 31
-    missed: 50
+    earned: 46
+    partial: 33
+    missed: 47
     na: 27
   checks:
   - id: leadership_present
     status: missed
   - id: base_url_per_api
-    status: missed
-  - id: well_known_published
     status: missed
   - id: apis_json_self_hosted
     status: missed
@@ -41,10 +39,6 @@ kin_checks:
   - id: domain_standard_conformance
     status: missed
   - id: overlay_published
-    status: missed
-  - id: rate_limits_documented
-    status: missed
-  - id: rate_limits_rich
     status: missed
   - id: deprecation_policy
     status: missed
@@ -226,6 +220,12 @@ kin_checks:
   - id: vocabulary_published
     status: partial
     earned: 1.25
+  - id: rate_limits_documented
+    status: partial
+    earned: 7.2
+  - id: rate_limits_rich
+    status: partial
+    earned: 3.6
   - id: github_org_present
     status: partial
     earned: 1.0
