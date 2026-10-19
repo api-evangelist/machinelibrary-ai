@@ -1,131 +1,526 @@
 openapi: 3.2.0
 info:
   title: Machine Library Conversations API
+  version: 0.1.0
+  contact:
+    email: contact@machinelibrary.ai
+    name: Machine Library
+    url: https://machinelibrary.ai/contacts
   description: 'Search, retrieve, and synthesize scholarly and public-interest documents through Machine Library, the search and AI product by Space Frontiers Company. Document recognition endpoints (`/v1/recognitions`: PDF, EPUB, and DJVU to structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at https://machinelibrary.ai/docs/api/reference presents both specs merged.'
   license:
-    name: MIT
     identifier: MIT
-  version: 0.1.0
+    name: MIT (API description only; retrieved content retains its own rights)
+  termsOfService: https://machinelibrary.ai/terms-of-service
 servers:
-- url: https://api.machinelibrary.ai
-  description: Machine Library
-- url: https://api.spacefrontiers.org
-  description: Space Frontiers (compatible endpoint)
+- description: Machine Library
+  url: https://api.machinelibrary.ai
+- description: Space Frontiers (compatible endpoint)
+  url: https://api.spacefrontiers.org
 tags:
 - name: Conversations
   description: Retrieval-augmented conversation workflows.
 paths:
   /v2/conversations/:
     get:
-      tags:
-      - Conversations
-      summary: List conversations owned by the authenticated user
+      description: List conversations owned by the authenticated account.
       operationId: listConversations
       responses:
         '200':
-          description: Conversation summaries.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListConversationsResponse'
+          description: Conversation summaries.
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-    post:
+      - oauth2:
+        - search
+      summary: List conversations owned by the authenticated user
       tags:
       - Conversations
-      summary: Run a retrieval-augmented conversation turn
+    post:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
       operationId: createConversationTurn
       requestBody:
-        description: Conversation query and model configuration.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationRequest'
+        description: Conversation query and model configuration.
         required: true
       responses:
         '200':
-          description: Completed assistant response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConversationResponse'
+          description: Completed assistant response.
         '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Invalid request.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Insufficient account balance.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-  /v2/conversations/stream:
-    post:
+      - oauth2:
+        - search
+      summary: Run a retrieval-augmented conversation turn
       tags:
       - Conversations
-      summary: Run a conversation turn and stream newline-delimited progress events
+  /v2/conversations/stream:
+    post:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
       operationId: streamConversationTurn
       requestBody:
-        description: Conversation query and model configuration.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationRequest'
+        description: Conversation query and model configuration.
         required: true
       responses:
         '200':
-          description: Newline-delimited progress and result events.
           content:
             text/event-stream:
               schema:
                 type: string
+          description: Newline-delimited progress and result events.
         '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Invalid request.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Insufficient account balance.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-  /v2/conversations/{slug}:
-    get:
+      - oauth2:
+        - search
+      summary: Run a conversation turn and stream newline-delimited progress events
       tags:
       - Conversations
-      summary: Fetch a conversation and all recorded request/response steps
-      operationId: getConversation
+  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}:
+    put:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
+      operationId: editConversationStep
       parameters:
-      - name: slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: conversation_id_or_slug
         required: true
         schema:
           type: string
+      - description: Recorded request step position.
+        in: path
+        name: step_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditStepRequest'
+        required: true
       responses:
         '200':
-          description: Complete conversation.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullConversation'
+          description: Recomputed complete conversation.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Invalid replacement query.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Insufficient account balance.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
-          description: Conversation not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conversation or request step not found.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-    delete:
+      - oauth2:
+        - search
+      summary: Replace a request step and recompute the conversation from that point
       tags:
       - Conversations
-      summary: Delete a conversation owned by the authenticated user
+  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream:
+    put:
+      description: Create or recompute a conversation turn using retrieved evidence. This operation can spend credits and has no general Idempotency-Key contract. After a timeout, inspect the conversation before submitting another turn. Streaming errors after headers are sent are delivered in the stream, not as a new HTTP status.
+      operationId: streamEditedConversationStep
+      parameters:
+      - description: Conversation slug or UUID.
+        in: path
+        name: conversation_id_or_slug
+        required: true
+        schema:
+          type: string
+      - description: Recorded request step ID.
+        in: path
+        name: step_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditStepRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            text/event-stream:
+              schema:
+                type: string
+          description: Newline-delimited progress and result events.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Invalid replacement query.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '402':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Insufficient account balance.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conversation or request step not found.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+      security:
+      - api_key: []
+      - bearer_auth: []
+      - oauth2:
+        - search
+      summary: Replace a request step and stream the recomputation as newline-delimited events
+      tags:
+      - Conversations
+  /v2/conversations/{slug}:
+    delete:
+      description: Delete a conversation owned by the authenticated account. No restore operation is provided.
       operationId: deleteConversation
       parameters:
-      - name: slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: slug
         required: true
         schema:
           type: string
@@ -133,476 +528,760 @@ paths:
         '200':
           description: Conversation deleted.
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Conversation not found.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}:
-    put:
+      - oauth2:
+        - search
+      summary: Delete a conversation owned by the authenticated user
       tags:
       - Conversations
-      summary: Replace a request step and recompute the conversation from that point
-      operationId: editConversationStep
+    get:
+      description: Read one conversation owned by the authenticated account or shared by its owner; an unavailable conversation returns 404.
+      operationId: getConversation
       parameters:
-      - name: conversation_id_or_slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: slug
         required: true
         schema:
           type: string
-      - name: step_id
-        in: path
-        description: Recorded request step position.
-        required: true
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EditStepRequest'
-        required: true
       responses:
         '200':
-          description: Recomputed complete conversation.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FullConversation'
-        '400':
-          description: Invalid replacement query.
+          description: Complete conversation.
         '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
           description: Missing or invalid API credential.
-        '402':
-          description: Insufficient account balance.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
         '404':
-          description: Conversation or request step not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conversation not found.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
-  /v2/conversations/{conversation_id_or_slug}/edit-step/{step_id}/stream:
-    put:
+      - oauth2:
+        - search
+      summary: Fetch a conversation and all recorded request/response steps
       tags:
       - Conversations
-      summary: Replace a request step and stream the recomputation as newline-delimited events
-      operationId: streamEditedConversationStep
+    patch:
+      description: 'Share a conversation owned by the authenticated account by link (`is_shared: true`), or make it private again. Anyone can read a shared conversation; only its owner can continue it. Not billed.'
+      operationId: updateConversation
       parameters:
-      - name: conversation_id_or_slug
+      - description: Conversation slug or UUID.
         in: path
-        description: Conversation slug or UUID.
+        name: slug
         required: true
         schema:
           type: string
-      - name: step_id
-        in: path
-        description: Recorded request step ID.
-        required: true
-        schema:
-          type: integer
-          format: int64
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EditStepRequest'
+              $ref: '#/components/schemas/UpdateConversationRequest'
         required: true
       responses:
         '200':
-          description: Newline-delimited progress and result events.
           content:
-            text/event-stream:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullConversation'
+          description: Updated complete conversation.
+        '401':
+          content:
+            application/json:
+              example:
+                detail: Unauthorized
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Missing or invalid API credential.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
               schema:
                 type: string
-        '400':
-          description: Invalid replacement query.
-        '401':
-          description: Missing or invalid API credential.
-        '402':
-          description: Insufficient account balance.
         '404':
-          description: Conversation or request step not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Conversation not found or not owned by the caller.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '429':
+          content:
+            application/json:
+              example:
+                detail:
+                  code: rate_limited
+                  retry_after_seconds: 2
+                  scope: search
+                status: error
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Request budget or search capacity exhausted. Honor Retry-After and use bounded backoff.
+          headers:
+            Retry-After:
+              description: Minimum delay in seconds before retrying this application-level rejection. Edge responses may differ.
+              schema:
+                minimum: 1
+                type: integer
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Internal service error. Retain X-Request-Id for support; do not blindly replay writes.
+          headers:
+            X-Request-Id:
+              description: Include this identifier when contacting support.
+              schema:
+                type: string
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
+      summary: Share an owned conversation by link, or make it private again
+      tags:
+      - Conversations
 components:
   schemas:
-    ConversationStep:
-      oneOf:
-      - $ref: '#/components/schemas/ConversationRequest'
-      - $ref: '#/components/schemas/ConversationResponse'
-      description: 'Discriminated on `kind`: "request" | "response".'
-    ConversationMetadata:
-      type: object
-      required:
-      - id
-      - created_at
+    SearchTrajectory:
       properties:
+        feedback_token:
+          description: A bounded, expiring capability to rate results of this retrieval.
+          type:
+          - string
+          - 'null'
         id:
           type: string
-        title:
+      required:
+      - id
+      type: object
+    QueryDetails:
+      properties:
+        bridge:
+          description: Intermediates a dependent question was answered through, in hop order.
+          items:
+            $ref: '#/components/schemas/BridgeStep'
+          type: array
+        compared:
+          minimum: 0
           type:
-          - string
+          - integer
           - 'null'
-        created_at:
-          type: string
-          format: date-time
-        slug:
-          type:
-          - string
-          - 'null'
+        incomplete_queries:
+          items:
+            type: string
+          type: array
+        plan_kind:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/PlanKind'
+            description: The planner's plan kind (`dependent` questions may bridge).
+        planning_fallback:
+          type: boolean
+        queries:
+          items:
+            type: string
+          type: array
         query:
           type:
           - string
           - 'null'
-        user_id:
+        ranking_fallback:
+          type: boolean
+        retrieved:
+          minimum: 0
           type:
           - integer
           - 'null'
-          format: int64
-        preview:
+        selected:
+          minimum: 0
           type:
-          - string
+          - integer
           - 'null'
-    CitationOccurrence:
       type: object
-      required:
-      - citation_index
-      - document_index
-      - excerpt
+    SnippetSource:
+      description: 'Location of a verbatim snippet in the original stored field. All positions
+
+        count Unicode scalar values; `end_char` is exclusive.'
       properties:
-        citation_index:
+        end_char:
+          minimum: 0
           type: integer
-          description: Zero-based position among citation markers in the answer.
+        field_length:
           minimum: 0
-        document_index:
           type: integer
-          description: One-based index into `ConversationResponse.search_documents`.
-          minimum: 0
-        snippet_index:
-          type:
-          - integer
-          - 'null'
-          description: Zero-based index into the selected document's snippets.
-          minimum: 0
-        excerpt:
-          type: string
-          description: Claim-specific excerpt suitable for citation previews.
-    Snippet:
-      type: object
-      description: One highlighted passage of a search hit.
-      required:
-      - field
-      - text
-      properties:
-        field:
-          type: string
-        text:
-          type: string
-        score:
-          type: number
-          format: double
-        chunk_id:
-          type:
-          - integer
-          - 'null'
-          format: int64
-        evidence:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/SnippetEvidence'
-    SnippetEvidence:
-      type: object
-      description: A reranker-selected, verbatim window within the original snippet.
-      required:
-      - text
-      - start_char
-      - score
-      properties:
-        text:
-          type: string
         start_char:
-          type: integer
-          description: Unicode scalar values, relative to the full `Snippet.text`.
           minimum: 0
-        score:
-          type: number
-          format: double
-    EditStepRequest:
-      type: object
+          type: integer
       required:
-      - new_query
-      properties:
-        new_query:
-          type: string
-          description: Replacement query for the selected request step.
-    SearchDocument:
+      - start_char
+      - end_char
+      - field_length
       type: object
+    FullConversation:
+      properties:
+        conversation_metadata:
+          $ref: '#/components/schemas/ConversationMetadata'
+        conversation_steps:
+          items:
+            $ref: '#/components/schemas/ConversationStep'
+          type: array
+      required:
+      - conversation_metadata
+      - conversation_steps
+      type: object
+    SearchDocument:
       description: 'One search hit: the stored document plus its snippets and score.'
+      properties:
+        document: {}
+        score:
+          format: double
+          type: number
+        snippets:
+          items:
+            $ref: '#/components/schemas/Snippet'
+          type: array
+        source:
+          type: string
       required:
       - source
       - document
-      properties:
-        source:
-          type: string
-        document: {}
-        snippets:
-          type: array
-          items:
-            $ref: '#/components/schemas/Snippet'
-        score:
-          type: number
-          format: double
-    ListConversationsResponse:
       type: object
-      required:
-      - conversations
-      properties:
-        conversations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationMetadata'
-    Query:
-      type: object
-      description: Classifier state object (spacefrontiers `Query`).
-      properties:
-        original_query:
-          type: string
-        reformulated_query:
-          type: string
-        keywords:
-          type: array
-          items:
-            type: string
-        filters: {}
-        is_recent:
-          type: boolean
-        is_event:
-          type: boolean
-        date:
-          type:
-          - array
-          - 'null'
-          items: false
-          prefixItems:
-          - type: string
-            format: date-time
-          - type: string
-            format: date-time
-          description: (start, end) as RFC3339 datetimes in JSON.
-        date_expression:
-          type:
-          - string
-          - 'null'
-          description: 'Unresolved classifier expression; cached instead of absolute timestamps
+    BridgeArm:
+      description: '`off`: no bridge; `passages`: hops from first-round passages only;
 
-            so relative ranges are evaluated at request time.'
-        content_type:
-          type:
-          - string
-          - 'null'
-        related_queries:
-          type: array
-          items:
-            type: string
-        query_language:
-          type:
-          - string
-          - 'null'
-        instruction:
-          type:
-          - string
-          - 'null'
-        knowledge_source:
-          type:
-          - string
-          - 'null'
-        classified_aspects:
-          type: array
-          items:
-            type: string
-        title:
-          type:
-          - string
-          - 'null'
+        `ontology`: recalled relations first, then passages.'
+      enum:
+      - 'off'
+      - passages
+      - ontology
+      type: string
     ConversationResponse:
-      type: object
-      required:
-      - conversation_id
-      - answer
       properties:
+        answer:
+          type: string
+        citations:
+          description: 'Ordered metadata for every inline citation marker, including repeated
+
+            citations to different passages of the same document.'
+          items:
+            $ref: '#/components/schemas/CitationOccurrence'
+          type: array
+        conversation_id:
+          type: string
+        id:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        kind:
+          type: string
+        model_name:
+          type:
+          - string
+          - 'null'
+        query:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/Query'
         query_details:
           oneOf:
           - type: 'null'
           - $ref: '#/components/schemas/QueryDetails'
             description: Persisted search-stage snapshot, captured only for entitled planning.
+        search_documents:
+          items:
+            $ref: '#/components/schemas/SearchDocument'
+          type: array
         trajectory:
           oneOf:
           - type: 'null'
           - $ref: '#/components/schemas/SearchTrajectory'
-        id:
-          type:
-          - integer
-          - 'null'
-          format: int64
-        conversation_id:
-          type: string
-        answer:
-          type: string
-        search_documents:
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchDocument'
-        citations:
-          type: array
-          items:
-            $ref: '#/components/schemas/CitationOccurrence'
-          description: 'Ordered metadata for every inline citation marker, including repeated
-
-            citations to different passages of the same document.'
-        query:
-          oneOf:
-          - type: 'null'
-          - $ref: '#/components/schemas/Query'
-        model_name:
-          type:
-          - string
-          - 'null'
-        kind:
-          type: string
-    SearchTrajectory:
-      type: object
       required:
-      - id
-      properties:
-        id:
-          type: string
-        feedback_token:
-          type:
-          - string
-          - 'null'
-          description: A bounded, expiring capability to rate results of this retrieval.
-    ConversationRequest:
+      - conversation_id
+      - answer
       type: object
-      required:
-      - query
-      - llm_config
-      properties:
-        id:
-          type:
-          - integer
-          - 'null'
-          format: int64
-        conversation_id:
-          type:
-          - string
-          - 'null'
-        document_ids:
-          type: array
-          items:
-            type: string
-          description: 'Exact Nexus documents to merge into retrieval regardless of the query
-
-            classifier. `default` keeps historical persisted steps compatible.'
-        query:
-          type: string
-        llm_config:
-          $ref: '#/components/schemas/LlmConfig'
-        sources_filters: {}
-        sources_literal_filters: {}
-        resolved_sources_literal_filters: {}
-        limit:
-          type: integer
-          format: int32
-          minimum: 0
-        max_model_documents:
-          type:
-          - integer
-          - 'null'
-          format: int32
-          description: 'Cap on documents sent to the model after reranking and budget
-
-            stripping (pinned documents keep priority). Experimentation knob for
-
-            quality/cost sweeps; absent or zero means no cap.'
-          minimum: 0
-        kind:
-          type: string
     LlmConfig:
-      type: object
-      required:
-      - model_name
       properties:
-        model_name:
-          type: string
         api_key:
           type:
           - string
           - 'null'
         max_context_length:
+          minimum: 0
           type:
           - integer
           - 'null'
-          minimum: 0
-    FullConversation:
-      type: object
+        model_name:
+          type: string
       required:
-      - conversation_metadata
-      - conversation_steps
-      properties:
-        conversation_metadata:
-          $ref: '#/components/schemas/ConversationMetadata'
-        conversation_steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversationStep'
-    QueryDetails:
+      - model_name
       type: object
+    Query:
+      description: Classifier state object (the retired Python client's `Query`).
       properties:
+        classified_aspects:
+          items:
+            type: string
+          type: array
+        content_type:
+          type:
+          - string
+          - 'null'
+        date:
+          description: '`[start, end]` as Unix seconds in JSON.'
+          items:
+            format: int64
+            type: integer
+          maxItems: 2
+          minItems: 2
+          type:
+          - array
+          - 'null'
+        date_expression:
+          description: 'Unresolved classifier expression; cached instead of absolute timestamps
+
+            so relative ranges are evaluated at request time.'
+          type:
+          - string
+          - 'null'
+        filters: {}
+        instruction:
+          type:
+          - string
+          - 'null'
+        is_event:
+          type: boolean
+        is_recent:
+          type: boolean
+        keywords:
+          items:
+            type: string
+          type: array
+        knowledge_source:
+          type:
+          - string
+          - 'null'
+        original_query:
+          type: string
+        query_language:
+          type:
+          - string
+          - 'null'
+        reformulated_query:
+          type: string
+        related_queries:
+          items:
+            type: string
+          type: array
+        title:
+          type:
+          - string
+          - 'null'
+      type: object
+    ConversationRequest:
+      properties:
+        bridge:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/BridgeArm'
+            description: 'Staff-only evaluation arm for bridge retrieval; ignored for everyone
+
+              else, who get the deployment''s setting.'
+        conversation_id:
+          type:
+          - string
+          - 'null'
+        document_ids:
+          description: 'Exact Nexus documents to merge into retrieval regardless of the query
+
+            classifier. `default` keeps historical persisted steps compatible.'
+          items:
+            type: string
+          type: array
+        id:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        kind:
+          type: string
+        limit:
+          format: int32
+          minimum: 0
+          type: integer
+        llm_config:
+          $ref: '#/components/schemas/LlmConfig'
+        max_model_documents:
+          description: 'Cap on documents sent to the model after reranking and budget
+
+            stripping (pinned documents keep priority). Experimentation knob for
+
+            quality/cost sweeps; absent or zero means no cap.'
+          format: int32
+          minimum: 0
+          type:
+          - integer
+          - 'null'
+        query:
+          type: string
+        resolved_sources_literal_filters: {}
+        sources_filters: {}
+        sources_literal_filters: {}
+      required:
+      - query
+      - llm_config
+      type: object
+    UpdateConversationRequest:
+      additionalProperties: false
+      properties:
+        is_shared:
+          description: '`true` lets anyone with the link read the conversation; only its owner
+
+            can continue it. `false` makes it private again.'
+          type: boolean
+      required:
+      - is_shared
+      type: object
+    EditStepRequest:
+      properties:
+        new_query:
+          description: Replacement query for the selected request step.
+          type: string
+      required:
+      - new_query
+      type: object
+    CitationOccurrence:
+      properties:
+        citation_index:
+          description: Zero-based position among citation markers in the answer.
+          minimum: 0
+          type: integer
+        document_index:
+          description: One-based index into `ConversationResponse.search_documents`.
+          minimum: 0
+          type: integer
+        excerpt:
+          description: Claim-specific excerpt suitable for citation previews.
+          type: string
+        snippet_index:
+          description: Zero-based index into the selected document's snippets.
+          minimum: 0
+          type:
+          - integer
+          - 'null'
+      required:
+      - citation_index
+      - document_index
+      - excerpt
+      type: object
+    Snippet:
+      description: One highlighted passage of a search hit.
+      properties:
+        chunk_id:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        evidence:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetEvidence'
+        field:
+          type: string
+        score:
+          format: double
+          type: number
+        source:
+          oneOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/SnippetSource'
+        table_header:
+          description: 'Caption, header and separator rows of the Markdown table this passage
+
+            continues, when the passage starts mid-table. Context only: it lies
+
+            outside `text` and its `source` coordinates.'
+          type:
+          - string
+          - 'null'
+        text:
+          type: string
+      required:
+      - field
+      - text
+      type: object
+    ConversationStep:
+      description: 'Discriminated on `kind`: "request" | "response".'
+      oneOf:
+      - $ref: '#/components/schemas/ConversationRequest'
+      - $ref: '#/components/schemas/ConversationResponse'
+    ConversationMetadata:
+      properties:
+        created_at:
+          format: int64
+          type: integer
+        id:
+          type: string
+        is_shared:
+          description: 'The owner shared it: anyone with the link can read it, only the owner
+
+            can continue it.'
+          type: boolean
+        preview:
+          type:
+          - string
+          - 'null'
         query:
           type:
           - string
           - 'null'
-        queries:
-          type: array
-          items:
-            type: string
-        incomplete_queries:
-          type: array
-          items:
-            type: string
-        retrieved:
+        slug:
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        user_id:
+          format: int64
           type:
           - integer
           - 'null'
+      required:
+      - id
+      - created_at
+      type: object
+    SnippetEvidence:
+      description: A reranker-selected, verbatim window within the original snippet.
+      properties:
+        score:
+          format: double
+          type: number
+        start_char:
+          description: Unicode scalar values, relative to the full `Snippet.text`.
           minimum: 0
-        compared:
+          type: integer
+        text:
+          type: string
+      required:
+      - text
+      - start_char
+      - score
+      type: object
+    PlanKind:
+      enum:
+      - single
+      - comparison
+      - facets
+      - conjunction
+      - dependent
+      type: string
+    ApiError:
+      properties:
+        detail:
+          oneOf:
+          - type: string
+          - additionalProperties: true
+            properties:
+              code:
+                type: string
+            type: object
+        status:
+          enum:
+          - error
+          type: string
+      required:
+      - status
+      - detail
+      type: object
+    BridgeStep:
+      description: 'One bridge hop: the intermediate a first-round source states, the
+
+        follow-up search, and how many documents it returned once finished.'
+      properties:
+        cited:
+          description: Whether the answer cited any of the hop's documents.
+          type:
+          - boolean
+          - 'null'
+        documents:
+          minimum: 0
           type:
           - integer
           - 'null'
-          minimum: 0
-        selected:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        planning_fallback:
+        fact:
+          type: string
+        query:
+          type: string
+        recalled:
+          description: Stated by the ontology rather than a first-round document.
           type: boolean
-        ranking_fallback:
-          type: boolean
+        source:
+          type: string
+      required:
+      - fact
+      - query
+      - source
+      type: object
+    ListConversationsResponse:
+      properties:
+        conversations:
+          items:
+            $ref: '#/components/schemas/ConversationMetadata'
+          type: array
+      required:
+      - conversations
+      type: object
   securitySchemes:
     api_key:
-      type: apiKey
+      description: Machine Library API key from https://machinelibrary.ai/keys.
       in: header
       name: X-Api-Key
-      description: Machine Library API key from https://machinelibrary.ai/keys.
+      type: apiKey
     bearer_auth:
-      type: http
-      scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+      scheme: bearer
+      type: http
+    oauth2:
+      description: Authorization code with mandatory S256 PKCE. Public clients use dynamic registration; see https://machinelibrary.ai/auth.md. Access spends the consenting account's credits.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+          refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+          scopes:
+            search: Search and retrieve research documents using your account credits.
+          tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      type: oauth2
+externalDocs:
+  description: Authentication, limits, errors, retries, and API lifecycle
+  url: https://machinelibrary.ai/docs/api/operations
 x-service-info:
   categories:
   - data

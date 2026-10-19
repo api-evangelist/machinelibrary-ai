@@ -1,16 +1,21 @@
 openapi: 3.2.0
 info:
   title: Machine Library Raw document downloads API
+  version: 0.1.0
+  contact:
+    email: contact@machinelibrary.ai
+    name: Machine Library
+    url: https://machinelibrary.ai/contacts
   description: 'Search, retrieve, and synthesize scholarly and public-interest documents through Machine Library, the search and AI product by Space Frontiers Company. Document recognition endpoints (`/v1/recognitions`: PDF, EPUB, and DJVU to structured Markdown) share this host and are described at `/v1/recognitions/docs/openapi.json`; the site reference at https://machinelibrary.ai/docs/api/reference presents both specs merged.'
   license:
-    name: MIT
     identifier: MIT
-  version: 0.1.0
+    name: MIT (API description only; retrieved content retains its own rights)
+  termsOfService: https://machinelibrary.ai/terms-of-service
 servers:
-- url: https://api.machinelibrary.ai
-  description: Machine Library
-- url: https://api.spacefrontiers.org
-  description: Space Frontiers (compatible endpoint)
+- description: Machine Library
+  url: https://api.machinelibrary.ai
+- description: Space Frontiers (compatible endpoint)
+  url: https://api.spacefrontiers.org
 tags:
 - name: Raw document downloads
   description: Authenticated, feature-gated streaming of PDF, EPUB, and DJVU library originals.
@@ -25,6 +30,8 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
       parameters:
       - name: filename
         in: path
@@ -57,7 +64,7 @@ paths:
               schema:
                 type: string
             X-Spent-Budget:
-              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing/world).
               schema:
                 type: string
           content:
@@ -91,7 +98,7 @@ paths:
               schema:
                 type: string
             X-Spent-Budget:
-              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing/world).
               schema:
                 type: string
           content:
@@ -215,6 +222,8 @@ paths:
       security:
       - api_key: []
       - bearer_auth: []
+      - oauth2:
+        - search
       parameters:
       - name: uri
         in: path
@@ -258,7 +267,7 @@ paths:
               schema:
                 type: string
             X-Spent-Budget:
-              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing/world).
               schema:
                 type: string
           content:
@@ -292,7 +301,7 @@ paths:
               schema:
                 type: string
             X-Spent-Budget:
-              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing).
+              description: Amount charged in USD for this request. See [current pricing](https://machinelibrary.ai/pricing/world).
               schema:
                 type: string
           content:
@@ -409,15 +418,28 @@ paths:
 components:
   securitySchemes:
     api_key:
-      type: apiKey
+      description: Machine Library API key from https://machinelibrary.ai/keys.
       in: header
       name: X-Api-Key
-      description: Machine Library API key from https://machinelibrary.ai/keys.
+      type: apiKey
     bearer_auth:
-      type: http
-      scheme: bearer
       bearerFormat: API key or OAuth 2.0 access token
       description: Send the same API key, or an OAuth 2.0 access token, as a Bearer token.
+      scheme: bearer
+      type: http
+    oauth2:
+      description: Authorization code with mandatory S256 PKCE. Public clients use dynamic registration; see https://machinelibrary.ai/auth.md. Access spends the consenting account's credits.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.machinelibrary.ai/v2/oauth/authorize
+          refreshUrl: https://api.machinelibrary.ai/v2/oauth/token
+          scopes:
+            search: Search and retrieve research documents using your account credits.
+          tokenUrl: https://api.machinelibrary.ai/v2/oauth/token
+      type: oauth2
+externalDocs:
+  description: Authentication, limits, errors, retries, and API lifecycle
+  url: https://machinelibrary.ai/docs/api/operations
 x-service-info:
   categories:
   - data

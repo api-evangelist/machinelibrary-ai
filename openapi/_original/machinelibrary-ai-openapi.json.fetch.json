@@ -1,0 +1,12 @@
+{
+ "url": "https://machinelibrary.ai/docs/openapi.json",
+ "final": "https://machinelibrary.ai/docs/openapi.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 98373,
+ "sha256": "7d0fda19256072b0e55d34a86a48756239ce394373d4e9959b4891a28a51be7b",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "re-archived: the provider's current document replaced a stale archive (roadmap#793); the old files are in openapi/_superseded/2026-10-19-stale"
+}
