@@ -323,3 +323,9 @@ x-service-info:
     apiReference: https://machinelibrary.ai/docs/api/reference
     homepage: https://machinelibrary.ai
     llms: https://machinelibrary.ai/llms.txt
+x-provenance:
+  method: harvested
+  publisher: Space Frontiers
+  source: https://machinelibrary.ai/docs/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
